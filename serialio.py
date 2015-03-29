@@ -16,6 +16,11 @@ class serialPort(QThread):
 	ioError = pyqtSignal(object)
 	ioException = pyqtSignal(object)
 	closed = pyqtSignal()
+	opened = pyqtSignal()
+	stopbits = serial.STOPBITS_ONE
+	noparity, evenparity, oddparity = serial.PARITY_NONE, serial.PARITY_EVEN, serial.PARITY_ODD
+	parity = noparity
+	bytesize = serial.EIGHTBITS
 
 	def __init__(self, rate=9600):
 		QThread.__init__(self) # needed for signals to work!!
@@ -49,26 +54,28 @@ class serialPort(QThread):
 		self.closed.emit()
 
 	def open(self, prefix, port, rate=None):
-		if self.opened():
+		if self.isOpen():
 			error("Already opened!")
 		else:
 			if rate == None:
 				self.rate = self.default
 			else:
 				self.rate = rate
+			self.prefix = prefix
 			self.name = port
 			portname = prefix+port
 			try:
 				self.port = serial.Serial(portname,
 										  rate,
 										  timeout=.01, # time to accumulate characters: 10 ms @ 115200, thats up to 115.2 chars
-										  parity='N', 
-										  stopbits=1,
+										  parity=self.parity, 
+										  stopbits=self.stopbits,
 										  xonxoff=0,
 										  rtscts=0, # hw flow control
-										  bytesize=8)
+										  bytesize=self.bytesize)
 				note('opened %s at %d'%(port, rate))
 				self.start() # run serial in thread
+				self.opened.emit()
 			except Exception, e:
 				if self.port:
 					self.port.close()
@@ -77,7 +84,7 @@ class serialPort(QThread):
 				raise Exception('open port failed for '+prefix+port)
 
 	def closePort(self):
-		if self.opened():
+		if self.isOpen():
 			port = self.port
 			self.port = None
 			port.flush()
@@ -95,7 +102,7 @@ class serialPort(QThread):
 		self.wait(1000)
 
 	def sink(self, s):
-		if self.opened():
+		if self.isOpen():
 			try:
 				self.port.write(s)
 				self.outputs += len(s)
@@ -109,10 +116,10 @@ class serialPort(QThread):
 		if self.rate != rate:
 			note('Baudrate changed to %d'%rate)
 			self.rate = rate
-		if self.opened():
+		if self.isOpen():
 			self.port.setBaudrate(rate)
 
-	def opened(self):
+	def isOpen(self):
 		if self.port:
 			return self.port.isOpen()
 		return False

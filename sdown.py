@@ -366,14 +366,14 @@ class sdownload(QObject):
 		self.mqRecv.start()
 		
 	def selectPort(self, port=None, rate=None):
-		if self.serialPort.opened():
+		if self.serialPort.isOpen():
 			self.serialPort.close()
 		if port:
 			self.portname = port
 		if rate:
 			self.serialPort.rate = rate
 		self.serialPort.open(self.prefix, self.portname, self.serialPort.rate)
-		if self.serialPort.opened():
+		if self.serialPort.isOpen():
 			self.serialPort.closed.connect(self.serialDone)
 			self.serialPort.ioError.connect(self.ioError)
 			self.serialPort.ioException.connect(self.ioError)

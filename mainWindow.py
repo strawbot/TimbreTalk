@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainWindow.ui'
 #
-# Created: Sun Oct 19 11:17:57 2014
+# Created: Thu Mar 26 16:54:26 2015
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -87,6 +87,12 @@ class Ui_MainWindow(object):
         self.BaudRate.addItem(_fromUtf8(""))
         self.BaudRate.addItem(_fromUtf8(""))
         self.horizontalLayout_10.addWidget(self.BaudRate)
+        self.toolButton = QtGui.QToolButton(self.groupBox_2)
+        self.toolButton.setText(_fromUtf8("N 8 1"))
+        self.toolButton.setPopupMode(QtGui.QToolButton.MenuButtonPopup)
+        self.toolButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextOnly)
+        self.toolButton.setObjectName(_fromUtf8("toolButton"))
+        self.horizontalLayout_10.addWidget(self.toolButton)
         self.verticalLayout.addLayout(self.horizontalLayout_10)
         self.horizontalLayout_11 = QtGui.QHBoxLayout()
         self.horizontalLayout_11.setObjectName(_fromUtf8("horizontalLayout_11"))
@@ -241,8 +247,21 @@ class Ui_MainWindow(object):
         self.inputIgnore.addItem(_fromUtf8(""))
         self.inputIgnore.addItem(_fromUtf8(""))
         self.horizontalLayout_12.addWidget(self.inputIgnore)
+        self.line = QtGui.QFrame(self.groupBox)
+        self.line.setFrameShape(QtGui.QFrame.VLine)
+        self.line.setFrameShadow(QtGui.QFrame.Sunken)
+        self.line.setObjectName(_fromUtf8("line"))
+        self.horizontalLayout_12.addWidget(self.line)
         spacerItem6 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_12.addItem(spacerItem6)
+        self.sendHex = QtGui.QPushButton(self.groupBox)
+        self.sendHex.setObjectName(_fromUtf8("sendHex"))
+        self.horizontalLayout_12.addWidget(self.sendHex)
+        self.hexNum = QtGui.QLineEdit(self.groupBox)
+        self.hexNum.setMinimumSize(QtCore.QSize(30, 0))
+        self.hexNum.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
+        self.hexNum.setObjectName(_fromUtf8("hexNum"))
+        self.horizontalLayout_12.addWidget(self.hexNum)
         self.verticalLayout_2.addLayout(self.horizontalLayout_12)
         self.verticalLayout_4.addWidget(self.groupBox)
         self.verticalLayout_14.addLayout(self.verticalLayout_4)
@@ -1390,6 +1409,7 @@ class Ui_MainWindow(object):
         self.inputIgnore.setItemText(1, QtGui.QApplication.translate("MainWindow", "Ignore CR", None, QtGui.QApplication.UnicodeUTF8))
         self.inputIgnore.setItemText(2, QtGui.QApplication.translate("MainWindow", "Ignore LF", None, QtGui.QApplication.UnicodeUTF8))
         self.inputIgnore.setItemText(3, QtGui.QApplication.translate("MainWindow", "Ignore CRLF", None, QtGui.QApplication.UnicodeUTF8))
+        self.sendHex.setText(QtGui.QApplication.translate("MainWindow", "Send Hex:", None, QtGui.QApplication.UnicodeUTF8))
         self.Controls.setTabText(self.Controls.indexOf(self.Serial), QtGui.QApplication.translate("MainWindow", "Serial", None, QtGui.QApplication.UnicodeUTF8))
         self.label_26.setText(QtGui.QApplication.translate("MainWindow", "Target:", None, QtGui.QApplication.UnicodeUTF8))
         self.unlockFlash.setText(QtGui.QApplication.translate("MainWindow", "Unlock", None, QtGui.QApplication.UnicodeUTF8))
@@ -1425,7 +1445,7 @@ class Ui_MainWindow(object):
         item = self.PackageTable.verticalHeaderItem(6)
         item.setText(QtGui.QApplication.translate("MainWindow", "IO App", None, QtGui.QApplication.UnicodeUTF8))
         item = self.PackageTable.verticalHeaderItem(7)
-        item.setText(QtGui.QApplication.translate("MainWindow", "SWB App", None, QtGui.QApplication.UnicodeUTF8))
+        item.setText(QtGui.QApplication.translate("MainWindow", "PM App", None, QtGui.QApplication.UnicodeUTF8))
         item = self.PackageTable.horizontalHeaderItem(0)
         item.setText(QtGui.QApplication.translate("MainWindow", "Left", None, QtGui.QApplication.UnicodeUTF8))
         item = self.PackageTable.horizontalHeaderItem(1)

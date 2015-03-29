@@ -160,6 +160,19 @@
                      </item>
                     </widget>
                    </item>
+                   <item>
+                    <widget class="QToolButton" name="toolButton">
+                     <property name="text">
+                      <string notr="true">N 8 1</string>
+                     </property>
+                     <property name="popupMode">
+                      <enum>QToolButton::MenuButtonPopup</enum>
+                     </property>
+                     <property name="toolButtonStyle">
+                      <enum>Qt::ToolButtonTextOnly</enum>
+                     </property>
+                    </widget>
+                   </item>
                   </layout>
                  </item>
                  <item>
@@ -541,6 +554,13 @@
                     </widget>
                    </item>
                    <item>
+                    <widget class="Line" name="line">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
                     <spacer name="horizontalSpacer">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
@@ -552,6 +572,26 @@
                       </size>
                      </property>
                     </spacer>
+                   </item>
+                   <item>
+                    <widget class="QPushButton" name="sendHex">
+                     <property name="text">
+                      <string>Send Hex:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLineEdit" name="hexNum">
+                     <property name="minimumSize">
+                      <size>
+                       <width>30</width>
+                       <height>0</height>
+                      </size>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
                    </item>
                   </layout>
                  </item>

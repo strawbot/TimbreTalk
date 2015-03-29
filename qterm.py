@@ -264,12 +264,12 @@ class terminal(QMainWindow):
 		self.serialPort.setRate(int(self.ui.BaudRate.currentText()))
 
 	def selectPort(self):
-		if self.serialPort.opened():
+		if self.serialPort.isOpen():
 			self.serialPort.close()
 		if self.ui.SerialPort.currentIndex():
 			self.portname = self.ui.SerialPort.currentText()
 			self.serialPort.open(self.prefix, self.portname, self.serialPort.rate)
-			if self.serialPort.opened():
+			if self.serialPort.isOpen():
 				self.serialPort.closed.connect(self.serialDone)
 				self.serialPort.ioError.connect(self.ioError)
 				self.serialPort.ioException.connect(self.ioError)
