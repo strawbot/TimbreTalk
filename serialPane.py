@@ -3,7 +3,7 @@
 from pyqtapi2 import *
 from message import *
 import sfsp, pids
-import sys
+import sys, traceback	
 
 class serialPane(QWidget):
 	def __init__(self, parent):
@@ -32,6 +32,7 @@ class serialPane(QWidget):
 		# menu for serial port parameters
 		paramenu = QMenu(self)
 		paramenu.addAction("N 8 1", lambda: self.setParam('N', 8, 1))
+		paramenu.addAction("E 8 1", lambda: self.setParam('E', 8, 1))
 		
 		paritymenu = paramenu.addMenu('Parity')
 		paritymenu.addAction('None', lambda: self.setParam('N',0,0))

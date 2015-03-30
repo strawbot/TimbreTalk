@@ -58,7 +58,7 @@
            <enum>Qt::NoContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="Serial">
            <attribute name="title">
@@ -1952,973 +1952,558 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
            <attribute name="title">
             <string>Test</string>
            </attribute>
-           <widget class="QToolBox" name="toolBox">
-            <property name="geometry">
-             <rect>
-              <x>5</x>
-              <y>13</y>
-              <width>361</width>
-              <height>401</height>
-             </rect>
-            </property>
-            <property name="currentIndex">
-             <number>6</number>
-            </property>
-            <widget class="QWidget" name="page">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>100</width>
-               <height>30</height>
-              </rect>
-             </property>
-             <attribute name="label">
-              <string>Nx File Transfer</string>
-             </attribute>
-             <widget class="QWidget" name="widget" native="true">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>106</y>
-                <width>231</width>
-                <height>21</height>
-               </rect>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QToolBox" name="toolBox">
+              <property name="currentIndex">
+               <number>2</number>
               </property>
-             </widget>
-             <widget class="QPushButton" name="readFile">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>150</y>
-                <width>110</width>
-                <height>32</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Read Lines</string>
-              </property>
-             </widget>
-             <widget class="QPushButton" name="readAll">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>118</y>
-                <width>94</width>
-                <height>32</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Read All</string>
-              </property>
-             </widget>
-             <widget class="QWidget" name="layoutWidget_8">
-              <property name="geometry">
-               <rect>
-                <x>80</x>
-                <y>40</y>
-                <width>61</width>
-                <height>24</height>
-               </rect>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_14">
-               <item>
-                <widget class="QLabel" name="label_25">
-                 <property name="text">
-                  <string>sfd:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="sfd">
-                 <property name="text">
-                  <string>0</string>
-                 </property>
-                 <property name="maxLength">
-                  <number>10</number>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QWidget" name="layoutWidget_7">
-              <property name="geometry">
-               <rect>
-                <x>150</x>
-                <y>40</y>
-                <width>61</width>
-                <height>24</height>
-               </rect>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_13">
-               <item>
-                <widget class="QLabel" name="label_24">
-                 <property name="text">
-                  <string>cfd:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="cfd">
-                 <property name="text">
-                  <string>0</string>
-                 </property>
-                 <property name="maxLength">
-                  <number>10</number>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QPushButton" name="openFile">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>79</y>
-                <width>102</width>
-                <height>32</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Open File</string>
-              </property>
-             </widget>
-             <widget class="QComboBox" name="access">
-              <property name="geometry">
-               <rect>
-                <x>110</x>
-                <y>80</y>
-                <width>101</width>
-                <height>26</height>
-               </rect>
-              </property>
-              <item>
-               <property name="text">
-                <string>Read Only</string>
+              <widget class="QWidget" name="page_0">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>344</width>
+                 <height>307</height>
+                </rect>
                </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Write Only</string>
-               </property>
-              </item>
-             </widget>
-             <widget class="QPushButton" name="closeFile">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>190</y>
-                <width>103</width>
-                <height>32</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Close File</string>
-              </property>
-             </widget>
-             <widget class="QWidget" name="layoutWidget_6">
-              <property name="geometry">
-               <rect>
-                <x>120</x>
-                <y>150</y>
-                <width>106</width>
-                <height>24</height>
-               </rect>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_4">
-               <item>
-                <widget class="QLineEdit" name="readSize">
-                 <property name="text">
-                  <string>100</string>
-                 </property>
-                 <property name="maxLength">
-                  <number>10</number>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_22">
-                 <property name="text">
-                  <string>x</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="numberLines">
-                 <property name="text">
-                  <string>1</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-             <widget class="QComboBox" name="transferfile">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>0</y>
-                <width>131</width>
-                <height>26</height>
-               </rect>
-              </property>
-              <item>
-               <property name="text">
-                <string>logfile</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>trendfile</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>trendsetupfile</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>debugfile</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>some file</string>
-               </property>
-              </item>
-             </widget>
-             <widget class="QPushButton" name="getFile">
-              <property name="geometry">
-               <rect>
-                <x>170</x>
-                <y>0</y>
-                <width>114</width>
-                <height>32</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Get File</string>
-              </property>
-             </widget>
-             <widget class="QWidget" name="layoutWidget">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>240</y>
-                <width>228</width>
-                <height>22</height>
-               </rect>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_8">
-               <item>
-                <widget class="QLabel" name="label_29">
-                 <property name="text">
-                  <string>Display:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="readOff">
-                 <property name="text">
-                  <string>Off</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="readText">
-                 <property name="text">
-                  <string>Text</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QRadioButton" name="readHex">
-                 <property name="text">
-                  <string>Hex</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-            <widget class="QWidget" name="Modus">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>100</width>
-               <height>30</height>
-              </rect>
-             </property>
-             <attribute name="label">
-              <string>Modbus</string>
-             </attribute>
-             <widget class="QWidget" name="layoutWidget_3">
-              <property name="geometry">
-               <rect>
-                <x>30</x>
-                <y>40</y>
-                <width>233</width>
-                <height>26</height>
-               </rect>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_5">
-               <item>
-                <widget class="QLabel" name="label_23">
-                 <property name="text">
-                  <string>Modbus Requests:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QComboBox" name="modbusRequests"/>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-            <widget class="QWidget" name="page_2">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>100</width>
-               <height>30</height>
-              </rect>
-             </property>
-             <attribute name="label">
-              <string>GUIDs</string>
-             </attribute>
-             <widget class="QWidget" name="layoutWidget">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>301</width>
-                <height>140</height>
-               </rect>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_10">
-               <item>
-                <widget class="QComboBox" name="guidSelect">
-                 <property name="minimumSize">
-                  <size>
-                   <width>301</width>
-                   <height>26</height>
-                  </size>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_26">
-                 <item alignment="Qt::AlignLeft">
-                  <widget class="QLabel" name="label_9">
-                   <property name="text">
-                    <string>Value:</string>
-                   </property>
-                  </widget>
-                 </item>
+               <attribute name="label">
+                <string>Stats</string>
+               </attribute>
+               <widget class="QWidget" name="layoutWidget">
+                <property name="geometry">
+                 <rect>
+                  <x>20</x>
+                  <y>21</y>
+                  <width>311</width>
+                  <height>189</height>
+                 </rect>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_16">
                  <item>
-                  <widget class="QLineEdit" name="guidValue">
-                   <property name="maximumSize">
-                    <size>
-                     <width>91</width>
-                     <height>22</height>
-                    </size>
-                   </property>
-                  </widget>
-                 </item>
-                 <item>
-                  <spacer name="horizontalSpacer_13">
-                   <property name="orientation">
-                    <enum>Qt::Horizontal</enum>
-                   </property>
-                   <property name="sizeHint" stdset="0">
-                    <size>
-                     <width>40</width>
-                     <height>20</height>
-                    </size>
-                   </property>
-                  </spacer>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <layout class="QHBoxLayout" name="horizontalLayout_25">
-                 <item>
-                  <layout class="QGridLayout" name="gridLayout_4">
-                   <item row="0" column="0">
-                    <widget class="QPushButton" name="getGuid">
-                     <property name="maximumSize">
-                      <size>
-                       <width>71</width>
-                       <height>32</height>
-                      </size>
-                     </property>
+                  <layout class="QGridLayout" name="gridLayout_5">
+                   <item row="0" column="1" alignment="Qt::AlignHCenter">
+                    <widget class="QLabel" name="label_12">
                      <property name="text">
-                      <string>Get</string>
+                      <string>Inputs</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
                      </property>
                     </widget>
                    </item>
-                   <item row="0" column="1">
-                    <widget class="QPushButton" name="setGuid">
-                     <property name="maximumSize">
-                      <size>
-                       <width>71</width>
-                       <height>32</height>
-                      </size>
-                     </property>
+                   <item row="0" column="2" alignment="Qt::AlignHCenter">
+                    <widget class="QLabel" name="label_11">
                      <property name="text">
-                      <string>Set</string>
+                      <string>Outputs</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignBottom|Qt::AlignHCenter</set>
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="0">
-                    <widget class="QPushButton" name="regGuid">
-                     <property name="maximumSize">
-                      <size>
-                       <width>71</width>
-                       <height>32</height>
-                      </size>
-                     </property>
+                   <item row="1" column="0" alignment="Qt::AlignRight">
+                    <widget class="QLabel" name="label_10">
                      <property name="text">
-                      <string>Reg</string>
+                      <string>Serial</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                      </property>
                     </widget>
                    </item>
                    <item row="1" column="1">
-                    <widget class="QPushButton" name="dregGuid">
-                     <property name="maximumSize">
-                      <size>
-                       <width>71</width>
-                       <height>32</height>
-                      </size>
+                    <widget class="QLineEdit" name="serialInputs">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="2">
+                    <widget class="QLineEdit" name="serialOutputs">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0" alignment="Qt::AlignRight">
+                    <widget class="QLabel" name="label_13">
+                     <property name="text">
+                      <string>SFP lo</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="1">
+                    <widget class="QLineEdit" name="sfpLoInputs">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="2">
+                    <widget class="QLineEdit" name="sfpLoOutputs">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="0" alignment="Qt::AlignRight">
+                    <widget class="QLabel" name="label_14">
+                     <property name="text">
+                      <string>SFP hi</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="1">
+                    <widget class="QLineEdit" name="sfpHiInputs">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="3" column="2">
+                    <widget class="QLineEdit" name="sfpHiOutputs">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="0" alignment="Qt::AlignRight">
+                    <widget class="QLabel" name="label_15">
+                     <property name="text">
+                      <string>Packets</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="1">
+                    <widget class="QLineEdit" name="inPackets">
+                     <property name="enabled">
+                      <bool>false</bool>
                      </property>
                      <property name="text">
-                      <string>Dereg</string>
+                      <string/>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="4" column="2">
+                    <widget class="QLineEdit" name="outPackets">
+                     <property name="enabled">
+                      <bool>false</bool>
+                     </property>
+                     <property name="text">
+                      <string/>
                      </property>
                     </widget>
                    </item>
                   </layout>
                  </item>
                  <item>
-                  <widget class="QCheckBox" name="guid16">
+                  <widget class="QPushButton" name="clearTranStats">
+                   <property name="maximumSize">
+                    <size>
+                     <width>81</width>
+                     <height>32</height>
+                    </size>
+                   </property>
                    <property name="text">
-                    <string>16</string>
+                    <string>Clear</string>
                    </property>
                   </widget>
                  </item>
                 </layout>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-            <widget class="QWidget" name="page_3">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>100</width>
-               <height>30</height>
-              </rect>
-             </property>
-             <attribute name="label">
-              <string>Load Test</string>
-             </attribute>
-             <widget class="QPushButton" name="loadRun">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>80</y>
-                <width>67</width>
-                <height>32</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Run</string>
-              </property>
-             </widget>
-             <widget class="QGroupBox" name="groupBox_8">
-              <property name="geometry">
-               <rect>
-                <x>20</x>
-                <y>130</y>
-                <width>161</width>
-                <height>51</height>
-               </rect>
-              </property>
-              <property name="title">
-               <string>Stats</string>
-              </property>
-              <widget class="QPushButton" name="clearStats">
+               </widget>
+              </widget>
+              <widget class="QWidget" name="page_1">
                <property name="geometry">
                 <rect>
-                 <x>10</x>
-                 <y>20</y>
-                 <width>67</width>
-                 <height>32</height>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>361</width>
+                 <height>299</height>
                 </rect>
                </property>
-               <property name="text">
-                <string>Clear</string>
-               </property>
-              </widget>
-              <widget class="QPushButton" name="getStats">
-               <property name="geometry">
-                <rect>
-                 <x>90</x>
-                 <y>20</y>
-                 <width>67</width>
-                 <height>32</height>
-                </rect>
-               </property>
-               <property name="text">
-                <string>Get</string>
-               </property>
-              </widget>
-             </widget>
-             <widget class="QWidget" name="layoutWidget_2">
-              <property name="geometry">
-               <rect>
-                <x>20</x>
-                <y>30</y>
-                <width>341</width>
-                <height>24</height>
-               </rect>
-              </property>
-              <layout class="QHBoxLayout" name="horizontalLayout_18">
-               <item>
-                <widget class="QLabel" name="label">
-                 <property name="text">
-                  <string>Frames:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="loadFrames">
-                 <property name="text">
-                  <string>1</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_27">
-                 <property name="text">
-                  <string>Length:</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="loadSize">
-                 <property name="text">
-                  <string>100</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLabel" name="label_28">
-                 <property name="text">
-                  <string>Delay(mS):</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QLineEdit" name="loadDelay">
-                 <property name="text">
-                  <string>1</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-            <widget class="QWidget" name="page_4">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>100</width>
-               <height>30</height>
-              </rect>
-             </property>
-             <attribute name="label">
-              <string>Stats</string>
-             </attribute>
-             <widget class="QWidget" name="layoutWidget">
-              <property name="geometry">
-               <rect>
-                <x>20</x>
-                <y>21</y>
-                <width>311</width>
-                <height>189</height>
-               </rect>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_16">
-               <item>
-                <layout class="QGridLayout" name="gridLayout_5">
-                 <item row="0" column="1" alignment="Qt::AlignHCenter">
-                  <widget class="QLabel" name="label_12">
-                   <property name="text">
-                    <string>Inputs</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="0" column="2" alignment="Qt::AlignHCenter">
-                  <widget class="QLabel" name="label_11">
-                   <property name="text">
-                    <string>Outputs</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="0" alignment="Qt::AlignRight">
-                  <widget class="QLabel" name="label_10">
-                   <property name="text">
-                    <string>Serial</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="1">
-                  <widget class="QLineEdit" name="serialInputs">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="1" column="2">
-                  <widget class="QLineEdit" name="serialOutputs">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="0" alignment="Qt::AlignRight">
-                  <widget class="QLabel" name="label_13">
-                   <property name="text">
-                    <string>SFP lo</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="1">
-                  <widget class="QLineEdit" name="sfpLoInputs">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="2" column="2">
-                  <widget class="QLineEdit" name="sfpLoOutputs">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="0" alignment="Qt::AlignRight">
-                  <widget class="QLabel" name="label_14">
-                   <property name="text">
-                    <string>SFP hi</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="1">
-                  <widget class="QLineEdit" name="sfpHiInputs">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="3" column="2">
-                  <widget class="QLineEdit" name="sfpHiOutputs">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="0" alignment="Qt::AlignRight">
-                  <widget class="QLabel" name="label_15">
-                   <property name="text">
-                    <string>Packets</string>
-                   </property>
-                   <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="1">
-                  <widget class="QLineEdit" name="inPackets">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                 <item row="4" column="2">
-                  <widget class="QLineEdit" name="outPackets">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string/>
-                   </property>
-                  </widget>
-                 </item>
-                </layout>
-               </item>
-               <item>
-                <widget class="QPushButton" name="clearTranStats">
-                 <property name="maximumSize">
-                  <size>
-                   <width>81</width>
+               <attribute name="label">
+                <string>Load Test</string>
+               </attribute>
+               <widget class="QPushButton" name="loadRun">
+                <property name="geometry">
+                 <rect>
+                  <x>10</x>
+                  <y>80</y>
+                  <width>67</width>
+                  <height>32</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Run</string>
+                </property>
+               </widget>
+               <widget class="QGroupBox" name="groupBox_8">
+                <property name="geometry">
+                 <rect>
+                  <x>20</x>
+                  <y>130</y>
+                  <width>161</width>
+                  <height>51</height>
+                 </rect>
+                </property>
+                <property name="title">
+                 <string>Stats</string>
+                </property>
+                <widget class="QPushButton" name="clearStats">
+                 <property name="geometry">
+                  <rect>
+                   <x>10</x>
+                   <y>20</y>
+                   <width>67</width>
                    <height>32</height>
-                  </size>
+                  </rect>
                  </property>
                  <property name="text">
                   <string>Clear</string>
                  </property>
                 </widget>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-            <widget class="QWidget" name="page_5">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>100</width>
-               <height>30</height>
-              </rect>
-             </property>
-             <attribute name="label">
-              <string>Power</string>
-             </attribute>
-             <widget class="QPushButton" name="setPower">
-              <property name="geometry">
-               <rect>
-                <x>100</x>
-                <y>60</y>
-                <width>114</width>
-                <height>32</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>Set Power</string>
-              </property>
-             </widget>
-             <widget class="QWidget" name="layoutWidget">
-              <property name="geometry">
-               <rect>
-                <x>20</x>
-                <y>0</y>
-                <width>71</width>
-                <height>146</height>
-               </rect>
-              </property>
-              <layout class="QVBoxLayout" name="verticalLayout_13">
-               <item>
-                <widget class="QCheckBox" name="displayPower">
+                <widget class="QPushButton" name="getStats">
+                 <property name="geometry">
+                  <rect>
+                   <x>90</x>
+                   <y>20</y>
+                   <width>67</width>
+                   <height>32</height>
+                  </rect>
+                 </property>
                  <property name="text">
-                  <string>Display</string>
+                  <string>Get</string>
                  </property>
                 </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="slotaPower">
-                 <property name="text">
-                  <string>Slot A</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="slotbPower">
-                 <property name="text">
-                  <string>Slot B</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="slot1Power">
-                 <property name="text">
-                  <string>Slot 1</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="slot2Power">
-                 <property name="text">
-                  <string>Slot 2</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="slot3Power">
-                 <property name="text">
-                  <string>Slot 3</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QCheckBox" name="slot4Power">
-                 <property name="text">
-                  <string>Slot 4</string>
-                 </property>
-                </widget>
-               </item>
-              </layout>
-             </widget>
-            </widget>
-            <widget class="QWidget" name="page_6">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>361</width>
-               <height>163</height>
-              </rect>
-             </property>
-             <attribute name="label">
-              <string>imx53</string>
-             </attribute>
-             <widget class="QWidget" name="layoutWidget">
-              <property name="geometry">
-               <rect>
-                <x>10</x>
-                <y>10</y>
-                <width>351</width>
-                <height>161</height>
-               </rect>
-              </property>
-              <layout class="QGridLayout" name="gridLayout_6">
-               <property name="horizontalSpacing">
-                <number>-1</number>
+               </widget>
+               <widget class="QWidget" name="layoutWidget_2">
+                <property name="geometry">
+                 <rect>
+                  <x>20</x>
+                  <y>30</y>
+                  <width>341</width>
+                  <height>24</height>
+                 </rect>
+                </property>
+                <layout class="QHBoxLayout" name="horizontalLayout_18">
+                 <item>
+                  <widget class="QLabel" name="label">
+                   <property name="text">
+                    <string>Frames:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="loadFrames">
+                   <property name="text">
+                    <string>1</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_27">
+                   <property name="text">
+                    <string>Length:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="loadSize">
+                   <property name="text">
+                    <string>100</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_28">
+                   <property name="text">
+                    <string>Delay(mS):</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLineEdit" name="loadDelay">
+                   <property name="text">
+                    <string>1</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </widget>
+              <widget class="QWidget" name="UARTBoot">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>344</width>
+                 <height>307</height>
+                </rect>
                </property>
-               <item row="3" column="1">
-                <widget class="QLineEdit" name="uimageSize">
-                 <property name="text">
-                  <string>0x3000000</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="2">
-                <widget class="QCheckBox" name="ubifs">
-                 <property name="text">
-                  <string>ubifs</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                 <property name="tristate">
-                  <bool>false</bool>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QLineEdit" name="uimageFile">
-                 <property name="text">
-                  <string>uImage</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="0">
-                <widget class="QPushButton" name="loadImage">
-                 <property name="text">
-                  <string>Load Image</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_30">
-                 <property name="text">
-                  <string>Size:</string>
-                 </property>
-                 <property name="alignment">
-                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="0">
-                <widget class="QPushButton" name="bootLinux">
-                 <property name="text">
-                  <string>Boot Linux</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="0">
-                <widget class="QPushButton" name="loadUboot">
-                 <property name="text">
-                  <string>Load Uboot</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="1">
-                <widget class="QLineEdit" name="ubootFile">
-                 <property name="text">
-                  <string>u-boot.imx.serial</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="0" column="2">
-                <widget class="QCheckBox" name="passthru">
-                 <property name="text">
-                  <string>passthru</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="4" column="1">
-                <widget class="QWidget" name="widget_2" native="true">
-                 <widget class="QRadioButton" name="left">
-                  <property name="geometry">
-                   <rect>
-                    <x>10</x>
-                    <y>0</y>
-                    <width>102</width>
-                    <height>20</height>
-                   </rect>
+               <attribute name="label">
+                <string>STM32 Boot Loader</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="verticalLayout_9" stretch="1,1,0,1,1,1,1,0">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="sizeConstraint">
+                 <enum>QLayout::SetNoConstraint</enum>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_22">
+                  <property name="spacing">
+                   <number>7</number>
                   </property>
-                  <property name="text">
-                   <string>Left</string>
+                  <item>
+                   <widget class="QPushButton" name="initBoot">
+                    <property name="text">
+                     <string>7F</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="Line" name="line_2">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="getCommand">
+                    <property name="text">
+                     <string>Get</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="gvCommand">
+                    <property name="text">
+                     <string>GV</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QPushButton" name="gidCommand">
+                    <property name="text">
+                     <string>GID</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_11">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>20</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_5">
+                  <property name="spacing">
+                   <number>7</number>
                   </property>
-                  <property name="checked">
-                   <bool>true</bool>
+                  <item>
+                   <widget class="QPushButton" name="readCommand">
+                    <property name="text">
+                     <string>Read</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_9">
+                    <property name="text">
+                     <string>Address:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="readAddress"/>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_22">
+                    <property name="text">
+                     <string>Length:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="readLength"/>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_8">
+                  <property name="spacing">
+                   <number>7</number>
+                  </property>
+                  <item>
+                   <widget class="QPushButton" name="goCommand">
+                    <property name="text">
+                     <string>Go</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_23">
+                    <property name="text">
+                     <string>Address:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="goAddress"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_12">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_13">
+                  <property name="spacing">
+                   <number>7</number>
+                  </property>
+                  <item>
+                   <widget class="QPushButton" name="writeCommand">
+                    <property name="text">
+                     <string>Write</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_24">
+                    <property name="text">
+                     <string>Address:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QLineEdit" name="writeAddress"/>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_7">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="writeLength">
+                    <property name="text">
+                     <string>Length</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QPlainTextEdit" name="writeData">
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>60</height>
+                   </size>
                   </property>
                  </widget>
-                 <widget class="QRadioButton" name="right">
-                  <property name="geometry">
-                   <rect>
-                    <x>60</x>
-                    <y>0</y>
-                    <width>102</width>
-                    <height>20</height>
-                   </rect>
-                  </property>
-                  <property name="text">
-                   <string>Right</string>
+                </item>
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_14">
+                  <item>
+                   <widget class="QPushButton" name="eraseCommand">
+                    <property name="text">
+                     <string>X Erase</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_13">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </item>
+                <item>
+                 <widget class="QPlainTextEdit" name="eraseData">
+                  <property name="maximumSize">
+                   <size>
+                    <width>16777215</width>
+                    <height>60</height>
+                   </size>
                   </property>
                  </widget>
-                </widget>
-               </item>
-              </layout>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
              </widget>
-            </widget>
-           </widget>
+            </item>
+           </layout>
           </widget>
           <widget class="QWidget" name="tab_2">
            <attribute name="title">

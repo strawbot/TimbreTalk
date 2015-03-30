@@ -4,21 +4,9 @@ from pyqtapi2 import *
 import time
 from message import *
 import sfsp, pids
-from modbusRequests import requests
 from endian import *
-import guidTest
 from random import randrange
-
-(NXFILE_OPEN_REQUEST,
-NXFILE_OPEN_RESPONSE,
-NXFILE_CLOSE_REQUEST,
-NXFILE_CLOSE_RESPONSE,
-NXFILE_READ_REQUEST,
-NXFILE_READ_RESPONSE,
-NXFILE_WRITE_REQUEST,
-NXFILE_WRITE_RESPONSE) = range(8)
-
-NXO_RDONLY, NXO_WRONLY = range(1,3)
+import traceback	
 
 class testPane(QWidget):
 	def __init__(self, parent):
@@ -29,26 +17,6 @@ class testPane(QWidget):
 		
 		self.transfer = 0
 
-		# modbus
-		self.ui.modbusRequests.activated.connect(self.modbusRequest)
-		for m in range(len(requests)):
-			self.ui.modbusRequests.addItem('%d (%d)'%(m,len(requests[m])))
-
-		# guids
-		self.guids = guidTest.guidTest(parent)
-		
-		# nx
-		self.readrepeat = 0
-		self.ui.openFile.clicked.connect(self.nxOpen)
-		self.ui.readFile.clicked.connect(self.nxRead)
-		self.ui.closeFile.clicked.connect(self.nxClose)
-		self.ui.readAll.clicked.connect(self.nxReadAll)
-		self.protocol.packetSource(pids.NXFILE, self.nxfilePacket)
-		
-		
-		# alt
-		self.protocol.packetSource(pids.ALT, self.altHandler)
-		
 		# load
 		self.loadTimer = QTimer()
 		self.loadTimer.timeout.connect(self.loadFrame)
@@ -60,120 +28,20 @@ class testPane(QWidget):
 		self.ui.getStats.clicked.connect(self.getStats)
 		self.protocol.packetSource(pids.STATS, self.showStats)
 
-		# power
-		self.ui.setPower.clicked.connect(self.sendPower)
+		# STM32 Boot Loader
+		self.ui.initBoot.clicked.connect(lambda: self.sendHex([0x7F]))
+		self.ui.getCommand.clicked.connect(lambda: self.sendHex([0x00,0xFF]))
+		self.ui.gvCommand.clicked.connect(lambda: self.sendHex([0x01,0xFE]))
+		self.ui.gidCommand.clicked.connect(lambda: self.sendHex([0x02,0xFD]))
+		self.ui.readCommand.clicked.connect(self.readCmd)
+		self.ui.goCommand.clicked.connect(self.goCmd)
+		self.ui.writeCommand.clicked.connect(self.writeCmd)
+		self.ui.eraseCommand.clicked.connect(self.eraseCmd)
+		self.ACK = chr(0x79)
 		
-		# imx53
-		self.ui.loadImage.clicked.connect(self.loadUimage)
-		self.ui.loadUboot.clicked.connect(self.loadUboot)
-		self.ui.bootLinux.clicked.connect(self.bootLinux)
+		self.ui.readAddress.setText('08000000')
+		self.ui.readLength.setText('10')
 
-	# alt
-	def altHandler(self, packet):
-		note('ALT: '+''.join(map(chr, packet[5:])))
-
-	# nx file
-	def cfd(self):
-		return shortList(int(self.ui.cfd.text()))
-
-	def sfd(self):
-		return shortList(int(self.ui.sfd.text()))
-	
-	def setCfd(self, i):
-		self.ui.cfd.setText(str(i))
-		
-	def setSfd(self, i):
-		self.ui.sfd.setText(str(i))
-		
-	def nxFile(self):
-		note( 'nxFile')
-		if self.transfer == 0:
-			self.transfer = 1
-			self.ui.getfile.setText("Abort")
-		else:
-			self.transfer = 0
-			self.ui.getfile.setText("Get File")
-
-#typedef struct {
-#	Byte pid;
-#	who_t who;
-#	tid_t tid;
-#	Byte spid;
-#	Byte payload[];
-#} filePacket_t;
-	
-	def nxfilePacket(self, packet):
-		size = 0
-		if self.ui.readText.isChecked():
-			messageDump( 'nxfilepacket: ', packet, 1)
-		elif self.ui.readHex.isChecked():
-			messageDump( 'nxfilepacket: ', packet)
-		spid = cast('BBBBB', packet)[4]
-		payload = packet[5:]
-		[cfd, sfd, err] = cast('HHB', payload)
-		self.setCfd(cfd)
-		self.setSfd(sfd)
-		if spid == NXFILE_OPEN_RESPONSE:
-			note('open response: %d, cfd: %d  sfd: %d'%(err, cfd, sfd))
-		elif spid == NXFILE_CLOSE_RESPONSE:
-			note('close response: %d, cfd: %d  sfd: %d'%(err, cfd, sfd))
-		elif spid == NXFILE_READ_RESPONSE:
-			size = len (payload) - 5
-			note('read response: %d, cfd: %d  sfd: %d  len: %d'%(err, cfd, sfd, size))
-		if self.readrepeat and size != 0:
-			self.readrepeat -= 1
-			self.nxReadLine()
-
-	def nxOpen(self):
-		self.readrepeat = 0
-		tid = [0, 0]
-		spid = [NXFILE_OPEN_REQUEST]
-		flags = [self.ui.access.currentIndex() + 1]
-		filename = map(ord, self.ui.transferfile.currentText()) + [0]
-		payload = self.cfd() + self.sfd() + flags + filename
-		packet = self.parent.who() + tid + spid + payload
-		self.protocol.sendNPS(pids.NXFILE, packet)
-	
-	def nxRead(self):
-		self.readrepeat = int(self.ui.numberLines.text()) - 1
-		self.nxReadLine()
-
-	def nxReadAll(self):
-		self.readrepeat = 1000
-		self.nxReadLine()
-
-	def nxReadLine(self):
-		tid = [0, 0]
-		spid = [NXFILE_READ_REQUEST]
-		size = [int(self.ui.readSize.text())]
-		payload = self.cfd() + self.sfd() + size
-		packet = self.parent.who() + tid + spid + payload
-		self.protocol.sendNPS(pids.NXFILE, packet)
-	
-	def nxClose(self):
-		tid = [0, 0]
-		spid = [NXFILE_CLOSE_REQUEST]
-		cfd = [0,0]
-		sfd = [0,1]
-		payload = self.cfd() + self.sfd()
-		packet = self.parent.who() + tid + spid + payload
-		self.protocol.sendNPS(pids.NXFILE, packet)
-	
-	# modbus
-	def modbusRequest(self, i):
-		payload = requests[i]
-		tid = [0, 0]
-		while payload:
-			length = len(payload)
-			if length > sfsp.MAX_SPID_PACKET_PAYLOAD:
-				length = sfsp.MAX_SPID_PACKET_PAYLOAD				
-				spid = [1] # should set to 1 for partial payload
-			else:
-				spid = [0] # should set to 0 for last payload
-			packet = self.parent.who() + tid + spid + payload[0:length]
-			self.protocol.sendNPS(pids.MODBUS, packet)
-			payload = payload[length::]
-	
 	# load test
 	def loadRun(self):
 		if self.loadFrames:
@@ -220,113 +88,66 @@ class testPane(QWidget):
 			if stats[i]:
 				note('%s: %i'%(statnames[i],stats[i]))
 	
-	# Power
-	def sendPower(self):
-		power = 0xFF # nothing on
-		if self.ui.displayPower.isChecked(): power &= ~0x40
-		if self.ui.slotaPower.isChecked(): power &= ~0x20
-		if self.ui.slotbPower.isChecked(): power &= ~0x10
-		if self.ui.slot1Power.isChecked(): power &= ~0x08
-		if self.ui.slot2Power.isChecked(): power &= ~0x04
-		if self.ui.slot3Power.isChecked(): power &= ~0x02
-		if self.ui.slot4Power.isChecked(): power &= ~0x01
-		self.parent.sendPhrase("reseti2c 0x%x bpower"%power)
-
-	# imx53
-	def loadUboot(self):
-		self.thread = uboot(self)
-		self.thread.setTerminationEnabled()
-		self.thread.start()
-		return
-		self.ui.loadUboot.setText('Abort')
-		def abortLoadUboot():
-			self.parent.selectPort()
-			self.thread.terminate()
-			self.thread.wait()
-			self.ui.loadUboot.setText('Load Uboot')
-			self.ui.loadUboot.clicked.connect(self.loadUboot)
-		self.ui.loadUboot.clicked.connect(abortLoadUboot)
-
-
-	def loadUimage(self): # for writing uImage from host1 usb stick to NAND
+	# STM32 Boot Loader
+	def sendHex(self, bytes):
 		try:
-			filename = self.ui.uimageFile.text()
-			bootsize = int(self.ui.uimageSize.text(), 0)
-			bootfrom = self.uimageAddress()
-			bootPhrase = 'setenv koffset 0x%x; setenv ksize 0x%x; usb start; fatload usb 0:1 0x70800000 %s; run nandkernargs; ${ekern}; ${wkern}'%(bootfrom, bootsize, filename)
-			self.parent.sendPhrase(bootPhrase)
+			note('sending: '+ reduce(lambda a,b: a+b, map(hex, bytes)))
+			self.parent.serialPort.sink(bytes)
 		except Exception, e:
-			print e
+			print >>sys.stderr, e
 			traceback.print_exc(file=sys.stderr)
 
-	def bootLinux(self): # run an uImage from NAND
-		def send(phrase):
-			self.parent.sendPhrase(phrase+'\r')
-			time.sleep (0.3)
-
-		bootsize = int(self.ui.uimageSize.text(), 0)
-		dramsize = 0x10000000
-		bootfrom = self.uimageAddress()
-		nexusbin = '/home/nexus/bin'
-		startup = 'startup'
-		usbmount = 'usbmount'
-		if self.ui.left.isChecked():
-			choice = 'left'
-		else:
-			choice = 'right'
-		console = 'ttymxc0'
-		mtdparts = 'mtdparts=mxc_nandv2_flash:16M(boot),48M(uImageLeft),48M(uImageRight),-(ubi)'
-
-		send("setenv cbootargs startup=%s/%s"%(nexusbin, startup))
-		send("setenv cbootargs ${cbootargs} usbmount=%s/%s "%(nexusbin, usbmount))
-		send("setenv cbootargs ${cbootargs} imageselect=%s "%choice)
-		send("setenv cbootargs ${cbootargs} video=mxcdi0fb:RGB666,VGA2 ")
-		send("setenv cbootargs ${cbootargs} di0_primary ")
-		send("setenv cbootargs ${cbootargs} ip=10.0.0.10 ")
-		send("setenv cbootargs ${cbootargs} consoleblank=0 ")
-		send("setenv cbootargs ${cbootargs} mem=%#x "%dramsize)
-		send("setenv mtdparts %s"%mtdparts)
-		send("setenv koffset %#x"%bootfrom)
-		send("setenv ksize %#x"%bootsize)
-		if self.ui.ubifs.checkState():
-			send("run ubifsboot")
-			pass
-		else: # 128MB
-			send("run nandboot")
-
-	def uimageAddress(self):
-		if self.ui.left.isChecked():
-			return 0x1000000
-		return 0x4000000
-
-class uboot(QThread):
-	def __init__(self, parent):
-		QThread.__init__(self) # needed for signals to work!!
-		self.parent = parent.parent
-		self.ui = parent.ui
-
-	def run(self):
-		try:
-			from iMX_Display_Serial_Download_Protocol import main
-			import sys
-
-			self.parent.serialPort.close()
-			file = str(self.ui.ubootFile.text())
-			portname = str(self.parent.prefix+self.parent.portname)
-			speed = ''
-			if self.ui.passthru.checkState():
-				speed = 'same'
-			sys.argv = ['serial_command', portname, 'exec%s'%speed, '0x777ffc00', file]
-			oldout, olderr = sys.stdout, sys.stderr
-			sys.stdout = sys.stderr = stdMessage
-			self.ui.loadUboot.setDisabled(True)
-			main()
-		except Exception, e:
-			print e
-			traceback.print_exc(file=sys.stderr)
-		finally:
-			self.ui.loadUboot.setEnabled(True)
-			self.parent.selectPort()
-			sys.stdout, sys.stderr = oldout, olderr
-			self.parent.sendPhrase(' \n')
+	def checksummed(self, bytes):
+		bytes.append(reduce(lambda a,b: a^b, bytes))
+		return bytes
 	
+	def checked(self, byte):
+		return (byte, ~byte&0xFF)
+
+	# command sequencer using signal from receive and iterator on sequences
+	# need to include a timeout
+	def bootSequence(self, sequences):
+		self.parent.serialPort.source.connect(self.nextSequence)
+		self.sequences = iter(sequences)
+		self.nextSequence(self.ACK)
+	
+	def nextSequence(self,ack):
+		try:
+			seq = self.sequences.next()
+			if ack != self.ACK:
+				error('NACK'+ack)
+				raise(StopIteration)
+			print seq
+			self.sendHex(seq)
+		except StopIteration:
+			self.parent.serialPort.source.disconnect(self.nextSequence)
+			note('done command')
+		except Exception, e:
+			print >>sys.stderr, e
+			traceback.print_exc(file=sys.stderr)
+
+	# sequenced commands
+	def readCmd(self):
+		try:
+			address = self.checksummed(bytearray.fromhex(self.ui.readAddress.text()))
+			print address
+			length = self.checked(int(self.ui.readLength.text()))
+			print length
+			self.bootSequence((self.checked(0x11), address, length))
+		except Exception, e:
+			print >>sys.stderr, e
+			traceback.print_exc(file=sys.stderr)
+
+	def goCmd(self):
+		address = self.checksummed(bytearray.fromhex(self.ui.goAddress.text()))
+		self.bootSequence((self.checked(0x21), address))
+
+	def writeCmd(self):
+		address = self.checksummed(bytearray.fromhex(self.ui.writeAddress.text()))
+		data = self.checksummed(bytearray.fromhex(self.ui.writedata.text()))
+		length = self.checked(len(data)-1)
+		self.bootSequence((self.checked(0x31), address, length, data ))
+
+	def eraseCmd(self):
+		pass
+
