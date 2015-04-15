@@ -2,7 +2,7 @@
 
 from pyqtapi2 import *
 from message import *
-import sfsp, pids
+import sfp, pids
 import sys, traceback	
 
 class serialPane(QWidget):
@@ -10,7 +10,7 @@ class serialPane(QWidget):
 		QWidget.__init__(self, parent)
 		self.parent = parent
 		self.ui = parent.ui
-		parent.protocol = sfsp.sfspProtocol()
+		parent.protocol = sfp.sfpProtocol()
 
 		self.portParametersMenu()
 
@@ -149,7 +149,7 @@ class serialPane(QWidget):
 		self.parent.protocol.sendNPS(talkout, payload)
 
 	def sendPing(self, flag):
-		self.parent.protocol.sendNPS(pids.PING, [])
+		self.parent.protocol.sendNPS(pids.PING, [self.parent.whoto, self.parent.whofrom])
 
 	def resetRcvr(self):
 		try:

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # GUI for serial transactions using Qt	Robert Chapman III	Sep 28, 2012
-version='1.20'
+version='1.0'
 
 from pyqtapi2 import *
 from cpuids import MAIN_HOST
@@ -12,9 +12,9 @@ updateUi('mainWindow')
 updateUi('tabs')
 
 from message import *
-import qterm, serialPane, srecordPane
-import packagepane
-import testpane, cpuids
+import qterm, serialPane, transferPane
+import infopane
+import utilitypane, cpuids
 import sys
 
 class qtran(qterm.terminal):
@@ -22,9 +22,9 @@ class qtran(qterm.terminal):
 		qterm.terminal.__init__(self)
 		self.whoto = self.whofrom = 0
 		self.serialPane = serialPane.serialPane(self)
-		srecordPane.srecordPane(self)
-		testpane.testPane(self)
-		packagepane.packagePane(self)
+		transferPane.srecordPane(self)
+		utilitypane.testPane(self)
+		infopane.infoPane(self)
 		self.listRoutes()
 
 		self.statTimer = QTimer()
@@ -70,7 +70,7 @@ class qtran(qterm.terminal):
 		self.ui.Controls.setCurrentIndex(SerialTab)
 	
 	def banner(self):
-		self.setWindowTitle('Qtran '+version)
+		self.setWindowTitle('Timbre Talk '+version)
 
 	def connectPort(self):
 		self.serialPane.connectPort()

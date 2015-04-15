@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1041</width>
-    <height>604</height>
+    <width>1031</width>
+    <height>597</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -36,6 +36,9 @@
         </property>
         <item>
          <widget class="QTabWidget" name="Controls">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="sizePolicy">
            <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
             <horstretch>0</horstretch>
@@ -58,7 +61,7 @@
            <enum>Qt::NoContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>2</number>
           </property>
           <widget class="QWidget" name="Serial">
            <attribute name="title">
@@ -602,9 +605,9 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="SRecords">
+          <widget class="QWidget" name="Transfer">
            <attribute name="title">
-            <string>S-Records</string>
+            <string>Transfer</string>
            </attribute>
            <widget class="QFrame" name="srecordTargets">
             <property name="geometry">
@@ -654,13 +657,22 @@
                   </spacer>
                  </item>
                  <item>
-                  <widget class="QPushButton" name="unlockFlash">
-                   <property name="enabled">
-                    <bool>false</bool>
-                   </property>
-                   <property name="text">
-                    <string>Unlock</string>
-                   </property>
+                  <widget class="QComboBox" name="comboBox">
+                   <item>
+                    <property name="text">
+                     <string>S-Record</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Intel Hex</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>Binary</string>
+                    </property>
+                   </item>
                   </widget>
                  </item>
                 </layout>
@@ -1095,862 +1107,216 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
           </widget>
           <widget class="QWidget" name="Packages">
            <attribute name="title">
-            <string>Packages</string>
+            <string>Info</string>
            </attribute>
-           <widget class="QTableWidget" name="PackageTable">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>50</y>
-              <width>240</width>
-              <height>261</height>
-             </rect>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="verticalScrollBarPolicy">
-             <enum>Qt::ScrollBarAlwaysOff</enum>
-            </property>
-            <property name="horizontalScrollBarPolicy">
-             <enum>Qt::ScrollBarAlwaysOff</enum>
-            </property>
-            <property name="autoScroll">
-             <bool>true</bool>
-            </property>
-            <property name="editTriggers">
-             <set>QAbstractItemView::NoEditTriggers</set>
-            </property>
-            <property name="tabKeyNavigation">
-             <bool>false</bool>
-            </property>
-            <property name="showDropIndicator" stdset="0">
-             <bool>false</bool>
-            </property>
-            <property name="dragDropOverwriteMode">
-             <bool>false</bool>
-            </property>
-            <property name="alternatingRowColors">
-             <bool>false</bool>
-            </property>
-            <property name="wordWrap">
-             <bool>false</bool>
-            </property>
-            <property name="rowCount">
-             <number>8</number>
-            </property>
-            <property name="columnCount">
-             <number>2</number>
-            </property>
-            <attribute name="horizontalHeaderDefaultSectionSize">
-             <number>80</number>
-            </attribute>
-            <attribute name="horizontalHeaderMinimumSectionSize">
-             <number>2</number>
-            </attribute>
-            <attribute name="verticalHeaderHighlightSections">
-             <bool>true</bool>
-            </attribute>
-            <attribute name="verticalHeaderMinimumSectionSize">
-             <number>14</number>
-            </attribute>
-            <row>
-             <property name="text">
-              <string>Package</string>
-             </property>
-             <property name="font">
-              <font>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="background">
-              <color>
-               <red>230</red>
-               <green>230</green>
-               <blue>230</blue>
-              </color>
-             </property>
-             <property name="foreground">
-              <brush brushstyle="NoBrush">
-               <color alpha="255">
-                <red>0</red>
-                <green>0</green>
-                <blue>255</blue>
-               </color>
-              </brush>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Launcher</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Main App</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>uBoot</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Linux</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>Display App</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>IO App</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>PM App</string>
-             </property>
-            </row>
-            <column>
-             <property name="text">
-              <string>Left</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Right</string>
-             </property>
-            </column>
-            <item row="0" column="0">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
+           <layout class="QVBoxLayout" name="verticalLayout_10">
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_24">
+              <item>
+               <widget class="QPushButton" name="Refresh">
+                <property name="text">
+                 <string>Refresh</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_16">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+             </layout>
             </item>
-            <item row="0" column="1">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_23">
+              <item>
+               <widget class="QGroupBox" name="groupBox_3">
+                <property name="title">
+                 <string>Choice</string>
+                </property>
+                <layout class="QFormLayout" name="formLayout">
+                 <property name="leftMargin">
+                  <number>4</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>4</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>4</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>4</number>
+                 </property>
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_33">
+                   <property name="text">
+                    <string>Running:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLabel" name="runningChoiceStatus">
+                   <property name="minimumSize">
+                    <size>
+                     <width>50</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: rgb(255, 255, 255);</string>
+                   </property>
+                   <property name="text">
+                    <string>Left</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_34">
+                   <property name="text">
+                    <string>Pending:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLabel" name="pendingChoiceStatus">
+                   <property name="minimumSize">
+                    <size>
+                     <width>50</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">background-color: rgb(255, 255, 255);</string>
+                   </property>
+                   <property name="text">
+                    <string>Invalid</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <layout class="QFormLayout" name="formLayout_2">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_35">
+                  <property name="text">
+                   <string>Magic:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QLabel" name="magicStatus">
+                  <property name="styleSheet">
+                   <string notr="true">background-color: rgb(255, 255, 255);</string>
+                  </property>
+                  <property name="text">
+                   <string>Fail</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_36">
+                  <property name="text">
+                   <string>Checksum:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QLabel" name="checksumStatus">
+                  <property name="styleSheet">
+                   <string notr="true">background-color: rgb(255, 255, 255);</string>
+                  </property>
+                  <property name="text">
+                   <string>Fail</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
             </item>
-            <item row="1" column="0">
-             <property name="text">
-              <string>empty</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
+            <item>
+             <widget class="QGroupBox" name="groupBox_4">
+              <property name="title">
+               <string>Versions</string>
+              </property>
+              <layout class="QHBoxLayout" name="horizontalLayout_25">
+               <item>
+                <layout class="QGridLayout" name="gridLayout_4">
+                 <item row="0" column="0">
+                  <widget class="QLabel" name="label_25">
+                   <property name="text">
+                    <string>Boot</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="0" column="1">
+                  <widget class="QLineEdit" name="bootVersion"/>
+                 </item>
+                 <item row="1" column="0">
+                  <widget class="QLabel" name="label_30">
+                   <property name="text">
+                    <string>Left App</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QLineEdit" name="leftAppVersion"/>
+                 </item>
+                 <item row="2" column="0">
+                  <widget class="QLabel" name="label_31">
+                   <property name="text">
+                    <string>Right App</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="1">
+                  <widget class="QLineEdit" name="rightAppVersion"/>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_17">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+              </layout>
+             </widget>
             </item>
-            <item row="1" column="1">
-             <property name="text">
-              <string>unknown</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>141</height>
+               </size>
+              </property>
+             </spacer>
             </item>
-            <item row="2" column="0">
-             <property name="text">
-              <string>bad header</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="2" column="1">
-             <property name="text">
-              <string>bad image</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="3" column="0">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="3" column="1">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="4" column="0">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="4" column="1">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="5" column="0">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="5" column="1">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="6" column="0">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="6" column="1">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="7" column="0">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="7" column="1">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-           </widget>
-           <widget class="QPushButton" name="Refresh">
-            <property name="geometry">
-             <rect>
-              <x>30</x>
-              <y>0</y>
-              <width>90</width>
-              <height>32</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Refresh</string>
-            </property>
-           </widget>
-           <widget class="QGroupBox" name="groupBox_3">
-            <property name="geometry">
-             <rect>
-              <x>260</x>
-              <y>30</y>
-              <width>121</width>
-              <height>71</height>
-             </rect>
-            </property>
-            <property name="title">
-             <string>Choice</string>
-            </property>
-            <layout class="QFormLayout" name="formLayout">
-             <property name="leftMargin">
-              <number>4</number>
-             </property>
-             <property name="topMargin">
-              <number>4</number>
-             </property>
-             <property name="rightMargin">
-              <number>4</number>
-             </property>
-             <property name="bottomMargin">
-              <number>4</number>
-             </property>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_33">
-               <property name="text">
-                <string>Running:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QLabel" name="runningChoiceStatus">
-               <property name="minimumSize">
-                <size>
-                 <width>50</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">background-color: rgb(255, 255, 255);</string>
-               </property>
-               <property name="text">
-                <string>Left</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_34">
-               <property name="text">
-                <string>Pending:</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="pendingChoiceStatus">
-               <property name="minimumSize">
-                <size>
-                 <width>50</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="styleSheet">
-                <string notr="true">background-color: rgb(255, 255, 255);</string>
-               </property>
-               <property name="text">
-                <string>Invalid</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-           <widget class="QTableWidget" name="SlotTable">
-            <property name="geometry">
-             <rect>
-              <x>10</x>
-              <y>350</y>
-              <width>361</width>
-              <height>81</height>
-             </rect>
-            </property>
-            <property name="verticalScrollBarPolicy">
-             <enum>Qt::ScrollBarAlwaysOff</enum>
-            </property>
-            <property name="horizontalScrollBarPolicy">
-             <enum>Qt::ScrollBarAlwaysOff</enum>
-            </property>
-            <property name="editTriggers">
-             <set>QAbstractItemView::NoEditTriggers</set>
-            </property>
-            <property name="tabKeyNavigation">
-             <bool>false</bool>
-            </property>
-            <property name="showDropIndicator" stdset="0">
-             <bool>false</bool>
-            </property>
-            <property name="dragDropOverwriteMode">
-             <bool>false</bool>
-            </property>
-            <attribute name="horizontalHeaderDefaultSectionSize">
-             <number>80</number>
-            </attribute>
-            <row>
-             <property name="text">
-              <string>SlotA</string>
-             </property>
-            </row>
-            <row>
-             <property name="text">
-              <string>SlotB</string>
-             </property>
-            </row>
-            <column>
-             <property name="text">
-              <string>Type</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Boot</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>Hiboot</string>
-             </property>
-            </column>
-            <column>
-             <property name="text">
-              <string>App</string>
-             </property>
-            </column>
-            <item row="0" column="0">
-             <property name="text">
-              <string>Empty</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-            </item>
-            <item row="0" column="1">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="0" column="2">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsSelectable|ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="0" column="3">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="1" column="0">
-             <property name="text">
-              <string>Empty</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="1" column="1">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="1" column="2">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-            <item row="1" column="3">
-             <property name="text">
-              <string/>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-           </widget>
-           <widget class="QTableWidget" name="MainbootTable">
-            <property name="geometry">
-             <rect>
-              <x>290</x>
-              <y>200</y>
-              <width>81</width>
-              <height>51</height>
-             </rect>
-            </property>
-            <attribute name="horizontalHeaderDefaultSectionSize">
-             <number>80</number>
-            </attribute>
-            <attribute name="verticalHeaderVisible">
-             <bool>false</bool>
-            </attribute>
-            <row>
-             <property name="text">
-              <string>New Row</string>
-             </property>
-            </row>
-            <column>
-             <property name="text">
-              <string>Main Boot</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>13</pointsize>
-              </font>
-             </property>
-            </column>
-            <item row="0" column="0">
-             <property name="text">
-              <string>1.1.1</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-           </widget>
-           <widget class="QLabel" name="label_31">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>30</y>
-              <width>62</width>
-              <height>16</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Packages:</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_32">
-            <property name="geometry">
-             <rect>
-              <x>0</x>
-              <y>330</y>
-              <width>62</width>
-              <height>16</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Slots:</string>
-            </property>
-           </widget>
-           <widget class="QTableWidget" name="DatabaseTable">
-            <property name="geometry">
-             <rect>
-              <x>290</x>
-              <y>260</y>
-              <width>81</width>
-              <height>51</height>
-             </rect>
-            </property>
-            <attribute name="horizontalHeaderDefaultSectionSize">
-             <number>80</number>
-            </attribute>
-            <attribute name="verticalHeaderVisible">
-             <bool>false</bool>
-            </attribute>
-            <row>
-             <property name="text">
-              <string>New Row</string>
-             </property>
-            </row>
-            <column>
-             <property name="text">
-              <string>Database</string>
-             </property>
-            </column>
-            <item row="0" column="0">
-             <property name="text">
-              <string>1.1.1</string>
-             </property>
-             <property name="font">
-              <font>
-               <pointsize>10</pointsize>
-              </font>
-             </property>
-             <property name="textAlignment">
-              <set>AlignHCenter|AlignVCenter|AlignCenter</set>
-             </property>
-             <property name="flags">
-              <set>ItemIsUserCheckable|ItemIsEnabled</set>
-             </property>
-            </item>
-           </widget>
-           <widget class="QLabel" name="label_35">
-            <property name="geometry">
-             <rect>
-              <x>260</x>
-              <y>120</y>
-              <width>62</width>
-              <height>16</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Magic:</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="label_36">
-            <property name="geometry">
-             <rect>
-              <x>260</x>
-              <y>140</y>
-              <width>81</width>
-              <height>16</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Checksum:</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="magicStatus">
-            <property name="geometry">
-             <rect>
-              <x>340</x>
-              <y>120</y>
-              <width>62</width>
-              <height>16</height>
-             </rect>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: rgb(255, 255, 255);</string>
-            </property>
-            <property name="text">
-             <string>Fail</string>
-            </property>
-           </widget>
-           <widget class="QLabel" name="checksumStatus">
-            <property name="geometry">
-             <rect>
-              <x>340</x>
-              <y>140</y>
-              <width>62</width>
-              <height>16</height>
-             </rect>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">background-color: rgb(255, 255, 255);</string>
-            </property>
-            <property name="text">
-             <string>Fail</string>
-            </property>
-           </widget>
-           <widget class="QPushButton" name="Rebuild">
-            <property name="geometry">
-             <rect>
-              <x>160</x>
-              <y>0</y>
-              <width>90</width>
-              <height>32</height>
-             </rect>
-            </property>
-            <property name="text">
-             <string>Rebuild</string>
-            </property>
-           </widget>
+           </layout>
           </widget>
-          <widget class="QWidget" name="tab">
+          <widget class="QWidget" name="Utility">
            <attribute name="title">
-            <string>Test</string>
+            <string>Utility</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
             <item>
@@ -1963,8 +1329,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>344</width>
-                 <height>307</height>
+                 <width>360</width>
+                 <height>315</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2127,8 +1493,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>361</width>
-                 <height>299</height>
+                 <width>100</width>
+                 <height>30</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2246,8 +1612,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>344</width>
-                 <height>307</height>
+                 <width>360</width>
+                 <height>315</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2347,7 +1713,11 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="readAddress"/>
+                   <widget class="QLineEdit" name="readAddress">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
                   </item>
                   <item>
                    <widget class="QLabel" name="label_22">
@@ -2357,7 +1727,11 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                    </widget>
                   </item>
                   <item>
-                   <widget class="QLineEdit" name="readLength"/>
+                   <widget class="QLineEdit" name="readLength">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
                   </item>
                  </layout>
                 </item>
@@ -2931,7 +2305,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1041</width>
+     <width>1031</width>
      <height>22</height>
     </rect>
    </property>
@@ -2959,8 +2333,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="serialProtocol"/>
   <buttongroup name="LfOut"/>
   <buttongroup name="CrOut"/>
+  <buttongroup name="serialProtocol"/>
  </buttongroups>
 </ui>

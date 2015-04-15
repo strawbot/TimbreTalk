@@ -3,7 +3,7 @@
 from pyqtapi2 import *
 import time
 from message import *
-import sfsp, pids
+import sfp, pids
 from endian import *
 from random import randrange
 import traceback	
@@ -23,11 +23,6 @@ class testPane(QWidget):
 		self.loadFrames = 0
 		self.ui.loadRun.clicked.connect(self.loadRun)
 		
-		# stats
-		self.ui.clearStats.clicked.connect(self.clearStats)
-		self.ui.getStats.clicked.connect(self.getStats)
-		self.protocol.packetSource(pids.STATS, self.showStats)
-
 		# STM32 Boot Loader
 		self.ui.initBoot.clicked.connect(lambda: self.sendHex([0x7F]))
 		self.ui.getCommand.clicked.connect(lambda: self.sendHex([0x00,0xFF]))
@@ -63,31 +58,6 @@ class testPane(QWidget):
 			self.ui.loadRun.setText('Run')
 			self.loadTimer.stop()
 
-	# stats
-	def getStats(self):
-		self.protocol.sendNPS(pids.GET_STATS, self.parent.who())
-		
-	def clearStats(self):
-		self.protocol.sendNPS(pids.CLEAR_STATS, self.parent.who())
-		
-	def showStats(self, packet):
-		statnames = [
-			'long_frame',
-			'short_frame',
-			'tossed',
-			'good_frame',
-			'bad_checksum',
-			'timeouts',
-			'resends',
-			'rx_overflow',
-			'sent_frames',
-			'unknown_packets',
-			'unrouted']
-		stats = cast('BB11L', packet)[2:]
-		for i in range(len(stats)):
-			if stats[i]:
-				note('%s: %i'%(statnames[i],stats[i]))
-	
 	# STM32 Boot Loader
 	def sendHex(self, bytes):
 		try:

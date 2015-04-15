@@ -27,7 +27,7 @@ printme = 0	# set to 1 to print >>sys.stderr, debug statements
 from pyqtapi2 import *
 
 import sys, traceback
-import listports, pids, serialio, sfsp
+import listports, pids, serialio, sfp
 from message import *
 from cpuids import *
 import recover, srecordTransfer
@@ -103,7 +103,7 @@ class sdownload(QObject):
 		# check for what to do
 		if self.parameters['recover'] or self.parameters['file'] or self.parameters['fwDbOp'] or self.parameters['guid'] or self.parameters['dereg']:
 			# protocol
-			self.protocol = sfsp.sfspProtocol()
+			self.protocol = sfp.sfpProtocol()
 			self.protocol.packetSource(pids.ALT, self.nullPacketHandler)
 			self.protocol.packetSource(pids.GUID, self.nullPacketHandler)
 

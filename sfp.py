@@ -1,6 +1,6 @@
-# SFSP Small Frame Synchronous Protocol  Robert Chapman III  Jul 4, 2012
+# SFP Small Frame Synchronous Protocol  Robert Chapman III  Jul 4, 2012
 
-# sfsp format: |0 length |1 sync |2 pid |3 payload | checksum |
+# sfp format: |0 length |1 sync |2 pid |3 payload | checksum |
 #  sync = ~length
 #  length = sizeof payload + 4
 #  pid = TALK_OUT
@@ -16,28 +16,35 @@ from message import *
 # packet ids
 from pids import *
 
-MAX_PACKET_LENGTH = 100		# this should be shared with sfap.py
-MAX_PAYLOAD_LENGTH = MAX_PACKET_LENGTH - 1 # pid not part of payload
-MIN_SFSP_LENGTH = 4
-FRAME_OVERHEAD = (MIN_SFSP_LENGTH - 1) # bytes used for transporting frame excluding pid
-MIN_SFSP_FRAME = (MIN_SFSP_LENGTH + 1) # length, sync, pid, checksum(2)
-MAX_SFSP_LENGTH = (MAX_PACKET_LENGTH + MIN_SFSP_LENGTH)
-MAX_SFSP_FRAME = (MAX_SFSP_LENGTH + 1)
-PACKET_OVERHEAD = 1 		# pid
-WHO_SIZE = 2
-WHO_PACKET_OVERHEAD = (PACKET_OVERHEAD+WHO_SIZE)   # pid, who
-TID_SIZE = 2
-SPID_SIZE = 1
-SPID_PACKET_OVERHEAD = WHO_PACKET_OVERHEAD + TID_SIZE + SPID_SIZE   # pid, who, tid, spid
-MAX_WHO_PACKET_PAYLOAD = (MAX_PACKET_LENGTH - WHO_PACKET_OVERHEAD)
-MAX_SPID_PACKET_PAYLOAD = (MAX_PACKET_LENGTH - SPID_PACKET_OVERHEAD)
+# no more than 254; set according to link resources; this should be shared with embedded side or derived
+MAX_FRAME_LENGTH = 254
 
+# frame trappings
+LENGTH_LENGTH = 1
+SYNC_LENGTH = 1
+PID_LENGTH = 1
+CHECKSUM_LENGTH = 2
+
+# defines - lengths in bytes
+MIN_FRAME_LENGTH = (SYNC_LENGTH + PID_LENGTH + CHECKSUM_LENGTH)
+MAX_SFP_SIZE = (LENGTH_LENGTH + MAX_FRAME_LENGTH)
+MIN_SFP_SIZE = (LENGTH_LENGTH + MIN_FRAME_LENGTH)
+MAX_PACKET_LENGTH = (MAX_FRAME_LENGTH - MIN_FRAME_LENGTH)
+MAX_PAYLOAD_LENGTH = (MAX_PACKET_LENGTH - PID_LENGTH)
+WHO_LENGTH = 2
+WHO_HEADER_SIZE = (PID_LENGTH + WHO_LENGTH)
+MAX_WHO_PAYLOAD_LENGTH = (MAX_PACKET_LENGTH - WHO_HEADER_SIZE)
+FRAME_OVERHEAD = (MIN_FRAME_LENGTH - PID_LENGTH)
+FRAME_HEADER = (LENGTH_LENGTH + SYNC_LENGTH)
+PACKET_HEADER = (PID_LENGTH)
+
+# status for lengths
 LENGTH_OK = 1
 LENGTH_LONG = 2
 LENGTH_SHORT = 3
 
 # protocol class
-class sfspProtocol(QThread):
+class sfpProtocol(QThread):
 	
 	source = Signal(object)
 	byteTimeout = Signal()
@@ -47,8 +54,8 @@ class sfspProtocol(QThread):
 	VERBOSE = 0
 
 	def __init__(self):
-		super(sfspProtocol, self).__init__() # needed for signals to work!!
-		self.sfspState = self.hunting	# states: hunting, syncing, receiving
+		super(sfpProtocol, self).__init__() # needed for signals to work!!
+		self.sfpState = self.hunting	# states: hunting, syncing, receiving
 		self.talkTarget = 0
 		self.lastsink = time.time()
 		self.loinputs = 0
@@ -111,7 +118,7 @@ class sfspProtocol(QThread):
 				error("Frame timeout - resetting receiver")
 				self.byteTimeout.emit()
 			else:
-				self.sfspState()					
+				self.sfpState()					
 		self.lastsink = t
 
 	# shutdown signal
@@ -120,14 +127,14 @@ class sfspProtocol(QThread):
 #		note('shutting down SFP\n\r')
 
 	def resetRx(self):
-		self.sfspState = self.hunting
+		self.sfpState = self.hunting
 		del self.frame[:]
 
 	def initRx(self): # to reinitialize an unsynced recevier
- 		warning("Receiver reset from state: %s  frame size: %i"%(self.sfspState.__name__, len(self.frame)))
+ 		warning("Receiver reset from state: %s  frame size: %i"%(self.sfpState.__name__, len(self.frame)))
 		self.resetRx()
 
-	# sending SFSP frames
+	# sending SFP frames
 	def sendNPS(self, pid, payload): # send a payload via normal packet service
 		self.outpackets += 1
 		self.hioutputs += len(payload) + 1
@@ -142,32 +149,32 @@ class sfspProtocol(QThread):
 			frame.append(i)
 		sum1, sum2 = self.checkSum(frame)
 		frame.extend([sum1 & 0xff, sum2 & 0xff])
-#		print >>sys.stderr, 'sfsp lower source %s'%type(frame)
+#		print >>sys.stderr, 'sfp lower source %s'%type(frame)
 		self.source.emit(''.join(map(chr, frame)))
 		if self.VERBOSE:
 			messageDump("\nFrame TX:",frame)
 		self.looutputs += len(frame)
 	
-	# receiving SFSP frames
+	# receiving SFP frames
 	
 	def routeFrame(self): # pass frame to packet layer
-		#print >>sys.stderr, 'sfsp upper source %s'%type(self.frame)
+		#print >>sys.stderr, 'sfp upper source %s'%type(self.frame)
 		pid = self.frame[2]
 		if pid: # pid of zero is empty sps packet
 			self.packetq.put(self.frame[2:self.frame[0]-1])
 			# [6,~6,pid,x,y,cs1,cs2] packet = pid,x,y
 	
 	# support
-	def sfspLengthOk(self, length):
-		if length >= MIN_SFSP_LENGTH:
-			if length <= MAX_SFSP_LENGTH:
+	def sfpLengthOk(self, length):
+		if length >= MIN_SFP_SIZE:
+			if length <= MAX_SFP_SIZE:
 				return LENGTH_OK
 			elif length < 255:
 				return LENGTH_LONG
 		else:
 			return LENGTH_SHORT
 	
-	def sfspSync(self, length, sync):
+	def sfpSync(self, length, sync):
 		return (~length & 0xFF) == sync
 
 	def frameOk(self): # check checksum
@@ -185,12 +192,12 @@ class sfspProtocol(QThread):
 	# Receiver states
 	def hunting(self): # look for frame length
 		if len(self.frame) > 0:
-			lengthValue = self.sfspLengthOk(self.frame[0])
+			lengthValue = self.sfpLengthOk(self.frame[0])
 			if lengthValue is LENGTH_OK:
-				self.sfspState = self.syncing
+				self.sfpState = self.syncing
 				self.frameStart = time.time() # use to discard stale bytes
 				self.bytesToReceive = self.frame[0]
-				self.sfspState() # recursive
+				self.sfpState() # recursive
 			else:
 				if lengthValue is LENGTH_SHORT:
 					error("host: short frame")
@@ -200,11 +207,11 @@ class sfspProtocol(QThread):
 				
 	def syncing(self): # wait for sync byte
 		if len(self.frame) > 2:
-			if self.sfspSync(self.frame[0], self.frame[1]):
+			if self.sfpSync(self.frame[0], self.frame[1]):
 				if self.VERBOSE:
 					note("host: synced")
-				self.sfspState = self.receiving
-				self.sfspState() # recursive
+				self.sfpState = self.receiving
+				self.sfpState() # recursive
 			else:
 				if self.VERBOSE:
 					error("host: not synced")
@@ -212,7 +219,7 @@ class sfspProtocol(QThread):
 
 	def receiving(self): # receive rest of frame
 		if len(self.frame) > self.frame[0]:
-			self.sfspState = self.hunting
+			self.sfpState = self.hunting
 			if self.frameOk():
 				if self.VERBOSE:
 					note("host: good frame")
@@ -222,7 +229,7 @@ class sfspProtocol(QThread):
 				self.inpackets += 1
 				self.hiinputs += self.frame[0] - 3
 				del self.frame[0:self.frame[0]+1]
-				self.sfspState() # recursive
+				self.sfpState() # recursive
 			else:
 				error("host: bad checksum")
 				del self.frame[0]
@@ -236,7 +243,7 @@ class sfspProtocol(QThread):
 		self.frame[2] &= PID_BITS
 
 	def sink(self, c): # external sink
-		#print >>sys.stderr, 'sfsp lower sink %s'%type(c)
+		#print >>sys.stderr, 'sfp lower sink %s'%type(c)
 		self.loinputs += len(c)
 		self.frame += map(ord,c)
 		if self.VERBOSE:
