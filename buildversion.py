@@ -34,6 +34,7 @@ import sys, traceback
 
 ubootTag = 'U-Boot'
 uimageTag = 'uImage'
+versionTag = 0xB11DDA7E # build date
 
 def dumpUimage(file):
 	image = map(ord, open(file, 'rb').read(64)) # header is 64 bytes
@@ -127,6 +128,18 @@ def printVersion(version):
 	major, minor, build = unpackMMB(version)
 	print >>sys.stderr, '%d.%d.%d'%(major,minor,build)
 
+# application version name and date
+def extractAppNameDate(image, endianness='big'):
+	tag = map(chr, endian.byteList(versionTag,4,endianness))
+	offset = listfind(image, tag)
+	if offset != -1:
+		offset += len(tag)
+		name = endian.l2s(image[offset:][:16])
+		date = endian.l2s(image[offset+16:][:32])
+		return name, date
+	else:
+		return 'noname','Jan  1 2000 00:00:00'
+
 # boot and apps version, name and date
 '''
 #define RELEASE_DATE_LENGTH 32
@@ -175,7 +188,16 @@ def versionDate(image):
 		return result
 
 # test
+def testAppVD():
+	import srecord
+	srec = srecord.Srecord('Test/testApp.srec')
+	image, checksum = srec.sRecordImage()
+	name, date = extractAppNameDate(image, 'little')
+	print 'image name: ', name, ' and date: ', date
+
 if __name__ == '__main__':
+	testAppVD()
+	exit()
 	date = "Aug 23 2013 - 21:48:33"
 	d = datetime.datetime.strptime(date, MDY_HMS)
 	build = buildNumber(d.day, d.hour, d.minute)

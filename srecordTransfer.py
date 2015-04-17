@@ -203,7 +203,9 @@ class sRecordTransfer(QObject):
 					error('No srecord image loaded.')
 					self.stopSending()
 					return
-				self.download = self.header() + self.image[:self.size]
+				header = self.header()
+				filler = [0xff] * (self.start - self.target - len(header))
+				self.download = header + filler + self.image[:self.size]
 				self.targetPointer = self.target
 				self.left = self.length = len(self.download)
 				self.startTransferTime = time.time()

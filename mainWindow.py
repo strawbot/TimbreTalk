@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainWindow.ui'
 #
-# Created: Thu Apr 16 23:07:29 2015
+# Created: Fri Apr 17 16:13:22 2015
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -559,7 +559,7 @@ class Ui_MainWindow(object):
         self.toolBox = QtGui.QToolBox(self.Utility)
         self.toolBox.setObjectName(_fromUtf8("toolBox"))
         self.page_0 = QtGui.QWidget()
-        self.page_0.setGeometry(QtCore.QRect(0, 0, 360, 315))
+        self.page_0.setGeometry(QtCore.QRect(0, 0, 100, 30))
         self.page_0.setObjectName(_fromUtf8("page_0"))
         self.layoutWidget1 = QtGui.QWidget(self.page_0)
         self.layoutWidget1.setGeometry(QtCore.QRect(20, 21, 311, 189))
@@ -983,7 +983,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.Controls.setCurrentIndex(2)
+        self.Controls.setCurrentIndex(0)
         self.BaudRate.setCurrentIndex(5)
         self.targetSelect.setCurrentIndex(-1)
         self.toolBox.setCurrentIndex(2)
