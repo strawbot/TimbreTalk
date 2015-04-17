@@ -61,7 +61,7 @@
            <enum>Qt::NoContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>2</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="Serial">
            <attribute name="title">
@@ -1329,8 +1329,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>360</width>
-                 <height>315</height>
+                 <width>100</width>
+                 <height>30</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2334,7 +2334,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
  </connections>
  <buttongroups>
   <buttongroup name="LfOut"/>
-  <buttongroup name="CrOut"/>
   <buttongroup name="serialProtocol"/>
+  <buttongroup name="CrOut"/>
  </buttongroups>
 </ui>

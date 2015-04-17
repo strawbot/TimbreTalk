@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainWindow.ui'
 #
-# Created: Mon Apr 13 12:24:43 2015
+# Created: Thu Apr 16 23:07:29 2015
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -530,21 +530,21 @@ class Ui_MainWindow(object):
         self.label_25 = QtGui.QLabel(self.groupBox_4)
         self.label_25.setObjectName(_fromUtf8("label_25"))
         self.gridLayout_4.addWidget(self.label_25, 0, 0, 1, 1)
-        self.lineEdit_4 = QtGui.QLineEdit(self.groupBox_4)
-        self.lineEdit_4.setObjectName(_fromUtf8("lineEdit_4"))
-        self.gridLayout_4.addWidget(self.lineEdit_4, 0, 1, 1, 1)
+        self.bootVersion = QtGui.QLineEdit(self.groupBox_4)
+        self.bootVersion.setObjectName(_fromUtf8("bootVersion"))
+        self.gridLayout_4.addWidget(self.bootVersion, 0, 1, 1, 1)
         self.label_30 = QtGui.QLabel(self.groupBox_4)
         self.label_30.setObjectName(_fromUtf8("label_30"))
         self.gridLayout_4.addWidget(self.label_30, 1, 0, 1, 1)
-        self.lineEdit_2 = QtGui.QLineEdit(self.groupBox_4)
-        self.lineEdit_2.setObjectName(_fromUtf8("lineEdit_2"))
-        self.gridLayout_4.addWidget(self.lineEdit_2, 1, 1, 1, 1)
+        self.leftAppVersion = QtGui.QLineEdit(self.groupBox_4)
+        self.leftAppVersion.setObjectName(_fromUtf8("leftAppVersion"))
+        self.gridLayout_4.addWidget(self.leftAppVersion, 1, 1, 1, 1)
         self.label_31 = QtGui.QLabel(self.groupBox_4)
         self.label_31.setObjectName(_fromUtf8("label_31"))
         self.gridLayout_4.addWidget(self.label_31, 2, 0, 1, 1)
-        self.lineEdit_3 = QtGui.QLineEdit(self.groupBox_4)
-        self.lineEdit_3.setObjectName(_fromUtf8("lineEdit_3"))
-        self.gridLayout_4.addWidget(self.lineEdit_3, 2, 1, 1, 1)
+        self.rightAppVersion = QtGui.QLineEdit(self.groupBox_4)
+        self.rightAppVersion.setObjectName(_fromUtf8("rightAppVersion"))
+        self.gridLayout_4.addWidget(self.rightAppVersion, 2, 1, 1, 1)
         self.horizontalLayout_25.addLayout(self.gridLayout_4)
         spacerItem11 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_25.addItem(spacerItem11)

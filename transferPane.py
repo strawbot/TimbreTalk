@@ -33,21 +33,9 @@ class srecordPane(QWidget):
 			# name, transferObject(parent, filename, target address, header choice, who for)
 		self.targets = [
 			['Main Boot',	sRecordTransfer(parent, '', MAIN_BOOT,		0, MAIN_CPU)],
-			['uBoot L', 	ubootTransfer  (parent, '', UBOOT_LEFT,		1, MAIN_CPU)],
-			['uBoot R', 	ubootTransfer  (parent, '', UBOOT_RIGHT,	1, MAIN_CPU)],
-			['Big uBoot L', ubootTransfer  (parent, '', BIG_UBOOT_LEFT,	1, MAIN_CPU)],
-			['Big uBoot R', ubootTransfer  (parent, '', BIG_UBOOT_RIGHT,1, MAIN_CPU)],
-			['Launcher L',	sRecordTransfer(parent, '', LAUNCHER_LEFT,	1, MAIN_CPU)],
-			['Launcher R',	sRecordTransfer(parent, '', LAUNCHER_RIGHT,	1, MAIN_CPU)],
 			['Main App L',	sRecordTransfer(parent, '', MAIN_APP_LEFT,	1, MAIN_CPU)],
-			['Main App R',	sRecordTransfer(parent, '', MAIN_APP_RIGHT,	1, MAIN_CPU)],
-			['IO App L',	sRecordTransfer(parent, '', IO_APP_LEFT,	1, MAIN_CPU)],
-			['IO App R',	sRecordTransfer(parent, '', IO_APP_RIGHT,	1, MAIN_CPU)],
-			['SWB App L',	sRecordTransfer(parent, '', SWB_APP_LEFT,	1, MAIN_CPU)],
-			['SWB App R',	sRecordTransfer(parent, '', SWB_APP_RIGHT,	1, MAIN_CPU)],
-			['Slot Boot',	sRecordTransfer(parent, '', SLOT_BOOT,		0, SLOTA_CPU)],
-			['Slot App',	sRecordTransfer(parent, '', SLOT_APP,		1, SLOTA_CPU)],
-			['IO Boot Hi',	sRecordTransfer(parent, '', IO_HIGH_BOOT,	1, SLOTA_CPU)]]
+			['Main App R',	sRecordTransfer(parent, '', MAIN_APP_RIGHT,	1, MAIN_CPU)]
+			]
 		for entry in self.targets:
 			self.ui.targetSelect.addItem(entry[0])
 			entry[1].progress.connect(self.progress)

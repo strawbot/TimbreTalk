@@ -96,17 +96,9 @@ class sRecordTransfer(QObject):
 		self.vcPacket.connect(self.vcPacketHandler)
 		
 	def who(self):
-#		if self.parent.whoto:	# parental override
-#			return self.parent.who()
-# this fails if set to main for packet routing.  Need to rethink how to program slotb
-		who = self.parent.who() # packet routing
-		if who[0] == SLOTB_CPU:
-			return who
-
 		if self.whofor:			# use default
 			return [self.whofor, self.parent.whofrom]
-
-		return who
+		return self.parent.who() # packet routing
 			
 	# slots
 	def eraseConfirmed(self, packet):
@@ -221,7 +213,7 @@ class sRecordTransfer(QObject):
 				self.parent.protocol.packetSource(pids.MEM_CHECK, self.verifyConfirmed)
 				self.starting.emit()
 				operation()
-				self.transferTimer.setInterval(10000)
+				self.transferTimer.setInterval(15000)
 				self.transferTimer.start()
 				self.retries = 5
 			else:
