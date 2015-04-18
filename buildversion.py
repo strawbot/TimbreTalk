@@ -31,6 +31,7 @@ import struct
 import datetime
 import endian
 import sys, traceback
+from targets import RELEASE_DATE_LENGTH, APP_NAME_LENGTH
 
 ubootTag = 'U-Boot'
 uimageTag = 'uImage'
@@ -128,18 +129,6 @@ def printVersion(version):
 	major, minor, build = unpackMMB(version)
 	print >>sys.stderr, '%d.%d.%d'%(major,minor,build)
 
-# application version name and date
-def extractAppNameDate(image, endianness='big'):
-	tag = map(chr, endian.byteList(versionTag,4,endianness))
-	offset = listfind(image, tag)
-	if offset != -1:
-		offset += len(tag)
-		name = endian.l2s(image[offset:][:16])
-		date = endian.l2s(image[offset+16:][:32])
-		return name, date
-	else:
-		return 'noname','Jan  1 2000 00:00:00'
-
 # boot and apps version, name and date
 '''
 #define RELEASE_DATE_LENGTH 32
@@ -187,13 +176,27 @@ def versionDate(image):
 	finally:
 		return result
 
+# application version name and date
+def extractNameDateVersion(image, endianness='big'):
+	name, date, version = 'naname','2000-01-01 00:00:00',0
+	tag = map(chr, endian.byteList(versionTag,4,endianness))
+	offset = listfind(image, tag)
+	if offset != -1:
+		offset += len(tag)
+		name = endian.l2s(image[offset:][:16])
+		date = MDYHMSasYMDHMS(endian.l2s(image[offset+16:][:20]))
+		version = buildVersion(date)
+	name = map(ord, name) + [0]*(APP_NAME_LENGTH - len(name))
+	date = map(ord, date) + [0]*(RELEASE_DATE_LENGTH - len(date))
+	return (name, date, version)
+
 # test
 def testAppVD():
 	import srecord
 	srec = srecord.Srecord('Test/testApp.srec')
 	image, checksum = srec.sRecordImage()
-	name, date = extractAppNameDate(image, 'little')
-	print 'image name: ', name, ' and date: ', date
+	name, date, version = extractNameDateVersion(image, 'little')
+	print 'image name: ', name, ' and date: ', date, ' version:', version
 
 if __name__ == '__main__':
 	testAppVD()

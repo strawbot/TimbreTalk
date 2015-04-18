@@ -147,11 +147,8 @@ class sRecordTransfer(QObject):
 			self.size = srec.size
 			self.entry = srec.entry
 			self.image, self.checksum = srec.sRecordImage()
-			version = map(ord, versionDate(self.image))
-			self.releaseDate = version + [0]*(RELEASE_DATE_LENGTH - len(version))
-			name = map(ord, versionName(self.image))
-			self.appName = name + [0]*(APP_NAME_LENGTH - len(name))
-			self.version = versionNumber(self.image)
+			self.appName, self.releaseDate, self.version = \
+			 extractNameDateVersion(self.image, 'little')
 		except Exception, e:
 			print >>sys.stderr, e
 			traceback.print_exc(file=sys.stderr)
