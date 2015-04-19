@@ -17,7 +17,7 @@ import infopane
 import utilitypane, cpuids
 import sys
 
-class qtran(qterm.terminal):
+class timbreTalk(qterm.terminal):
 	def __init__(self):
 		qterm.terminal.__init__(self)
 		self.whoto = self.whofrom = 0
@@ -106,9 +106,9 @@ if __name__ == "__main__":
 	sys.excepthook = lambda *args: None
 	app = QApplication([])
 	try:
-		qtran = qtran()
+		timbreTalk = timbreTalk()
 		sys.exit(app.exec_())
 	except Exception, e:
 		print >>sys.stderr, e
 		traceback.print_exc(file=sys.stderr)
-	qtran.close()
+	timbreTalk.close()

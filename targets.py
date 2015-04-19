@@ -4,8 +4,8 @@ import struct
 
 # taken from copyrun.h and memorymaps.h
 MAIN_BOOT		= 0x08000000
-MAIN_APP_LEFT	= 0x08080000
-MAIN_APP_RIGHT	= 0x08180000
+MAIN_APP_LEFT	= 0x08040000
+MAIN_APP_RIGHT	= 0x08080000
 
 '''
 #define RELEASE_DATE_LENGTH 32

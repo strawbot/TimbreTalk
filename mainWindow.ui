@@ -61,7 +61,7 @@
            <enum>Qt::NoContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>3</number>
           </property>
           <widget class="QWidget" name="Serial">
            <attribute name="title">
@@ -803,10 +803,20 @@
                    </property>
                   </widget>
                  </item>
-                 <item row="2" column="2">
+                 <item row="4" column="2">
                   <widget class="QPushButton" name="Run">
                    <property name="text">
                     <string>Run</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item row="2" column="2">
+                  <widget class="QCheckBox" name="endian">
+                   <property name="text">
+                    <string>Big Endian</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
                    </property>
                   </widget>
                  </item>
@@ -1322,15 +1332,119 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
             <item>
              <widget class="QToolBox" name="toolBox">
               <property name="currentIndex">
-               <number>2</number>
+               <number>0</number>
               </property>
-              <widget class="QWidget" name="page_0">
+              <widget class="QWidget" name="Debug">
+               <attribute name="label">
+                <string>Debug</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="verticalLayout_15">
+                <item>
+                 <widget class="QGroupBox" name="printme">
+                  <property name="title">
+                   <string>Printme</string>
+                  </property>
+                  <layout class="QVBoxLayout" name="verticalLayout_13">
+                   <item>
+                    <widget class="QCheckBox" name="checkBox">
+                     <property name="text">
+                      <string>buildVersion</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_2">
+                     <property name="text">
+                      <string>endian</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_3">
+                     <property name="text">
+                      <string>fwdb</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_6">
+                     <property name="text">
+                      <string>infopane</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_7">
+                     <property name="text">
+                      <string>machines</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_8">
+                     <property name="text">
+                      <string>packagedatabase</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_9">
+                     <property name="text">
+                      <string>pidport</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_5">
+                     <property name="text">
+                      <string>srecordTransfer</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QCheckBox" name="checkBox_4">
+                     <property name="text">
+                      <string>transferPane</string>
+                     </property>
+                    </widget>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="verticalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>20</width>
+                    <height>40</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+               <zorder>checkBox</zorder>
+               <zorder>checkBox_2</zorder>
+               <zorder>checkBox_3</zorder>
+               <zorder>checkBox_4</zorder>
+               <zorder>checkBox_5</zorder>
+               <zorder>checkBox_6</zorder>
+               <zorder>checkBox_7</zorder>
+               <zorder>checkBox_8</zorder>
+               <zorder>checkBox_9</zorder>
+               <zorder>printme</zorder>
+               <zorder>checkBox_7</zorder>
+               <zorder>verticalSpacer_3</zorder>
+              </widget>
+              <widget class="QWidget" name="Stats">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>100</width>
-                 <height>30</height>
+                 <width>360</width>
+                 <height>281</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1488,13 +1602,13 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 </layout>
                </widget>
               </widget>
-              <widget class="QWidget" name="page_1">
+              <widget class="QWidget" name="LoadTest">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>100</width>
-                 <height>30</height>
+                 <width>360</width>
+                 <height>281</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1613,7 +1727,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                  <x>0</x>
                  <y>0</y>
                  <width>360</width>
-                 <height>315</height>
+                 <height>283</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2334,7 +2448,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
  </connections>
  <buttongroups>
   <buttongroup name="LfOut"/>
-  <buttongroup name="serialProtocol"/>
   <buttongroup name="CrOut"/>
+  <buttongroup name="serialProtocol"/>
  </buttongroups>
 </ui>

@@ -1,6 +1,8 @@
 # endian mixup prevention  Rob Chapman  Jan 27, 2011
 # big endian format is default
 
+printme = 0
+
 # string of hex to list of hex, must start with 0x
 def hexList (string, endian='big'):
 	l = [int(string[i:i+2],16)  for i in range(2,len(string),2)]
@@ -11,6 +13,7 @@ def hexList (string, endian='big'):
 
 # numbers to lists of bytes
 def byteList (integer, length, endian="big"): # turn an integer into a list of values
+	if printme: print 'endian:',endian
 	n = length - 1
 	l = [(integer/(2**((n-i)*8)) & 0xFF) for i in range(length)]
 	if endian == "big":

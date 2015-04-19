@@ -32,9 +32,9 @@ class srecordPane(QWidget):
 		# default target addresses and menu setup
 			# name, transferObject(parent, filename, target address, header choice, who for)
 		self.targets = [
-			['Main Boot',	sRecordTransfer(parent, '', MAIN_BOOT,		0, MAIN_CPU)],
-			['Main App L',	sRecordTransfer(parent, '', MAIN_APP_LEFT,	1, MAIN_CPU)],
-			['Main App R',	sRecordTransfer(parent, '', MAIN_APP_RIGHT,	1, MAIN_CPU)]
+			['Main Boot',	sRecordTransfer(parent, '', MAIN_BOOT,		0, MAIN_CPU, 'little')],
+			['Main App L',	sRecordTransfer(parent, '', MAIN_APP_LEFT,	1, MAIN_CPU, 'little')],
+			['Main App R',	sRecordTransfer(parent, '', MAIN_APP_RIGHT,	1, MAIN_CPU, 'little')]
 			]
 		for entry in self.targets:
 			self.ui.targetSelect.addItem(entry[0])
@@ -104,6 +104,7 @@ class srecordPane(QWidget):
 		self.ui.entryPoint.setText(hex(target.entry))
 		self.ui.checkSum.setText("0x%X"%target.checksum) # prevent L suffix
 		self.ui.header.setChecked(target.headerFlag)
+		self.ui.endian.setChecked(target.endian == 'big')
 	
 	def saveSrecordValues(self): # this saves values to last target and shows current
 		if printme: print >>sys.stderr, 'saveSrecordValues'
@@ -116,21 +117,30 @@ class srecordPane(QWidget):
 			target.entry = int(self.ui.entryPoint.text(), 0)
 			target.checksum = int(self.ui.checkSum.text().rstrip('L'), 0)
 			target.headerFlag = self.ui.header.checkState()
+			target.endian = 'big' if self.ui.endian.checkState() else 'little'
 		self.showSrecordValues()
 		
 	# sending an srecord
 		# use the values in the entry boxes; when switching to another target swap the
 		# screen values out to self.targets; 
 	def sendSrecord(self):
-		self.runCommand(SEND)
+		try:
+			self.runCommand(SEND)
+		except Exception, e:
+			print >>sys.stderr, e
+			traceback.print_exc(file=sys.stderr)
 		
 	def selectFile(self):
 		if printme: print >>sys.stderr, 'selectFile'
-		target = self.target()
-		file = QFileDialog().getOpenFileName(directory=target.dir)
-		if file:
-			target.useFile(file)
-		self.showSrecordValues()
+		try:
+			target = self.target()
+			file = QFileDialog().getOpenFileName(directory=target.dir)
+			if file:
+				target.useFile(file)
+			self.showSrecordValues()
+		except Exception, e:
+			print >>sys.stderr, e
+			traceback.print_exc(file=sys.stderr)
 		
 	def progress(self, n):
 		if printme: print >>sys.stderr, 'progress'
@@ -193,7 +203,7 @@ class srecordPane(QWidget):
 
 	def runVerify(self):
 		self.runCommand(VERIFY)
-
+		
 	def runCommand(self, command):
 		if printme: print >>sys.stderr, command
 		if self.sending == 0:

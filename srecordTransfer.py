@@ -44,6 +44,7 @@ EVALUATE_PACKET_OVERHEAD = WHO_PACKET_OVERHEAD # pid, who
 MAX_WHO_PACKET_PAYLOAD = (MAX_PACKET_LENGTH - WHO_PACKET_OVERHEAD)
 MEMORY_PACKET_OVERHEAD = 4 + 1 # 32bit address + length
 maxMemTransfer = MAX_WHO_PACKET_PAYLOAD - MEMORY_PACKET_OVERHEAD
+ALLOWABLE_GAP = 0x100 # maximum gap between image and header
 
 class sRecordTransfer(QObject):
 	starting = Signal()
@@ -63,7 +64,7 @@ class sRecordTransfer(QObject):
 	tcPacket = Signal(object)
 	vcPacket = Signal(object)
 
-	def __init__(self, parent, file='', target=0, header=0, whofor=0):
+	def __init__(self, parent, file='', target=0, header=0, whofor=0, endian='big'):
 		if printme: print >>sys.stderr, '__init__'
 		QObject.__init__(self) # needed for signals to work!!
 
@@ -79,6 +80,7 @@ class sRecordTransfer(QObject):
 		# parameters passed
 		self.target = target
 		self.headerFlag = header
+		self.endian = endian
 		self.whofor = whofor
 		self.useFile(file)
 		
@@ -141,14 +143,14 @@ class sRecordTransfer(QObject):
 
 	def loadSrecord(self):
 		try:
-			if printme: print >>sys.stderr, 'loadSrecord'
+			if printme: print >>sys.stderr, 'loadSrecord', self.endian
 			srec = srecord.Srecord(self.file)
 			self.start = srec.start
 			self.size = srec.size
 			self.entry = srec.entry
 			self.image, self.checksum = srec.sRecordImage()
 			self.appName, self.releaseDate, self.version = \
-			 extractNameDateVersion(self.image, 'little')
+			 extractNameDateVersion(self.image, self.endian)
 		except Exception, e:
 			print >>sys.stderr, e
 			traceback.print_exc(file=sys.stderr)
@@ -169,23 +171,25 @@ class sRecordTransfer(QObject):
 			return HEADER_SIZE
 		return 0
 
-	def header(self):
+	def header(self, gap):
 		#	[ version# start dest size entry checksum headerSize releaseDate appName headerChecksum ]
-		if printme: print >>sys.stderr, 'header'
+		if printme: print >>sys.stderr, 'header', self.endian
 		if self.headersize():
-			version = longList(self.version)
-			start = longList(self.target + self.headersize())
-			dest = longList(self.start)
-			size = longList(self.size)
-			entry = longList(self.entry)
-			checksum = longList(self.checksum)
-			headerSize = longList(HEADER_SIZE)
+			version = longList(self.version, self.endian)
+			
+			start = longList(self.target + self.headersize() + gap, self.endian)
+			
+			dest = longList(self.start, self.endian)
+			size = longList(self.size, self.endian)
+			entry = longList(self.entry, self.endian)
+			checksum = longList(self.checksum, self.endian)
+			headerSize = longList(HEADER_SIZE, self.endian)
 			releaseDate = self.releaseDate
 			appName = self.appName
 
 			head = version + start + dest + size + entry + checksum \
 				    + headerSize + releaseDate + appName
-			headerChecksum = longList(fletcher32(head, HEADER_SIZE - 4))
+			headerChecksum = longList(fletcher32(head, HEADER_SIZE - 4), self.endian)
 			return head + headerChecksum
 		return []
 
@@ -200,8 +204,12 @@ class sRecordTransfer(QObject):
 					error('No srecord image loaded.')
 					self.stopSending()
 					return
-				header = self.header()
-				filler = [0xff] * (self.start - self.target - len(header))
+
+				gap = (self.start - self.target - self.headersize())
+				if gap > ALLOWABLE_GAP:
+					gap = 0
+				filler = [0xff] * gap
+				header = self.header(gap)
 				self.download = header + filler + self.image[:self.size]
 				self.targetPointer = self.target
 				self.left = self.length = len(self.download)
