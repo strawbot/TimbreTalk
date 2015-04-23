@@ -1,4 +1,11 @@
 Log for Timbre Talk
+ This log is kept with the source code and is refined as the source code changes
+ providing a human readable summary of the past, present and future of the code
+ base. As issues are encountered, they are entered under the Issues: section. As
+ they are resolved or things are changed, they are entered under the Updates:
+ section. Once they are no longer relavent, they are removed. The repository will
+ contain tags or major milestones which delineate these removals so as to serve
+ as a signpost in the source code development preventing the accumulation of clutter.
 
 Issues:
  1. when clicking on send and transfer happens error produced:
@@ -17,5 +24,7 @@ Issues:
  9. add collaborative max length negotiations for sfp protocol
  10. revise, update and test all code
  11. file button stays blue after loading file
+ 12. provide the ability to upload from memory and create an SREC file - leave out
+     0xFF sequences. Given start and finish.
 
 Updates:
