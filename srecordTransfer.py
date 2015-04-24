@@ -176,9 +176,7 @@ class sRecordTransfer(QObject):
 		if printme: print >>sys.stderr, 'header', self.endian
 		if self.headersize():
 			version = longList(self.version, self.endian)
-			
-			start = longList(self.target + self.headersize() + gap, self.endian)
-			
+			start = longList(self.target + self.headersize() + gap, self.endian)			
 			dest = longList(self.start, self.endian)
 			size = longList(self.size, self.endian)
 			entry = longList(self.entry, self.endian)
@@ -186,7 +184,6 @@ class sRecordTransfer(QObject):
 			headerSize = longList(HEADER_SIZE, self.endian)
 			releaseDate = self.releaseDate
 			appName = self.appName
-
 			head = version + start + dest + size + entry + checksum \
 				    + headerSize + releaseDate + appName
 			headerChecksum = longList(fletcher32(head, HEADER_SIZE - 4), self.endian)
