@@ -64,7 +64,11 @@ class sfpProtocol(QThread):
 		self.hioutputs = 0
 		self.inpackets = 0
 		self.outpackets = 0
-		
+		self.packetSource(SPS, self.spsHandler)
+	
+	def spsHandler(self, packet):
+		pass
+
 #		initSignalCatcher()
 
 		# separate thread for packet distributer
