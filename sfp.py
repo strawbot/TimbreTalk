@@ -64,11 +64,8 @@ class sfpProtocol(QThread):
 		self.hioutputs = 0
 		self.inpackets = 0
 		self.outpackets = 0
-		self.packetSource(SPS, self.spsHandler)
+ 		self.packetSource(SPS, self.spsHandler)
 	
-	def spsHandler(self, packet):
-		pass
-
 #		initSignalCatcher()
 
 		# separate thread for packet distributer
@@ -113,6 +110,9 @@ class sfpProtocol(QThread):
 		def pingBack(packet): # responder
 			self.sendNPS(PING_BACK, [])
 		self.packetSource(PING, pingBack)
+
+	def spsHandler(self, packet):
+		pass
 
 	# thread for receiver
 	def processBytes(self): # run rx state machine receiver
