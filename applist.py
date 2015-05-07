@@ -1,4 +1,7 @@
+# list files used by an App  Robert Chapman III  May 7, 2015
+# usage: python applist.py tt sdown
 import os.path
+import sys
 
 files = []
 
@@ -18,8 +21,11 @@ def parseList(file):
 						elif words[0] == 'from':
 							parseList(words[1])
 
-parseList('tt')
-files.sort()
-for file in files:
-	if file:
-		print file
+for app in sys.argv[1:]:
+	print 'Files used in %s.py:'%app
+	del files[:]
+	parseList(app)
+	files.sort()
+	for file in files:
+		if file:
+			print '  ',file

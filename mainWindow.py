@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainWindow.ui'
 #
-# Created: Sat Apr 18 21:17:55 2015
+# Created: Thu May  7 15:19:06 2015
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -563,6 +563,7 @@ class Ui_MainWindow(object):
         self.toolBox = QtGui.QToolBox(self.Utility)
         self.toolBox.setObjectName(_fromUtf8("toolBox"))
         self.Debug = QtGui.QWidget()
+        self.Debug.setGeometry(QtCore.QRect(0, 0, 360, 281))
         self.Debug.setObjectName(_fromUtf8("Debug"))
         self.verticalLayout_15 = QtGui.QVBoxLayout(self.Debug)
         self.verticalLayout_15.setObjectName(_fromUtf8("verticalLayout_15"))
@@ -576,18 +577,12 @@ class Ui_MainWindow(object):
         self.checkBox_2 = QtGui.QCheckBox(self.printme)
         self.checkBox_2.setObjectName(_fromUtf8("checkBox_2"))
         self.verticalLayout_13.addWidget(self.checkBox_2)
-        self.checkBox_3 = QtGui.QCheckBox(self.printme)
-        self.checkBox_3.setObjectName(_fromUtf8("checkBox_3"))
-        self.verticalLayout_13.addWidget(self.checkBox_3)
         self.checkBox_6 = QtGui.QCheckBox(self.printme)
         self.checkBox_6.setObjectName(_fromUtf8("checkBox_6"))
         self.verticalLayout_13.addWidget(self.checkBox_6)
         self.checkBox_7 = QtGui.QCheckBox(self.printme)
         self.checkBox_7.setObjectName(_fromUtf8("checkBox_7"))
         self.verticalLayout_13.addWidget(self.checkBox_7)
-        self.checkBox_8 = QtGui.QCheckBox(self.printme)
-        self.checkBox_8.setObjectName(_fromUtf8("checkBox_8"))
-        self.verticalLayout_13.addWidget(self.checkBox_8)
         self.checkBox_9 = QtGui.QCheckBox(self.printme)
         self.checkBox_9.setObjectName(_fromUtf8("checkBox_9"))
         self.verticalLayout_13.addWidget(self.checkBox_9)
@@ -602,7 +597,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_15.addItem(spacerItem13)
         self.toolBox.addItem(self.Debug, _fromUtf8(""))
         self.Stats = QtGui.QWidget()
-        self.Stats.setGeometry(QtCore.QRect(0, 0, 360, 281))
+        self.Stats.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.Stats.setObjectName(_fromUtf8("Stats"))
         self.layoutWidget1 = QtGui.QWidget(self.Stats)
         self.layoutWidget1.setGeometry(QtCore.QRect(20, 21, 311, 189))
@@ -677,7 +672,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_16.addWidget(self.clearTranStats)
         self.toolBox.addItem(self.Stats, _fromUtf8(""))
         self.LoadTest = QtGui.QWidget()
-        self.LoadTest.setGeometry(QtCore.QRect(0, 0, 360, 281))
+        self.LoadTest.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.LoadTest.setObjectName(_fromUtf8("LoadTest"))
         self.loadRun = QtGui.QPushButton(self.LoadTest)
         self.loadRun.setGeometry(QtCore.QRect(10, 80, 67, 32))
@@ -717,7 +712,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_18.addWidget(self.loadDelay)
         self.toolBox.addItem(self.LoadTest, _fromUtf8(""))
         self.UARTBoot = QtGui.QWidget()
-        self.UARTBoot.setGeometry(QtCore.QRect(0, 0, 360, 283))
+        self.UARTBoot.setGeometry(QtCore.QRect(0, 0, 242, 283))
         self.UARTBoot.setObjectName(_fromUtf8("UARTBoot"))
         self.verticalLayout_9 = QtGui.QVBoxLayout(self.UARTBoot)
         self.verticalLayout_9.setSpacing(0)
@@ -1114,10 +1109,8 @@ class Ui_MainWindow(object):
         self.printme.setTitle(QtGui.QApplication.translate("MainWindow", "Printme", None, QtGui.QApplication.UnicodeUTF8))
         self.checkBox.setText(QtGui.QApplication.translate("MainWindow", "buildVersion", None, QtGui.QApplication.UnicodeUTF8))
         self.checkBox_2.setText(QtGui.QApplication.translate("MainWindow", "endian", None, QtGui.QApplication.UnicodeUTF8))
-        self.checkBox_3.setText(QtGui.QApplication.translate("MainWindow", "fwdb", None, QtGui.QApplication.UnicodeUTF8))
         self.checkBox_6.setText(QtGui.QApplication.translate("MainWindow", "infopane", None, QtGui.QApplication.UnicodeUTF8))
         self.checkBox_7.setText(QtGui.QApplication.translate("MainWindow", "machines", None, QtGui.QApplication.UnicodeUTF8))
-        self.checkBox_8.setText(QtGui.QApplication.translate("MainWindow", "packagedatabase", None, QtGui.QApplication.UnicodeUTF8))
         self.checkBox_9.setText(QtGui.QApplication.translate("MainWindow", "pidport", None, QtGui.QApplication.UnicodeUTF8))
         self.checkBox_5.setText(QtGui.QApplication.translate("MainWindow", "srecordTransfer", None, QtGui.QApplication.UnicodeUTF8))
         self.checkBox_4.setText(QtGui.QApplication.translate("MainWindow", "transferPane", None, QtGui.QApplication.UnicodeUTF8))

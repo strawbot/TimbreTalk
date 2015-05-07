@@ -103,6 +103,9 @@ class timbreTalk(qterm.terminal):
 
 if __name__ == "__main__":
 	import sys, traceback	
+# 	kwargs = dict(x.split('=', 1) for x in sys.argv[1:])
+# 	name = kwargs.get('name', '')
+# 	port = kwargs.get('port', '/dev/ttyACM0')
 	sys.excepthook = lambda *args: None
 	app = QApplication([])
 	try:

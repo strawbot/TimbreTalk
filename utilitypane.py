@@ -42,20 +42,16 @@ class testPane(QWidget):
 
 	# printme
 	def setupPrintme(self):
-		import buildversion, endian, fwdb, infopane, machines, packagedatabase
+		import buildversion, endian, infopane, machines
 		import pidport, srecordTransfer, transferPane
 # 		self.ui.buildversion.setChecked(buildversion.printme)
 # 		self.ui.buildversion.stateChanged(lambda x: buildversion.printme = x)
 		self.ui.endian.setChecked(endian.printme)
 		self.ui.endian.stateChanged.connect(lambda x: setattr(self, endian.printme,x))
-# 		self.ui.fwdb.setChecked(fwdb.printme)
-# 		self.ui.fwdb.stateChanged(lambda x: fwdb.printme = x)
 # 		self.ui.infopane.setChecked(infopane.printme)
 # 		self.ui.infopane.stateChanged(lambda x: infopane.printme = x)
 # 		self.ui.machines.setChecked(machines.printme)
 # 		self.ui.machines.stateChanged(lambda x: machines.printme = x)
-# 		self.ui.packagedatabase.setChecked(packagedatabase.printme)
-# 		self.ui.packagedatabase.stateChanged(lambda x: packagedatabase.printme = x)
 # 		self.ui.pidport.setChecked(pidport.printme)
 # 		self.ui.pidport.stateChanged(lambda x: pidport.printme = x)
 # 		self.ui.srecordTransfer.setChecked(srecordTransfer.printme)
