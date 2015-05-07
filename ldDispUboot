@@ -1,2 +1,0 @@
-
-time ./iMX_Display_Serial_Download_Protocol.py $1 exec 0x777ffc00 u-boot.imx.serial
