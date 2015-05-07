@@ -26,5 +26,7 @@ Issues:
  11. file button stays blue after loading file
  12. provide the ability to upload from memory and create an SREC file - leave out
      0xFF sequences. Given start and finish.
+ 13. Phrases should be able to have delays between characters to interface with slow
+     links.
 
 Updates:
