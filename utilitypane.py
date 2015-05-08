@@ -6,7 +6,10 @@ from message import *
 import sfp, pids
 from endian import *
 from random import randrange
+from image import *
 import traceback	
+
+printme = 0
 
 class testPane(QWidget):
 	def __init__(self, parent):
@@ -26,7 +29,7 @@ class testPane(QWidget):
 		self.loadFrames = 0
 		self.ui.loadRun.clicked.connect(self.loadRun)
 		
-		# STM32 Boot Loader
+		# STM32 Boot Tools
 		self.ui.initBoot.clicked.connect(lambda: self.sendHex([0x7F]))
 		self.ui.getCommand.clicked.connect(lambda: self.sendHex([0x00,0xFF]))
 		self.ui.gvCommand.clicked.connect(lambda: self.sendHex([0x01,0xFE]))
@@ -39,6 +42,33 @@ class testPane(QWidget):
 		
 		self.ui.readAddress.setText('08000000')
 		self.ui.readLength.setText('10')
+
+		# STM32F4 Boot Loader
+		self.ui.bootSelect.clicked.connect(self.selectFile)
+		self.ui.sendBoot.clicked.connect(self.sendBoot)
+		
+	def selectFile(self):
+		if printme: print >>sys.stderr, 'selectBoot'
+		try:
+			self.image = imageRecord(QFileDialog().getOpenFileName())
+			self.ui.bootFile.setText(self.image.name)
+			self.ui.bootStart.setText(hex(self.image.start))
+			self.ui.bootSize.setText(str(self.image.size))
+		except Exception, e:
+			print >>sys.stderr, e
+			traceback.print_exc(file=sys.stderr)
+	
+	def sendBoot(self):
+		pass
+	
+	def progress(self, n):
+		if printme: print >>sys.stderr, 'progress'
+		if n:
+			self.ui.progressBar.setValue(n*1000)
+		else:
+			self.ui.progressBar.reset()
+			self.ui.progressBar.setMaximum(1000)
+
 
 	# printme
 	def setupPrintme(self):

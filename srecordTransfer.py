@@ -7,7 +7,7 @@ slots: stopSending, startSending
 from pyqtapi2 import *
 
 import os, time, traceback
-import srecord, pids
+import image, pids
 from endian import *
 from message import *
 from checksum import fletcher32
@@ -144,11 +144,11 @@ class sRecordTransfer(QObject):
 	def loadSrecord(self):
 		try:
 			if printme: print >>sys.stderr, 'loadSrecord', self.endian
-			srec = srecord.Srecord(self.file)
+			srec = image.imageRecord(self.file)
 			self.start = srec.start
 			self.size = srec.size
 			self.entry = srec.entry
-			self.image, self.checksum = srec.sRecordImage()
+			self.image, self.checksum = srec.recordImage()
 			self.appName, self.releaseDate, self.version = \
 			 extractNameDateVersion(self.image, self.endian)
 		except Exception, e:
