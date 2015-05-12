@@ -4,7 +4,7 @@ from message import *
 from checksum import fletcher32
 
 class imageRecord():
-	MAX_IMAGE_SIZE = 1024 * 1024 # 1MB
+	MAX_IMAGE_SIZE = 1024 * 1024 * 2 # 2MB
 	HOLE_FILL = 0xFF
 	records = []
 
@@ -15,7 +15,7 @@ class imageRecord():
 		self.addRecord(file)
 		self.createImage()
 
-	def addRecord(self, file):
+	def addRecord(self, file): # turn file into list of address,data tuples
 		self.start = 0xFFFFFFFF
 		self.end = self.entry = 0
 		del self.records[:]
@@ -26,7 +26,7 @@ class imageRecord():
 		elif type in ['hex']:
 			self.addHexRecord(file)
 		else:
-			error('File suffix not .hex, .srec nor .S19: %s'%self.name)
+			error('Unknown format. File suffix not .hex, .srec nor .S19: %s'%self.name)
 		if self.start == 0xFFFFFFFF:
 			self.start = 0
 		self.size = self.end - self.start
@@ -34,7 +34,7 @@ class imageRecord():
 	def createImage(self): # direct memory image from hex strings with holes as 0xFF
 		del self.image[:]
 		if self.size > self.MAX_IMAGE_SIZE:
-			error('image is too large! %d'%self.size)
+			error('Image is too large! %d'%self.size)
 		else:
 			self.image = [self.HOLE_FILL]*self.size
 			for record in self.records:
@@ -42,7 +42,7 @@ class imageRecord():
 				data = record[1]
 				for i in range(0,len(data),2):
 					if self.image[a+i/2] != 0xFF:
-						warning('\nsrecord.createImage: Overwrite data at %x'%(self.start + a + i/2))
+						warning('\nimageRecord.createImage: Overwrite data at %x'%(self.start + a + i/2))
 					self.image[a+i/2] = int(data[i:i+2], 16)
 		return self.image
 	
@@ -58,35 +58,34 @@ class imageRecord():
 	  [3:6] address
 	  [7:8] type: 00 data; 01 end; 02 ext seg; 03 seg start; 04 ext addr; 05 lin start
 	  [9:-2] data
-	  [-2:] checksum: 2's complement of sump of all preceding bytes
+	  [-2:] checksum: 2's complement of sump of all preceding bytes; ignored
 	'''
 	def addHexRecord(self, file):
 		try:
 			base = 0
 			for line in open(file, 'r').readlines():
 				line = line.strip()
-				if not line:
-					continue
-				if line[0] == ':':
-					count = int(line[1:3], 16)
-					address = int(line[3:7], 16) + base
-					type = int(line[7:9])
-					data = line[9:-2]
-					checksum = line[-2:]
-					if   type == 0:
-						self.records.append((address,data))
-						self.start = min(self.start, address)
-						self.end = max(self.end, address + len(data)/2)
-					elif type == 1:
-						pass # end of file
-					elif type == 2:
-						base = int(data, 16) * 16
-					elif type == 4:
-						base = int(data, 16) << 16
-					elif type == 3 or type == 5:
-						self.entry = int(data, 16)
-					else:
-						raise Exception('Unknown hex record:%s'%line)
+				if line:
+					if line[0] == ':':
+						count = int(line[1:3], 16)
+						address = int(line[3:7], 16) + base
+						type = int(line[7:9])
+						data = line[9:-2]
+						checksum = line[-2:]
+						if type == 0:
+							self.records.append((address,data))
+							self.start = min(self.start, address)
+							self.end = max(self.end, address + len(data)/2)
+						elif type == 1:
+							pass # end of file
+						elif type == 2:
+							base = int(data, 16) * 16
+						elif type == 4:
+							base = int(data, 16) << 16
+						elif type == 3 or type == 5:
+							self.entry = int(data, 16)
+						else:
+							raise Exception('Unknown hex record:%s'%line)
 		except:
 			error('Error parsing hex-record file! Unknown format')
 
@@ -110,7 +109,7 @@ class imageRecord():
 		[2:4] count
 		[4:8,10,12] address
 		[:-2] data
-		[-2:] checksum
+		[-2:] checksum; ignored
 
 	There are eight record types, listed below:
 	Record 	Description 	Address Bytes 	Data Sequence
@@ -176,3 +175,5 @@ class imageRecord():
 					self.end = max(self.end, address+len(data)/2)
 		except:
 			error('Error parsing s-record file! Unknown format')
+
+# unit test code: convert srec and hex file to images and compare checksums
