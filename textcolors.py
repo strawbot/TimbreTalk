@@ -21,6 +21,13 @@ class Ui_MainWindow(object):
 		self.whitebg.setGeometry(QtCore.QRect(10, 10, 301, 421))
 		self.whitebg.setObjectName(_fromUtf8("whitebg"))
 		MainWindow.setCentralWidget(self.centralwidget)
+		font = QtGui.QFont()
+		font.setFamily(_fromUtf8("Courier"))
+		font.setPointSize(12)
+		font.setItalic(False)
+		font.setKerning(False)
+		self.blackbg.setFont(font)
+		self.whitebg.setFont(font)
 
 		def text(pane, color):
 			f = pane.currentCharFormat()
