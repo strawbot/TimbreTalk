@@ -23,7 +23,7 @@ class timbreTalk(qterm.terminal):
 		self.whoto = self.whofrom = 0
 		self.serialPane = serialPane.serialPane(self)
 		transferPane.srecordPane(self)
-		utilitypane.testPane(self)
+		utilitypane.utilityPane(self)
 		infopane.infoPane(self)
 		self.listRoutes()
 
@@ -75,6 +75,9 @@ class timbreTalk(qterm.terminal):
 	def connectPort(self):
 		self.serialPane.connectPort()
 	
+	def disconnectPort(self):
+		self.serialPane.disconnectFlows()
+
 	# Routing
 	def listRoutes(self):
 		routes = [['Direct',0]]

@@ -29,9 +29,14 @@ Issues:
  13. Phrases should be able to have delays between characters to interface with slow
      links.
  14. add srecord and intel hex file generator
+ 15. fix popup menu in terminal window so it is not blue
+ 16. change copied text to be not blue?
+ 17. should check to make sure pyserial 2.7 or greater is being used
+ 18. add parity, size and stopbits to monitor utility
 
 Updates:
  1. removed unneccessary files from folder
  2. modified applist to take arguments
  3. added intel hex records to srecord file interpreter and consolodated to one file
  4. added exception hook to catch all those pesky quiet exceptions and make them visible
+ 5. added textcolors.py to list all text colors on black and white backgrounds
