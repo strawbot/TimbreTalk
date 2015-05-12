@@ -1,0 +1,11 @@
+Install PyInstaller-2.1 into this folder and then from inside that folder execute
+these scripts to build TimbreTalk for:
+
+Mac:
+./pyinstaller.py --runtime-hook ../rthook_pyqt4.py -w -F -i ../timbretalk.icns -p ../  ../tt.py
+
+Windows:
+pyinstaller.py --runtime-hook ..\rthook_pyqt4.py -w -F -i ..\timbretalk.ico --noupx -p ..\ ..\tt.py
+
+Linux:
+./pyinstaller.py --runtime-hook ../rthook_pyqt4.py -w -F -i ../timbretalk.ico -p ../ ../tt.py

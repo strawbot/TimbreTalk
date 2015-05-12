@@ -40,3 +40,5 @@ Updates:
  3. added intel hex records to srecord file interpreter and consolodated to one file
  4. added exception hook to catch all those pesky quiet exceptions and make them visible
  5. added textcolors.py to list all text colors on black and white backgrounds
+ 6. added support for creating binary applications for the three platforms (Mac,
+    Windows, Linux). Follow instructions in "pyinstaller scripts.txt".

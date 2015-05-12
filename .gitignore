@@ -1,1 +1,3 @@
 *.pyc
+PyInstaller-2.1
+*.pyo
