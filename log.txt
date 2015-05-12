@@ -11,7 +11,7 @@ Issues:
  1. when clicking on send and transfer happens error produced:
  	 ecPacketHandler
      error: structure bigger than list: str=14 list=11
- 2. Utility Tab should have list of printme's that can be turned while running
+ 2. Utility Tab should have list of printme's that can be turned on while running
  3. errors should be caught throughout and put into a log either on a tab or a file
     and or printed to launch window. no error should happen without notifying anyone
  4. when the serial port is bombed, the gui should still function. there should be a
@@ -28,7 +28,10 @@ Issues:
      0xFF sequences. Given start and finish.
  13. Phrases should be able to have delays between characters to interface with slow
      links.
+ 14. add srecord and intel hex file generator
 
 Updates:
  1. removed unneccessary files from folder
  2. modified applist to take arguments
+ 3. added intel hex records to srecord file interpreter and consolodated to one file
+ 4. added exception hook to catch all those pesky quiet exceptions and make them visible

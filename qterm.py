@@ -66,6 +66,12 @@ class terminal(QMainWindow):
 		self.ui.ClearText.clicked.connect(self.clearText)
 		self.ui.saveText.clicked.connect(self.saveText)
 		self.textcount = 0
+
+		# capture all qt errors to terminal window
+		def log_uncaught_exceptions(ex_cls, ex, tb):
+			error(''.join(traceback.format_tb(tb)))
+			error('{0}: {1}'.format(ex_cls, ex))
+		sys.excepthook = log_uncaught_exceptions		
 	
 		# setup input/output
 		self.ui.InBuffered.clicked.connect(self.buffered)
