@@ -106,7 +106,7 @@ if __name__ == "__main__":
 # 	kwargs = dict(x.split('=', 1) for x in sys.argv[1:])
 # 	name = kwargs.get('name', '')
 # 	port = kwargs.get('port', '/dev/ttyACM0')
-	sys.excepthook = lambda *args: None
+#	sys.excepthook = lambda *args: None
 	app = QApplication([])
 	try:
 		timbreTalk = timbreTalk()
