@@ -169,6 +169,7 @@ class terminal(QMainWindow):
 						if s:
 							self.output.emit(s)
 					except Empty:
+						print 'Empty exception'
 						pass
 					except Exception, e:
 						print >>sys.stderr, e
@@ -386,7 +387,9 @@ class terminal(QMainWindow):
 				elif style == 'warning':
 					f.setForeground(QColor("orange"))
 				elif style == 'error':
-					f.setForeground(QColor("red"))
+					f.setForeground(QColor("tomato"))
+				else:
+					f.setForeground(QColor(style))
 				self.ui.textEdit.setCurrentCharFormat(f)
 				self.ui.textEdit.appendPlainText(s)
 			else:
