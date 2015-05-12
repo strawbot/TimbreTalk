@@ -108,7 +108,8 @@ class sfpProtocol(QThread):
 		self.byteTimeout.connect(self.initRx)
 		
 		def pingBack(packet): # responder
-			self.sendNPS(PING_BACK, [])
+			whoto, whofrom = cast('BB', packet)[0:2]
+			self.sendNPS(PING_BACK, [whofrom, whoto])
 		self.packetSource(PING, pingBack)
 
 	def spsHandler(self, packet):
