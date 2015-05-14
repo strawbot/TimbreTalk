@@ -30,16 +30,14 @@ def setTextOutput(f): # output can be redirected to a different place
 	textout = f
 
 # messages
-def note(string, newline=True):
-	if newline == True:
-		string = string+'\n'
-	textout(string, style='note')
+def note(string):
+	textout('\n'+string, style='note')
 
 def warning(string): # mark a message for formatting
-	textout(string+'\n', style='warning')
+	textout('\n'+string, style='warning')
 
 def error(string):
-	textout(string+'\n', style='error')
+	textout('\n'+string, style='error')
 
 def message(string, style=''): # mark a message for formatting
 #	string = ''.join(x+hex(x) for x in string)

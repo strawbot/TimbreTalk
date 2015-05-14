@@ -381,7 +381,7 @@ class terminal(QMainWindow):
 			visible = self.isCursorVisible()
 			f = self.ui.textEdit.currentCharFormat()
 			if style: # Note: QColor.colorNames() for a list of named colors
-				s = s.strip()
+#				s = s.strip()
 				if style == 'note':
 					f.setForeground(QColor("springgreen"))
 				elif style == 'warning':
@@ -391,19 +391,12 @@ class terminal(QMainWindow):
 				else:
 					f.setForeground(QColor(style))
 				self.ui.textEdit.setCurrentCharFormat(f)
-				self.ui.textEdit.appendPlainText(s)
+				if s[0] in ['\r','\n']:
+					self.textcount = 0
+				self.ui.textEdit.insertPlainText(s)
 			else:
 				f.setForeground(QColor("cyan"))
 				self.ui.textEdit.setCurrentCharFormat(f)
-				#t = ''
-				#for c in s:
-				#	if ord(c) in range(32,127):
-				#		t += c
-				#	else:
-				#		print >>sys.stderr, hex(ord(c))
-				#s = t
-				#self.ui.textEdit.insertPlainText(s)
-				#'''
 				for c in s:
 					if self.ui.InHex.isChecked():
 						text = ' ' + format(ord(c), '02X')
@@ -422,11 +415,8 @@ class terminal(QMainWindow):
 								self.ui.textEdit.insertPlainText(c) # Cannot queue arguments of type 'QTextCursor'
 					if self.textcount > width:
 						self.ui.textEdit.insertPlainText('\r\n')
-						# print >>sys.stderr, self.textcount
 						self.textcount = 0
-				#'''
 			if visible:
-				#self.ui.textEdit.ensureCursorVisible()
 				sb = self.ui.textEdit.verticalScrollBar()
 				sb.setValue(sb.maximum())
 			self.mutex.unlock()

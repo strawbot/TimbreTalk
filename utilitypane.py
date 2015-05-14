@@ -62,25 +62,12 @@ class utilityPane(QWidget):
 		self.loadFrames = 0
 		self.ui.loadRun.clicked.connect(self.loadRun)
 		
-		# STM32 Boot Tools
-		self.ui.initBoot.clicked.connect(lambda: self.sendHex([0x7F]))
-		self.ui.getCommand.clicked.connect(lambda: self.sendHex([0x00,0xFF]))
-		self.ui.gvCommand.clicked.connect(lambda: self.sendHex([0x01,0xFE]))
-		self.ui.gidCommand.clicked.connect(lambda: self.sendHex([0x02,0xFD]))
-		self.ui.readCommand.clicked.connect(self.readCmd)
-		self.ui.goCommand.clicked.connect(self.goCmd)
-		self.ui.writeCommand.clicked.connect(self.writeCmd)
-		self.ui.eraseCommand.clicked.connect(self.eraseCmd)
-		
-		self.ui.readAddress.setText('08000000')
-		self.ui.readLength.setText('10')
-
 		# STM32F4 Boot Loader
 		self.ui.bootSelect.clicked.connect(self.selectFile)
 		self.ui.sendBoot.clicked.connect(self.sendBoot)
 		self.progress.connect(self.progressBar)
 		self.transferTimer = QTimer()
-		self.transferTimer.timeout.connect(self.abortBoot)
+		self.transferTimer.timeout.connect(self.timedOut)
 		self.transferTimer.setSingleShot(True)
 		
 		self.ui.Boot.clicked.connect(self.listenBoot)
@@ -125,7 +112,7 @@ class utilityPane(QWidget):
 	
 	# Boot downloader
 	def listenBoot(self):
-		note('redirecting serial port to boot listener', True)
+		note('Redirecting serial port to boot listener')
 		self.parent.disconnectPort()
 		def showRx(rx):
 			note('Rx:%s'%''.join(map(lambda x: ' '+hex(ord(x))[2:],  rx)))
@@ -134,25 +121,35 @@ class utilityPane(QWidget):
 	
 	def noListenBoot(self):
 		self.parent.connectPort()
-		note('serial port reconnected')
+		note('Serial port reconnected')
 
 	def echoTx(self, tx):
 		note('Tx:%s'%''.join(map(lambda x: ' '+hex(x)[2:],  tx)))
 		self.parent.serialPort.sink(tx)
 
 	# support for sequencing off of replies
-	def onAck(self, sequence, successor):
-		note('Tx:%s'%''.join(map(lambda x: ' '+hex(x)[2:],  sequence)))
+	def onAck(self, sequence, successor): # setup callback for next step
+		if self.ui.verbose.isChecked():
+			note('Tx:%s'%''.join(map(lambda x: ' '+hex(x)[2:],  sequence)))
 		self.parent.serialPort.sink(sequence)
 		self.nextState = successor
 
-	def nextSuccessor(self,ack):
-		note('Rx: %s'% hex(ord(ack))[2:])
+	def nextSuccessor(self,ack): # invoke callback if acked
+		if self.ui.verbose.isChecked():
+			note('Rx: %s'% hex(ord(ack))[2:])
 		if ack == self.ACK:
 			self.nextState()
 		else:
 			error('NACK'+ack)
 			self.abortBoot()
+
+	def progressBar(self, n):
+		if printme: print >>sys.stderr, 'progress'
+		if n:
+			self.ui.bootLoaderProgressBar.setValue(n*1000)
+		else:
+			self.ui.bootLoaderProgressBar.reset()
+			self.ui.bootLoaderProgressBar.setMaximum(1000)
 
 	# states
 	def sendBoot(self):
@@ -168,45 +165,36 @@ class utilityPane(QWidget):
 				error("No image for downloading")
 		
 	def connectBoot(self):
-		note('redirecting serial port to boot loader', True)
+		note('Acquiring serial port for boot loader')
 		self.progress.emit(0)
 		self.parent.disconnectPort()
 		self.setParam(self.parent.serialPort, 'E', 8, 1)
 		self.parent.serialPort.source.connect(self.nextSuccessor)
-		note('connect with stm32 boot loader', True)
+		note('Connect with stm32 boot loader... ')
 		self.onAck([0x7F], self.eraseBoot)
 		self.progress.emit(.025)
 	
-	def disableRDP(self):
-		self.onAck(self.checked(0x92), self.waitAck)
-	
-	def waitAck(self):
-		self.onAck([], self.eraseBoot)
-
 	def eraseBoot(self):
+		message('connected')
+		note('Erasing...')
 		self.transferTimer.start(20000)
 		self.onAck(self.checked(0x44), self.erasePages)
 		self.progress.emit(.05)
 
-	def erasePages(self):
-# 		firstSector = sectorIs(self.image.start)
-# 		lastSector = sectorIs(self.image.start + self.image.size)
-# 		sectors = range(firstSector, lastSector + 1)[0]
-# 		self.onAck(self.checksummed([len(sectors) - 1] + sectors), downloadBoot)
+	def erasePages(self): # erase pages not supported; erase all
 		self.onAck(self.checksummed([0xFF,0xFF]), self.downloadBoot)
 
 	def downloadBoot(self):
 		elapsed = time.time() - self.startTransferTime
-		note(' Flash erased in %.1f seconds'%elapsed, True)
+		message(' flash erased in %.1f seconds'%elapsed,'note')
 
-		note('download image')
+		note('Download image ')
 		self.pointer = self.image.start
 		self.writeCommand()
 		self.chunk = 256
 
 	def writeCommand(self): # progress bar from .1 to .9
 		self.transferTimer.start(2000)
-		print self.pointer,self.image.start,self.image.size,(self.pointer - self.image.start)/self.image.size
 		self.progress.emit(.1 + (.8*(self.pointer - self.image.start)/self.image.size))
 		if self.pointer < self.image.end:
 			self.onAck(self.checked(0x31), self.writeAddress)
@@ -218,7 +206,8 @@ class utilityPane(QWidget):
 		self.onAck(address, self.writeData)
 
 	def writeData(self):
-		note('.')
+		if not self.ui.verbose.isChecked():
+			message('.', "note")
 		self.chunk = min(self.chunk, self.image.end - self.pointer)
 		if self.chunk % 4:
 			error('Transfer size not a multiple of 4')
@@ -227,8 +216,8 @@ class utilityPane(QWidget):
 		data = self.image.image[index:index+self.chunk]
 		self.onAck(self.checksummed([self.chunk-1] + data), self.writeCommand)
 
-	def verifyBoot(self):
-		note('\nverify image')
+	def verifyBoot(self): # not verified, just trusted
+		# note('\nverify image')
 		self.reconnectSerial()
 	
 	def reconnectSerial(self):
@@ -238,25 +227,21 @@ class utilityPane(QWidget):
 		rate = (8*self.image.size)/(elapsed*1000)
 		rateMsg = ' @ %.1fkbps'%rate
 		note(transferMsg+rateMsg)
-		self.transferTimer.stop()
-		self.parent.connectPort()
-		note('serial port reconnected')
-		self.ui.sendBoot.setText('Send')
+		self.finishBoot()
+	
+	def timedOut(self):
+		error('Timed out')
+		self.abortBoot()
 
 	def abortBoot(self):
 		error('Transfer aborted.')
+		self.finishBoot()
+
+	def finishBoot(self):
 		self.transferTimer.stop()
 		self.parent.connectPort()
-		note('serial port reconnected')
+		note('serial port returned')
 		self.ui.sendBoot.setText('Send')
-
-	def progressBar(self, n):
-		if printme: print >>sys.stderr, 'progress'
-		if n:
-			self.ui.bootLoaderProgressBar.setValue(n*1000)
-		else:
-			self.ui.bootLoaderProgressBar.reset()
-			self.ui.bootLoaderProgressBar.setMaximum(1000)
 
 	# STM32 Boot Loader
 	def sendHex(self, bytes):
@@ -295,38 +280,6 @@ class utilityPane(QWidget):
 		except Exception, e:
 			print >>sys.stderr, e
 			traceback.print_exc(file=sys.stderr)
-
-	# sequenced commands
-	def readCmd(self):
-		try:
-			address = self.checksummed(bytearray.fromhex(self.ui.readAddress.text()))
-			print address
-			length = self.checked(int(self.ui.readLength.text()))
-			print length
-			self.bootSequence((self.checked(0x11), address, length))
-		except Exception, e:
-			print >>sys.stderr, e
-			traceback.print_exc(file=sys.stderr)
-
-	def goCmd(self):
-		address = self.checksummed(bytearray.fromhex(self.ui.goAddress.text()))
-		self.bootSequence((self.checked(0x21), address))
-
-	def writeCmd(self):
-		address = self.checksummed(bytearray.fromhex(self.ui.writeAddress.text()))
-		data = self.checksummed(bytearray.fromhex(self.ui.writedata.text()))
-		length = self.checked(len(data)-1)
-		self.bootSequence((self.checked(0x31), address, length, data ))
-
-	def sectorIs(self, address):
-		for i in range(len(sectors)):
-			if sectors[i][1] <= address < (sectors[i][1] + sectors[i][2]*1024):
-				return i
-		return None
-
-	def eraseCmd(self):
-		pass
-
 
 	# printme
 	def setupPrintme(self):

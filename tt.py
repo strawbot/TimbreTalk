@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # GUI for serial transactions using Qt	Robert Chapman III	Sep 28, 2012
-version='1.0'
+version='1.1'
 
 from pyqtapi2 import *
 from cpuids import MAIN_HOST

@@ -130,7 +130,7 @@ class serialPane(QWidget):
 
 	def protocolDump(self, flag):
 		self.parent.protocol.VERBOSE = flag
-		note('protocol dump ',(flag != 0))
+		note('protocol dump ')
 
 	# talk connections
 	def talkPacket(self, packet): # handle text packets
