@@ -1,4 +1,4 @@
-# build an image from a file  Robert Chapman III  May 7, 2015
+# build image from intel hex or motorola Srecord file  Robert Chapman III  May 7, 2015
 
 from message import *
 from checksum import fletcher32

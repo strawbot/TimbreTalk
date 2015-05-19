@@ -16,3 +16,6 @@ def updateUi(qt): # input file root name to be updated
 		file = open(mwpy, "w")
 		compileUi(mwui, file, execute=True)
 		file.close()
+
+if __name__ == '__main__':
+	updateUi('mainWindow')

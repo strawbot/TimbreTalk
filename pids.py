@@ -26,7 +26,8 @@ FLASH_WRITE=0x11	# request write to flash; who, 32bit addr, 8bit length, bytes
 WRITE_CONF=0x12	# confirm a write to memory; who, addr32, len8
 ERASE_MEM=0x13	# erase memory range froms start to end
 ERASE_CONF=0x14	# confirm memory erased (0) or not (!0)
-MAX_PIDS=0x15	# number of PIDS defined
+AT_CMD=0x15	# at commands
+MAX_PIDS=0x16	# number of PIDS defined
 
 pids = {
 	ACK_BIT:"ACK_BIT",	# used for indicating SPS frames
@@ -54,5 +55,6 @@ pids = {
 	WRITE_CONF:"WRITE_CONF",	# confirm a write to memory; who, addr32, len8
 	ERASE_MEM:"ERASE_MEM",	# erase memory range froms start to end
 	ERASE_CONF:"ERASE_CONF",	# confirm memory erased (0) or not (!0)
+	AT_CMD:"AT_CMD",	# at commands
 	MAX_PIDS:"MAX_PIDS"	# number of PIDS defined
 }

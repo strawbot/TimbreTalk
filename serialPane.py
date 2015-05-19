@@ -17,6 +17,7 @@ class serialPane(QWidget):
 		# signals
 		self.ui.SFP.clicked.connect(self.selectSfp)
 		self.ui.Serial1.clicked.connect(self.selectSerial)
+		self.ui.AT.clicked.connect(self.selectAt)
 		self.ui.Ping.clicked.connect(self.sendPing)
 		self.ui.ResetRcvr.clicked.connect(self.resetRcvr)
 		self.ui.ProtocolDump.stateChanged.connect(self.protocolDump)
@@ -101,23 +102,11 @@ class serialPane(QWidget):
 	def connectPort(self):
 		if self.ui.SFP.isChecked():
 			self.selectSfp()
-		else:
+		elif self.ui.Serial1.isChecked():
 			self.selectSerial()
-
-	def selectSfp(self):
-		if not self.ui.SFP.isChecked():
-			note('changed to SFP')
-			self.self.resetRcvr()
-		self.disconnectFlows()
-		if self.ui.LoopBack.isChecked():
-			self.parent.serialPort.source.connect(self.parent.serialPort.sink)
-			self.parent.protocol.source.connect(self.parent.protocol.sink)
-			self.parent.source.connect(self.talkSink)
 		else:
-			self.parent.protocol.source.connect(self.parent.serialPort.sink)
-			self.parent.serialPort.source.connect(self.parent.protocol.sink)
-			self.parent.source.connect(self.talkSink)
-	
+			self.selectAt()
+
 	def selectSerial(self):
 		if not self.ui.Serial1.isChecked():
 			note('changed to no-protocol serial')
@@ -128,6 +117,33 @@ class serialPane(QWidget):
 			self.parent.serialPort.source.connect(self.parent.sink)
 			self.parent.source.connect(self.parent.serialPort.sink)
 
+	def selectSfp(self):
+		if not self.ui.SFP.isChecked():
+			note('changed to SFP')
+			self.resetRcvr()
+		self.disconnectFlows()
+		if self.ui.LoopBack.isChecked():
+			self.parent.serialPort.source.connect(self.parent.serialPort.sink)
+			self.parent.protocol.source.connect(self.parent.protocol.sink)
+			self.parent.source.connect(self.talkSink)
+		else:
+			self.parent.protocol.source.connect(self.parent.serialPort.sink)
+			self.parent.serialPort.source.connect(self.parent.protocol.sink)
+			self.parent.source.connect(self.talkSink)
+	
+	def selectAt(self):
+		if not self.ui.AT.isChecked():
+			note('changed to AT')
+		self.disconnectFlows()
+		if self.ui.LoopBack.isChecked():
+			self.parent.serialPort.source.connect(self.parent.serialPort.sink)
+			self.parent.protocol.source.connect(self.parent.protocol.sink)
+			self.parent.source.connect(self.ATSink)
+		else:
+			self.parent.protocol.source.connect(self.parent.serialPort.sink)
+			self.parent.serialPort.source.connect(self.parent.protocol.sink)
+			self.parent.source.connect(self.ATSink)
+	
 	def protocolDump(self, flag):
 		self.parent.protocol.VERBOSE = flag
 		note('protocol dump ')
@@ -138,15 +154,23 @@ class serialPane(QWidget):
 
 	def talkSink(self, s): # have a text port
 		s = str(s)
-		who = self.parent.who()
 		if self.ui.InBuffered.isChecked():
 			talkout = pids.EVAL
 			s = s.strip()
-			payload = who+map(ord,s)+[0]
+			payload = map(ord,s)+[0]
 		else:
 			talkout = pids.TALK_IN
-			payload = who+map(ord,s)
-		self.parent.protocol.sendNPS(talkout, payload)
+			payload = map(ord,s)
+		self.parent.protocol.sendNPS(talkout, self.parent.who()+payload)
+
+	def ATSink(self, s): # sent through as AT PID
+		s = str(s)
+		if self.ui.InBuffered.isChecked():
+			s = s.strip()
+			payload = map(ord,s)+[0xD]
+		else:
+			payload = map(ord,s)
+		self.parent.protocol.sendNPS(pids.AT_CMD, self.parent.who()+payload)
 
 	def sendPing(self, flag):
 		self.parent.protocol.sendNPS(pids.PING, [self.parent.whoto, self.parent.whofrom])
