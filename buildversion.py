@@ -193,9 +193,8 @@ def extractNameDateVersion(image, endianness='big'):
 # test
 def testAppVD():
 	import image
-	srec = image.addRecord('Test/testApp.srec')
-	image, checksum = srec.recordImage()
-	name, date, version = extractNameDateVersion(image, 'little')
+	srec = image.imageRecord('Test/testApp.srec')
+	name, date, version = extractNameDateVersion(srec.image, 'little')
 	print 'image name: ', name, ' and date: ', date, ' version:', version
 
 if __name__ == '__main__':

@@ -2,6 +2,7 @@
 
 from message import *
 from checksum import fletcher32
+import os
 
 class imageRecord():
 	MAX_IMAGE_SIZE = 1024 * 1024 * 2 # 2MB
@@ -12,19 +13,28 @@ class imageRecord():
 		del self.records[:]
 		self.records = []
 		self.image = []
-		self.addRecord(file)
+		self.timestamp = 0
+		self.file = file
+		self.addRecord()
 		self.createImage()
 
-	def addRecord(self, file): # turn file into list of address,data tuples
+	def checkUpdates(self):
+		if self.timestamp != os.path.getmtime(self.file):
+			warning(' disk image is newer - reloading ')
+			self.addRecord()
+			self.createImage()
+
+	def addRecord(self): # turn file into list of address,data tuples
+		self.timestamp = os.path.getmtime(self.file) # remember for checking later
 		self.start = 0xFFFFFFFF
 		self.end = self.entry = 0
 		del self.records[:]
-		self.name = file.rsplit('/', 1)[-1]
+		self.name = self.file.rsplit('/', 1)[-1]
 		type = self.name.rsplit('.', 1)[-1]
 		if type in ['srec', 'S19']:
-			self.addSrecord(file)
+			self.addSrecord()
 		elif type in ['hex']:
-			self.addHexRecord(file)
+			self.addHexRecord()
 		else:
 			error('Unknown format. File suffix not .hex, .srec nor .S19: %s'%self.name)
 		if self.start == 0xFFFFFFFF:
@@ -60,10 +70,10 @@ class imageRecord():
 	  [9:-2] data
 	  [-2:] checksum: 2's complement of sump of all preceding bytes; ignored
 	'''
-	def addHexRecord(self, file):
+	def addHexRecord(self):
 		try:
 			base = 0
-			for line in open(file, 'r').readlines():
+			for line in open(self.file, 'r').readlines():
 				line = line.strip()
 				if line:
 					if line[0] == ':':
@@ -137,9 +147,9 @@ class imageRecord():
 	The address field of the S7, S8, or S9 records may contain a starting
 	address for the program.
 	'''
-	def addSrecord(self,file):
+	def addSrecord(self):
 		try:
-			for line in open(file, 'r').readlines():
+			for line in open(self.file, 'r').readlines():
 				line = line.strip()
 				if not line:
 					continue

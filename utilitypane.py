@@ -161,6 +161,7 @@ class utilityPane(QWidget):
 				self.connectBoot()
 				self.transferTimer.start(2000)
 				self.ui.sendBoot.setText('Abort')
+				self.image.checkUpdates()
 			else:
 				error("No image for downloading")
 		
@@ -240,7 +241,7 @@ class utilityPane(QWidget):
 	def finishBoot(self):
 		self.transferTimer.stop()
 		self.parent.connectPort()
-		note('serial port returned')
+		note('serial port reconnected')
 		self.ui.sendBoot.setText('Send')
 
 	# STM32 Boot Loader

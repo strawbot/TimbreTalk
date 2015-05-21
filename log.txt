@@ -35,7 +35,6 @@ Issues:
  18. add parity, size and stopbits to monitor utility
  19. change flow of boot loader so that the received bytes come to the next sequence
      so that it makes a decision to move on or not. Same with timeout.
- 20. need to make bootloader check for file changed on disk
  21. application should be able to load CPU ids and PIDs perhaps handlers too
  22. application should be able to store preferences which would include pids and cpu ids
 Updates:
@@ -46,3 +45,4 @@ Updates:
  5. added textcolors.py to list all text colors on black and white backgrounds
  6. added support for creating binary applications for the three platforms (Mac,
     Windows, Linux). Follow instructions in "pyinstaller scripts.txt".
+ 7. Done: 20. need to make bootloader check for file changed on disk
