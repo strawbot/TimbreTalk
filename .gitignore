@@ -1,3 +1,6 @@
 *.pyc
 PyInstaller-2.1
 *.pyo
+build
+dist
+tt.spec
