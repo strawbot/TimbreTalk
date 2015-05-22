@@ -3,6 +3,7 @@
 from message import *
 from checksum import fletcher32
 import os
+from ctypes import *
 
 class imageRecord():
 	MAX_IMAGE_SIZE = 1024 * 1024 * 2 # 2MB
@@ -35,8 +36,10 @@ class imageRecord():
 			self.addSrecord()
 		elif type in ['hex']:
 			self.addHexRecord()
+		elif type in ['elf']:
+			self.addElfRecord()
 		else:
-			error('Unknown format. File suffix not .hex, .srec nor .S19: %s'%self.name)
+			error('Unknown format. File suffix not .hex, .srec, .S19, .elf: %s'%self.name)
 		if self.start == 0xFFFFFFFF:
 			self.start = 0
 		self.size = self.end - self.start
@@ -185,5 +188,99 @@ class imageRecord():
 					self.end = max(self.end, address+len(data)/2)
 		except:
 			error('Error parsing s-record file! Unknown format')
+
+	''' ELF file format: ELF file main Header format:
+		Byte	ident[16]; 0x7f 3 chars; class; encoding; version; 
+		Short	type
+		Short	machine
+		Long 	version
+		Long	entry
+		Long	phoff
+		Long	shoff
+		Long	flags
+		Short	ehsize
+		Short	phentsize
+		Short	phnum
+		Short	shentsize
+		Short	shnum
+		Short	shstrndx
+	Program headers start at phoff and there are phnum of them. They contain
+	information about the parts to build the image.
+	'''
+	def addElfRecord(self):
+		# named constants
+		EI_MAG0, EI_MAG1, EI_MAG2, EI_MAG3, EI_CLASS, EI_DATA, EI_VERSION, EI_PAD, EI_NIDENT = range(8) + [16]
+		ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3 = '\x7f', 'E', 'L', 'F'
+		ELFCLASSNONE, ELFCLASS32, ELFCLASS64 = range(3)
+		ELFDATANONE, ELFDATA2LSB, ELFDATA2MSB = range(3)
+		ET_NONE, ET_REL, ET_EXEC, ET_DYN, ET_CORE = range(5)
+		EM_NONE, EM_M32, EM_SPARC, EM_386, EM_68K, EM_88K, EM_86O, EM_MIPS, EM_ARM = range(6) + [7,8,0x28]
+
+		def elfHeader(base):
+			class elfHeaderBase(base):
+				_fields_ = [('ident', c_ubyte * EI_NIDENT),
+							('type', c_ushort),
+							('machine', c_ushort),
+							('version', c_uint32),
+							('entry', c_uint32),
+							('phoff', c_uint32),
+							('shoff', c_uint32),
+							('flags', c_uint32),
+							('ehsize', c_ushort),
+							('phentsize', c_ushort),
+							('phnum', c_ushort),
+							('shentsize', c_ushort),
+							('shnum', c_ushort),
+							('shstrndx', c_ushort)]
+			return elfHeaderBase()
+
+		# format of program headers used to find image sections
+		def programHeader(base):
+			class programHeaderBase(base):
+				_fields_ = [('p_type', c_uint32),
+							('p_offset', c_uint32),
+							('p_vaddr', c_uint32),
+							('p_paddr', c_uint32),
+							('p_filesz', c_uint32),
+							('p_memsz', c_uint32),
+							('p_flags', c_uint32),
+							('p_align', c_uint32)]
+			return programHeaderBase()
+
+		# determine endian
+		file = open(self.file, 'rb')
+		file.seek(EI_DATA)
+		if file.read(1) == ELFDATA2MSB:
+			endian = BigEndianStructure
+		else:
+			endian = LittleEndianStructure
+
+		# elf header
+		elf = elfHeader(endian)
+		file.seek(EI_MAG0)
+		file.readinto(elf)
+	
+		if elf.ident[EI_MAG0:EI_CLASS] != map(ord, [ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3]):
+			error('Not an elf file')
+			return
+
+		self.entry = elf.entry
+
+		# program headers
+		ph = programHeader(endian)
+	
+		for i in range(elf.phnum):
+			file.seek(elf.phoff + i * sizeof(ph))
+			file.readinto(ph)
+			# image
+			if ph.p_filesz:
+				address = int(ph.p_paddr)
+				file.seek(ph.p_offset)
+				data = file.read(ph.p_filesz).encode("hex")
+				self.records.append((address,data))
+				self.start = min(self.start, address)
+				self.end = max(self.end, address+len(data)/2)
+
+		file.close()
 
 # unit test code: convert srec and hex file to images and compare checksums
