@@ -67,11 +67,11 @@ machines = {EM_NONE:'no machine', EM_M32:'AT&T WE 32100', EM_SPARC:'SPARC', EM_3
 
 def ehDump(elf):
 	print 'ident: %s'%chr(elf.ident[EI_MAG1])+chr(elf.ident[EI_MAG2])+chr(elf.ident[EI_MAG3])
-	print 'class: %s'%classes.get(elf.ident[EI_CLASS], 'unknown')
-	print 'encoding: %s'%encodings.get(elf.ident[EI_DATA], 'unknown')
+	print 'class: %s'%classes.get(elf.ident[EI_CLASS], str(elf.ident[EI_CLASS]))
+	print 'encoding: %s'%encodings.get(elf.ident[EI_DATA], str(elf.ident[EI_DATA]))
 	print 'version: %d'%elf.ident[EI_VERSION]
-	print 'type: %s'%types.get(elf.type,'unknown')
-	print 'machine: %s'%machines.get(elf.machine, 'unknown')
+	print 'type: %s'%types.get(elf.type, str(elf.type))
+	print 'machine: %s'%machines.get(elf.machine, str(elf.machine))
 	print 'version: %d'%elf.version
 	print 'entry: 0x%X'%elf.entry
 	print 'phoff: %d'%elf.phoff
@@ -98,7 +98,7 @@ def elfDump(file):
 	# determine endian
 	file = open(file, 'rb')
 	file.seek(EI_DATA)
-	if file.read(1) == ELFDATA2MSB:
+	if ord(file.read(1)) == ELFDATA2MSB:
 		endian = BigEndianStructure
 	else:
 		endian = LittleEndianStructure
@@ -114,19 +114,19 @@ def elfDump(file):
 	size = 0
 	image = []
 	
-	for i in range(elf.phnum):
-		print 'PH#',i
-		file.seek(elf.phoff + i * sizeof(ph))
-		file.readinto(ph)
-		phDump(ph)
-		size += ph.p_filesz
-		# image
-		file.seek(ph.p_offset)
-		image += file.read(ph.p_filesz)
+	if elf.type == ET_EXEC:
+		for i in range(elf.phnum):
+			print 'PH#',i
+			file.seek(elf.phoff + i * sizeof(ph))
+			file.readinto(ph)
+			phDump(ph)
+			size += ph.p_filesz
+			# image
+			file.seek(ph.p_offset)
+			image += file.read(ph.p_filesz)
+		print 'size', size
+		print 'image length:',len(image)
 
-	print 'image type',type(image[0]), image[0]
-	print 'size', size
-	print 'image length:',len(image)
 	file.close()
 
 elfDump(sys.argv[1])

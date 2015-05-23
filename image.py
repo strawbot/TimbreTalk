@@ -250,7 +250,7 @@ class imageRecord():
 		# determine endian
 		file = open(self.file, 'rb')
 		file.seek(EI_DATA)
-		if file.read(1) == ELFDATA2MSB:
+		if ord(file.read(1)) == ELFDATA2MSB:
 			endian = BigEndianStructure
 		else:
 			endian = LittleEndianStructure
