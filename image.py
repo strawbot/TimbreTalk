@@ -264,6 +264,10 @@ class imageRecord():
 			error('Not an elf file')
 			return
 
+		if elf.type != ET_EXEC:
+			error('Not an executable file')
+			return
+
 		self.entry = elf.entry
 
 		# program headers
