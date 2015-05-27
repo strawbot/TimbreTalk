@@ -52,6 +52,8 @@ def s2l(s): # string to list of bytes
 	return [ord(s[i]) for i in range(len(s))]
 
 def l2s(l): # list of bytes to string
+	if type(l[0]) == type(' '):
+		return l
 	return ''.join(map(chr,l[:]))
 
 # convert list of bytes to a structure given format
