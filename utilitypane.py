@@ -44,13 +44,14 @@ sectors = [[0, 0x08000000, 16],
 class utilityPane(QWidget):
 	progress = Signal(object)
 	ACK = chr(0x79)
+	NACK = chr(0x1F)
 
 	def __init__(self, parent):
 		QWidget.__init__(self, parent)
 		self.parent = parent
 		self.ui = parent.ui
 		self.protocol = parent.protocol
-		
+		self.startTransferTime = 0
 		self.image = None
 
 		# printme
@@ -69,7 +70,7 @@ class utilityPane(QWidget):
 		self.transferTimer = QTimer()
 		self.transferTimer.timeout.connect(self.timedOut)
 		self.transferTimer.setSingleShot(True)
-		
+
 		self.ui.Boot.clicked.connect(self.listenBoot)
 		self.ui.Reconnect.clicked.connect(self.noListenBoot)
 		self.ui.Init.clicked.connect(lambda: self.echoTx([0x7F]))
@@ -82,6 +83,7 @@ class utilityPane(QWidget):
 		self.ui.Get.clicked.connect(lambda: self.echoTx(self.checked(0x0)))
 		self.ui.Getrpd.clicked.connect(lambda: self.echoTx(self.checked(0x1)))
 		self.ui.Getid.clicked.connect(lambda: self.echoTx(self.checked(0x2)))
+		self.ui.Go.clicked.connect(self.goButton)
 
 		# monitor ports - should make a common class and instantiate multiple times
 		self.sptimer = QTimer()
@@ -128,20 +130,25 @@ class utilityPane(QWidget):
 		self.parent.serialPort.sink(tx)
 
 	# support for sequencing off of replies
-	def onAck(self, sequence, successor): # setup callback for next step
+	def onAck(self, sequence, successor, failure=None): # setup callback for next step
 		if self.ui.verbose.isChecked():
 			note('Tx:%s'%''.join(map(lambda x: ' '+hex(x)[2:],  sequence)))
 		self.parent.serialPort.sink(sequence)
 		self.nextState = successor
+		self.failState = failure
 
 	def nextSuccessor(self,ack): # invoke callback if acked
 		if self.ui.verbose.isChecked():
-			note('Rx: %s'% hex(ord(ack))[2:])
+			note('Rx: %s'% hex(ord(ack[0]))[2:])
 		if ack == self.ACK:
 			self.nextState()
-		else:
-			error('NACK'+ack)
-			self.abortBoot()
+			return
+		if ack == self.NACK:
+			if self.failState:
+				self.failState()
+				return
+		error('NACK'+ack)
+		self.abortBoot()
 
 	def progressBar(self, n):
 		if printme: print >>sys.stderr, 'progress'
@@ -219,15 +226,32 @@ class utilityPane(QWidget):
 
 	def verifyBoot(self): # not verified, just trusted
 		# note('\nverify image')
+		if self.ui.run.isChecked():
+			self.goCommand()
+		else:
+			self.reconnectSerial()
+	
+	def goButton(self):
+		self.listenBoot()
+		self.parent.serialPort.source.connect(self.nextSuccessor)
+		self.startTransferTime = 0
+		self.onAck([0x7F], self.goCommand, self.goCommand)
+		
+	def goCommand(self):
+		self.onAck(self.checked(0x21), self.goAddress)
+
+	def goAddress(self):
+		self.echoTx(self.checksummed(longList(int(self.ui.bootStart.text(), 0))))
 		self.reconnectSerial()
 	
 	def reconnectSerial(self):
 		self.progress.emit(1)
-		elapsed = time.time() - self.startTransferTime
-		transferMsg = 'Finished in %.1f seconds'%elapsed
-		rate = (8*self.image.size)/(elapsed*1000)
-		rateMsg = ' @ %.1fkbps'%rate
-		note(transferMsg+rateMsg)
+		if self.startTransferTime:
+			elapsed = time.time() - self.startTransferTime
+			transferMsg = 'Finished in %.1f seconds'%elapsed
+			rate = (8*self.image.size)/(elapsed*1000)
+			rateMsg = ' @ %.1fkbps'%rate
+			note(transferMsg+rateMsg)
 		self.finishBoot()
 	
 	def timedOut(self):
