@@ -194,9 +194,9 @@ class imageRecord():
 		Short	type
 		Short	machine
 		Long 	version
-		Long	entry
-		Long	phoff
-		Long	shoff
+		Long	entry // longlong for 64-bit
+		Long	phoff // longlong for 64-bit
+		Long	shoff // longlong for 64-bit
 		Long	flags
 		Short	ehsize
 		Short	phentsize
@@ -268,7 +268,7 @@ class imageRecord():
 			error('Not an executable file')
 			return
 
-		self.entry = elf.entry
+		self.entry = int(elf.entry)
 
 		# program headers
 		ph = programHeader(endian)
