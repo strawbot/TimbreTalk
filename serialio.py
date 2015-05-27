@@ -87,8 +87,11 @@ class serialPort(QThread):
 		if self.isOpen():
 			port = self.port
 			self.port = None
-			port.flush()
-			port.close()
+			try:
+				port.flush()
+				port.close()
+			except:
+				pass
 			note('closed %s'%self.name)
 		else:
 			self.port = None
