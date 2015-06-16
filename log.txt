@@ -37,6 +37,10 @@ Issues:
      so that it makes a decision to move on or not. Same with timeout.
  21. application should be able to load CPU ids and PIDs perhaps handlers too
  22. application should be able to store preferences which would include pids and cpu ids
+ 23. reset port buffers when changing ports. and perhaps clear once open.
+ 24. when garbage comes in, displaying in serial hex is fine but if SFP is running, it hangs
+ 25. change reboot button to send reboot as a command. 4 execute doesn't cut it.
+
 Updates:
  1. removed unneccessary files from folder
  2. modified applist to take arguments
