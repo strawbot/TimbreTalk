@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainWindow.ui'
 #
-# Created: Wed May 27 11:22:05 2015
+# Created: Tue Jun 23 08:58:34 2015
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -824,8 +824,14 @@ class Ui_MainWindow(object):
         self.verbose.setGeometry(QtCore.QRect(10, 220, 76, 20))
         self.verbose.setObjectName(_fromUtf8("verbose"))
         self.toolBox.addItem(self.page, _fromUtf8(""))
+        self.page_2 = QtGui.QWidget()
+        self.page_2.setObjectName(_fromUtf8("page_2"))
+        self.setDateTime = QtGui.QPushButton(self.page_2)
+        self.setDateTime.setGeometry(QtCore.QRect(10, 0, 113, 32))
+        self.setDateTime.setObjectName(_fromUtf8("setDateTime"))
+        self.toolBox.addItem(self.page_2, _fromUtf8(""))
         self.Monitor = QtGui.QWidget()
-        self.Monitor.setGeometry(QtCore.QRect(0, 0, 100, 30))
+        self.Monitor.setGeometry(QtCore.QRect(0, 0, 360, 213))
         self.Monitor.setObjectName(_fromUtf8("Monitor"))
         self.MonitorPort1 = QtGui.QComboBox(self.Monitor)
         self.MonitorPort1.setGeometry(QtCore.QRect(20, 20, 140, 26))
@@ -1129,7 +1135,7 @@ class Ui_MainWindow(object):
         self.Controls.setCurrentIndex(3)
         self.BaudRate.setCurrentIndex(5)
         self.targetSelect.setCurrentIndex(-1)
-        self.toolBox.setCurrentIndex(3)
+        self.toolBox.setCurrentIndex(4)
         self.MonitorBaud1.setCurrentIndex(5)
         self.MonitorBaud2.setCurrentIndex(5)
         self.Color1.setCurrentIndex(4)
@@ -1263,6 +1269,8 @@ class Ui_MainWindow(object):
         self.label_9.setText(QtGui.QApplication.translate("MainWindow", "Tools:", None, QtGui.QApplication.UnicodeUTF8))
         self.verbose.setText(QtGui.QApplication.translate("MainWindow", "Verbose", None, QtGui.QApplication.UnicodeUTF8))
         self.toolBox.setItemText(self.toolBox.indexOf(self.page), QtGui.QApplication.translate("MainWindow", "STM32F4 Boot Loader", None, QtGui.QApplication.UnicodeUTF8))
+        self.setDateTime.setText(QtGui.QApplication.translate("MainWindow", "Set Date/Time", None, QtGui.QApplication.UnicodeUTF8))
+        self.toolBox.setItemText(self.toolBox.indexOf(self.page_2), QtGui.QApplication.translate("MainWindow", "Test", None, QtGui.QApplication.UnicodeUTF8))
         self.MonitorPort1.setItemText(0, QtGui.QApplication.translate("MainWindow", "(Select a Port)", None, QtGui.QApplication.UnicodeUTF8))
         self.MonitorPort2.setItemText(0, QtGui.QApplication.translate("MainWindow", "(Select a Port)", None, QtGui.QApplication.UnicodeUTF8))
         self.label_37.setText(QtGui.QApplication.translate("MainWindow", "Port 1:", None, QtGui.QApplication.UnicodeUTF8))

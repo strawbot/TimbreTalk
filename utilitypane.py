@@ -1,7 +1,7 @@
 # test panel for qtran  Robert Chapman III  Oct 24, 2012
 
 from pyqtapi2 import *
-import time
+import time, datetime
 from message import *
 import sfp, pids
 from endian import *
@@ -9,7 +9,6 @@ from random import randrange
 from image import *
 import traceback	
 import listports, serialio
-import time
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
@@ -99,6 +98,8 @@ class utilityPane(QWidget):
 		self.ui.MonitorBaud1.activated.connect(self.selectRate1)
 		self.ui.MonitorBaud2.activated.connect(self.selectRate2)
 
+		self.ui.setDateTime.clicked.connect(self.setDateTimeNow)
+		
 	def selectFile(self):
 		if printme: print >>sys.stderr, 'selectBoot'
 		try:
@@ -458,3 +459,10 @@ class utilityPane(QWidget):
 	def timestamp(self):
 		ms = current_milli_time()
 		return "%d.%03d: "%(ms/1000,ms%1000)
+		
+	def setDateTimeNow(self):
+		n = datetime.datetime.now()
+		cmd = "%d %d %d setdate %d %d %d settime date"% \
+		       (n.year%100, n.month, n.day, n.hour, n.minute, n.second)
+		payload = map(ord, cmd) + [0]
+		self.parent.protocol.sendNPS(pids.EVAL, self.parent.who() + payload)

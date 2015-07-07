@@ -1268,7 +1268,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
             <item>
              <widget class="QToolBox" name="toolBox">
               <property name="currentIndex">
-               <number>3</number>
+               <number>4</number>
               </property>
               <widget class="QWidget" name="Debug">
                <property name="geometry">
@@ -2006,13 +2006,31 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 </property>
                </widget>
               </widget>
+              <widget class="QWidget" name="page_2">
+               <attribute name="label">
+                <string>Test</string>
+               </attribute>
+               <widget class="QPushButton" name="setDateTime">
+                <property name="geometry">
+                 <rect>
+                  <x>10</x>
+                  <y>0</y>
+                  <width>113</width>
+                  <height>32</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>Set Date/Time</string>
+                </property>
+               </widget>
+              </widget>
               <widget class="QWidget" name="Monitor">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>100</width>
-                 <height>30</height>
+                 <width>360</width>
+                 <height>213</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2815,8 +2833,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="serialProtocol"/>
   <buttongroup name="LfOut"/>
   <buttongroup name="CrOut"/>
+  <buttongroup name="serialProtocol"/>
  </buttongroups>
 </ui>
