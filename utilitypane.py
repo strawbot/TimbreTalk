@@ -242,7 +242,10 @@ class utilityPane(QWidget):
 		self.onAck(self.checked(0x21), self.goAddress)
 
 	def goAddress(self):
-		self.echoTx(self.checksummed(longList(int(self.ui.bootStart.text(), 0))))
+		address = self.ui.bootStart.text()
+		if not address:
+			address = "0x8000000"
+		self.echoTx(self.checksummed(longList(int(address, 0))))
 		self.reconnectSerial()
 	
 	def reconnectSerial(self):

@@ -20,7 +20,6 @@ Issues:
  6. generalize code base for Timbre Talk and accept plug ins for:
      protocol, pids, cpuids, targets
  7. make it look prettier on Linux, Windows
- 8. make it easy to release a binary for windows and mac
  9. add collaborative max length negotiations for sfp protocol
  10. revise, update and test all code
  11. file button stays blue after loading file
@@ -37,6 +36,8 @@ Issues:
      so that it makes a decision to move on or not. Same with timeout.
  21. application should be able to load CPU ids and PIDs perhaps handlers too
  22. application should be able to store preferences which would include pids and cpu ids
+ 23. GUI should be hierarchial and plugable so that projects can add their special parts
+     but still be able to get general updates to GUI.
 Updates:
  1. removed unneccessary files from folder
  2. modified applist to take arguments
@@ -45,4 +46,5 @@ Updates:
  5. added textcolors.py to list all text colors on black and white backgrounds
  6. added support for creating binary applications for the three platforms (Mac,
     Windows, Linux). Follow instructions in "pyinstaller scripts.txt".
+    8. make it easy to release a binary for windows and mac
  7. Done: 20. need to make bootloader check for file changed on disk
