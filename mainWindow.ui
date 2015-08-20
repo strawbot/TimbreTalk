@@ -16,9 +16,6 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_12">
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_8"/>
-    </item>
-    <item>
      <layout class="QHBoxLayout" name="horizontalLayout_15">
       <property name="sizeConstraint">
        <enum>QLayout::SetMinimumSize</enum>
@@ -61,7 +58,7 @@
            <enum>Qt::NoContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>3</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="Serial">
            <attribute name="title">
@@ -2571,6 +2568,9 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
       </item>
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_5">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QPlainTextEdit" name="textEdit">
           <property name="minimumSize">
@@ -2722,23 +2722,52 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_35">
           <property name="spacing">
-           <number>7</number>
+           <number>-1</number>
           </property>
           <item>
-           <widget class="QPushButton" name="Find">
-            <property name="text">
-             <string>Find</string>
+           <widget class="QFrame" name="frame">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
             </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="FindText"/>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="FindBackwards">
-            <property name="text">
-             <string>Backwards</string>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
             </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_8">
+             <property name="topMargin">
+              <number>6</number>
+             </property>
+             <property name="bottomMargin">
+              <number>6</number>
+             </property>
+             <item>
+              <widget class="QPushButton" name="Find">
+               <property name="text">
+                <string>Find</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLineEdit" name="FindText"/>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="FindBackwards">
+               <property name="text">
+                <string>Backwards</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+            <zorder>Find</zorder>
+            <zorder>Find</zorder>
+            <zorder>Find</zorder>
+            <zorder>FindText</zorder>
+            <zorder>FindBackwards</zorder>
            </widget>
           </item>
           <item>
@@ -2755,9 +2784,40 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
            </spacer>
           </item>
           <item>
+           <widget class="QFrame" name="frame_4">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <property name="topMargin">
+              <number>6</number>
+             </property>
+             <property name="bottomMargin">
+              <number>6</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="checkBox_3">
+               <property name="text">
+                <string>Log to file</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
            <widget class="QPushButton" name="saveText">
             <property name="text">
-             <string>Save Text</string>
+             <string>Save</string>
             </property>
            </widget>
           </item>
@@ -2770,7 +2830,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              </size>
             </property>
             <property name="text">
-             <string>Clear Text</string>
+             <string>Clear</string>
             </property>
            </widget>
           </item>
@@ -2815,8 +2875,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="serialProtocol"/>
   <buttongroup name="LfOut"/>
   <buttongroup name="CrOut"/>
+  <buttongroup name="serialProtocol"/>
  </buttongroups>
 </ui>

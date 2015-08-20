@@ -12,6 +12,7 @@ from pyqtapi2 import *
 import sys, time, os, Queue
 from signalcatch import initSignalCatcher
 from message import *
+from endian import *
 
 # packet ids
 from pids import *
@@ -79,7 +80,9 @@ class sfpProtocol(QThread):
 				while True:
 					try:
 						packet = self.q.get()
-					except:
+					except Exception, e:
+						print >>sys.stderr, e
+						traceback.print_exc(file=sys.stderr)
 						break;
 					pid = packet[0]
 					handler = self.ph.get(pid)

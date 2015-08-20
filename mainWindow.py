@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainWindow.ui'
 #
-# Created: Wed May 27 11:22:05 2015
+# Created: Fri Aug  7 13:35:34 2015
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -594,7 +594,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_15.addItem(spacerItem9)
         self.toolBox.addItem(self.Debug, _fromUtf8(""))
         self.Stats = QtGui.QWidget()
-        self.Stats.setGeometry(QtCore.QRect(0, 0, 100, 30))
+        self.Stats.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.Stats.setObjectName(_fromUtf8("Stats"))
         self.layoutWidget = QtGui.QWidget(self.Stats)
         self.layoutWidget.setGeometry(QtCore.QRect(20, 21, 311, 189))
@@ -669,7 +669,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_16.addWidget(self.clearTranStats)
         self.toolBox.addItem(self.Stats, _fromUtf8(""))
         self.LoadTest = QtGui.QWidget()
-        self.LoadTest.setGeometry(QtCore.QRect(0, 0, 100, 30))
+        self.LoadTest.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.LoadTest.setObjectName(_fromUtf8("LoadTest"))
         self.loadRun = QtGui.QPushButton(self.LoadTest)
         self.loadRun.setGeometry(QtCore.QRect(10, 80, 67, 32))
@@ -825,7 +825,7 @@ class Ui_MainWindow(object):
         self.verbose.setObjectName(_fromUtf8("verbose"))
         self.toolBox.addItem(self.page, _fromUtf8(""))
         self.Monitor = QtGui.QWidget()
-        self.Monitor.setGeometry(QtCore.QRect(0, 0, 100, 30))
+        self.Monitor.setGeometry(QtCore.QRect(0, 0, 98, 28))
         self.Monitor.setObjectName(_fromUtf8("Monitor"))
         self.MonitorPort1 = QtGui.QComboBox(self.Monitor)
         self.MonitorPort1.setGeometry(QtCore.QRect(20, 20, 140, 26))
@@ -1106,6 +1106,9 @@ class Ui_MainWindow(object):
         self.horizontalLayout_35.addWidget(self.FindBackwards)
         spacerItem10 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_35.addItem(spacerItem10)
+        self.checkBox_3 = QtGui.QCheckBox(self.centralwidget)
+        self.checkBox_3.setObjectName(_fromUtf8("checkBox_3"))
+        self.horizontalLayout_35.addWidget(self.checkBox_3)
         self.saveText = QtGui.QPushButton(self.centralwidget)
         self.saveText.setObjectName(_fromUtf8("saveText"))
         self.horizontalLayout_35.addWidget(self.saveText)
@@ -1126,7 +1129,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.Controls.setCurrentIndex(3)
+        self.Controls.setCurrentIndex(0)
         self.BaudRate.setCurrentIndex(5)
         self.targetSelect.setCurrentIndex(-1)
         self.toolBox.setCurrentIndex(3)
@@ -1314,6 +1317,7 @@ class Ui_MainWindow(object):
         self.Controls.setTabText(self.Controls.indexOf(self.tab_2), QtGui.QApplication.translate("MainWindow", "Phrases", None, QtGui.QApplication.UnicodeUTF8))
         self.Find.setText(QtGui.QApplication.translate("MainWindow", "Find", None, QtGui.QApplication.UnicodeUTF8))
         self.FindBackwards.setText(QtGui.QApplication.translate("MainWindow", "Backwards", None, QtGui.QApplication.UnicodeUTF8))
+        self.checkBox_3.setText(QtGui.QApplication.translate("MainWindow", "Log", None, QtGui.QApplication.UnicodeUTF8))
         self.saveText.setText(QtGui.QApplication.translate("MainWindow", "Save Text", None, QtGui.QApplication.UnicodeUTF8))
         self.ClearText.setText(QtGui.QApplication.translate("MainWindow", "Clear Text", None, QtGui.QApplication.UnicodeUTF8))
 
