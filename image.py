@@ -24,6 +24,8 @@ class imageRecord():
 			warning(' disk image is newer - reloading ')
 			self.addRecord()
 			self.createImage()
+			return True
+		return False
 
 	def addRecord(self): # turn file into list of address,data tuples
 		self.timestamp = os.path.getmtime(self.file) # remember for checking later
