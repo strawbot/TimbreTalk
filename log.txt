@@ -36,11 +36,15 @@ Issues:
      so that it makes a decision to move on or not. Same with timeout.
  21. application should be able to load CPU ids and PIDs perhaps handlers too
  22. application should be able to store preferences which would include pids and cpu ids
- 23. GUI should be hierarchial and plugable so that projects can add their special parts
+ 23. reset port buffers when changing ports. and perhaps clear once open.
+ 24. when garbage comes in, displaying in serial hex is fine but if SFP is running, it hangs
+ 25. change reboot button to send reboot as a command. 4 execute doesn't cut it.
+ 26. GUI should be hierarchial and plugable so that projects can add their special parts
      but still be able to get general updates to GUI.
- 24. when in buffered IO mode, better editing facilities should be available such as 
+ 27. when in buffered IO mode, better editing facilities should be available such as 
      inline editing, front of line, back of line, history with up down cursor
- 25. remember target directory in utility pane like transfer pane: selectFile...
+ 28. remember target directory in utility pane like transfer pane: selectFile...
+
 Updates:
  1. removed unneccessary files from folder
  2. modified applist to take arguments

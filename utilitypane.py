@@ -271,7 +271,7 @@ class utilityPane(QWidget):
 		self.transferTimer.stop()
 		self.parent.connectPort()
 		note('serial port reconnected')
-		self.ui.sendBoot.setText('Send')
+		self.ui.sendBoot.setText('Transfer')
 
 	# STM32 Boot Loader
 	def sendHex(self, bytes):
