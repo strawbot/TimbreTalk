@@ -38,6 +38,9 @@ Issues:
  22. application should be able to store preferences which would include pids and cpu ids
  23. GUI should be hierarchial and plugable so that projects can add their special parts
      but still be able to get general updates to GUI.
+ 24. when in buffered IO mode, better editing facilities should be available such as 
+     inline editing, front of line, back of line, history with up down cursor
+ 25. remember target directory in utility pane like transfer pane: selectFile...
 Updates:
  1. removed unneccessary files from folder
  2. modified applist to take arguments
@@ -48,3 +51,4 @@ Updates:
     Windows, Linux). Follow instructions in "pyinstaller scripts.txt".
     8. make it easy to release a binary for windows and mac
  7. Done: 20. need to make bootloader check for file changed on disk
+ 8. fixed a bug in size for STM32 file not updating when file on disk changed
