@@ -169,7 +169,8 @@ class utilityPane(QWidget):
 				self.connectBoot()
 				self.transferTimer.start(2000)
 				self.ui.sendBoot.setText('Abort')
-				self.image.checkUpdates()
+				if self.image.checkUpdates():
+					self.ui.bootSize.setText(str(self.image.size))
 			else:
 				error("No image for downloading")
 		
