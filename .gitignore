@@ -4,3 +4,5 @@ PyInstaller-2.1
 build
 dist
 tt.spec
+cpuids.py
+pids.py

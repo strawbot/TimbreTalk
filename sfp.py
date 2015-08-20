@@ -12,7 +12,7 @@ from pyqtapi2 import *
 import sys, time, os, Queue
 from signalcatch import initSignalCatcher
 from message import *
-from endian import *
+from endian import cast
 
 # packet ids
 from pids import *
