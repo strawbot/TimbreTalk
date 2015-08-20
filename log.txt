@@ -39,11 +39,19 @@ Issues:
  23. reset port buffers when changing ports. and perhaps clear once open.
  24. when garbage comes in, displaying in serial hex is fine but if SFP is running, it hangs
  25. change reboot button to send reboot as a command. 4 execute doesn't cut it.
- 26. GUI should be hierarchial and plugable so that projects can add their special parts
+ 26. need to adjust for cpuids with aliases. don't use index but get actual value
+ 27. It would be nice to have a Frequent Button area - an area where controls could be
+     dragged to which is common to all tabs and has a copy of any button dragged there.
+     The button would act as the real button. 
+ 28. The protocol mode should be shown somewhere global and perhaps other serial parameters
+     to make it easy to see what operational mode the interface is in
+ 29. Tab text does not show up in Yosemite as it doesn't fit. Instead it is a letter
+     followed by an ellipse.
+ 30. GUI should be hierarchial and plugable so that projects can add their special parts
      but still be able to get general updates to GUI.
- 27. when in buffered IO mode, better editing facilities should be available such as 
+ 31. when in buffered IO mode, better editing facilities should be available such as 
      inline editing, front of line, back of line, history with up down cursor
- 28. remember target directory in utility pane like transfer pane: selectFile...
+ 32. remember target directory in utility pane like transfer pane: selectFile...
 
 Updates:
  1. removed unneccessary files from folder
