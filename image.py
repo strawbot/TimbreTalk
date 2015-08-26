@@ -11,19 +11,27 @@ class imageRecord():
 	records = []
 
 	def __init__(self, file):
-		del self.records[:]
 		self.records = []
 		self.image = []
-		self.timestamp = 0
 		self.file = file
-		self.addRecord()
-		self.createImage()
+		self.dir = ''
+		self.name = ''
+		self.timestamp = 0
+		self.size = 0
+		if self.file:
+			x = self.file.rsplit('/', 1)
+			if len(x) > 1:
+				self.dir, self.name = x
+			else:
+				self.name = x[0]
+
+			self.type = self.name.rsplit('.', 1)[-1]
+			self.addRecord()
 
 	def checkUpdates(self):
 		if self.timestamp != os.path.getmtime(self.file):
 			warning(' disk image is newer - reloading ')
 			self.addRecord()
-			self.createImage()
 			return True
 		return False
 
@@ -32,19 +40,25 @@ class imageRecord():
 		self.start = 0xFFFFFFFF
 		self.end = self.entry = 0
 		del self.records[:]
-		self.name = self.file.rsplit('/', 1)[-1]
-		type = self.name.rsplit('.', 1)[-1]
-		if type in ['srec', 'S19']:
+
+		if self.type in ['srec', 'S19']:
 			self.addSrecord()
-		elif type in ['hex']:
+		elif self.type in ['hex']:
 			self.addHexRecord()
-		elif type in ['elf']:
+		elif self.type in ['elf']:
 			self.addElfRecord()
+		elif self.type in ['jbc', 'jam']:
+			del self.image[:]
+			self.image.extend(map(ord, open(self.file,'rb').read()))
+			self.start = 0
+			self.size = self.end = len(self.image)
+			return
 		else:
-			error('Unknown format. File suffix not .hex, .srec, .S19, .elf: %s'%self.name)
+			error('Unknown format. File suffix not .hex, .srec, .S19, .elf, .jbc, .jam: %s'%self.name)
 		if self.start == 0xFFFFFFFF:
 			self.start = 0
 		self.size = self.end - self.start
+		self.createImage()
 
 	def createImage(self): # direct memory image from hex strings with holes as 0xFF
 		del self.image[:]
@@ -59,7 +73,6 @@ class imageRecord():
 					if self.image[a+i/2] != 0xFF:
 						warning('\nimageRecord.createImage: Overwrite data at %x'%(self.start + a + i/2))
 					self.image[a+i/2] = int(data[i:i+2], 16)
-		return self.image
 	
 	def recordImage(self): # return built image, checksum
 		check = fletcher32(self.image, len(self.image))

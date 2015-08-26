@@ -9,6 +9,8 @@ from random import randrange
 from image import *
 import traceback	
 import listports, serialio
+from stmTransfer import stmSender
+from jamTransfer import jamSender
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
@@ -41,10 +43,6 @@ sectors = [[0, 0x08000000, 16],
 			[23, 0x081E0000, 128]]
 
 class utilityPane(QWidget):
-	progress = Signal(object)
-	ACK = chr(0x79)
-	NACK = chr(0x1F)
-
 	def __init__(self, parent):
 		QWidget.__init__(self, parent)
 		self.parent = parent
@@ -63,26 +61,46 @@ class utilityPane(QWidget):
 		self.ui.loadRun.clicked.connect(self.loadRun)
 		
 		# STM32F4 Boot Loader
-		self.ui.bootSelect.clicked.connect(self.selectFile)
-		self.ui.sendBoot.clicked.connect(self.sendBoot)
-		self.progress.connect(self.progressBar)
-		self.transferTimer = QTimer()
-		self.transferTimer.timeout.connect(self.timedOut)
-		self.transferTimer.setSingleShot(True)
+		self.stm = stmSender(self)
+		self.stm.setName.connect(self.ui.bootFile.setText)
+		self.stm.setSize.connect(self.ui.bootSize.setText)
+		self.ui.bootSelect.clicked.connect(lambda: self.stm.selectFile(QFileDialog().getOpenFileName(directory=self.stm.dir)))
+		self.ui.sendBoot.clicked.connect(self.stm.sendFile)
+		self.ui.bootLoaderProgressBar.reset()
+		self.ui.bootLoaderProgressBar.setMaximum(1000)
+		self.stm.setProgress.connect(lambda n: self.ui.bootLoaderProgressBar.setValue(n*1000))
+		self.stm.setAction.connect(lambda: self.ui.sendBoot.setText)
+		self.stm.verbose = self.ui.verbose.isChecked()
+		self.ui.verbose.stateChanged.connect(self.stm.setVerbose)
+		self.stm.run = self.ui.run.isChecked()
+		self.ui.run.stateChanged.connect(self.stm.setRun)
+		self.stm.setStart.connect(lambda a: self.ui.bootStart.setText(a))
+		self.ui.bootStart.textChanged.connect(lambda t: self.stm.address)
+ 		self.ui.Go.clicked.connect(self.stm.goButton)
+		
+# 		self.ui.Boot.clicked.connect(self.listenBoot)
+# 		self.ui.Reconnect.clicked.connect(self.noListenBoot)
+# 		self.ui.Init.clicked.connect(lambda: self.echoTx([0x7F]))
+# 		self.ui.Rdp.clicked.connect(lambda: self.echoTx(self.checked(0x92)))
+# 		self.ui.Erase.clicked.connect(lambda: self.echoTx(self.checked(0x44)))
+# 		self.ui.Pages.clicked.connect(lambda: self.echoTx(self.checksummed([0xFF,0xFF])))
+# 		self.ui.Write.clicked.connect(lambda: self.echoTx(self.checked(0x31)))
+# 		self.ui.Address.clicked.connect(lambda: self.echoTx(self.checksummed([8,0,0,0])))
+# 		self.ui.Data.clicked.connect(lambda: self.echoTx(self.checksummed([7,1,2,3,4,5,6,7,8])))
+# 		self.ui.Get.clicked.connect(lambda: self.echoTx(self.checked(0x0)))
+# 		self.ui.Getrpd.clicked.connect(lambda: self.echoTx(self.checked(0x1)))
+# 		self.ui.Getid.clicked.connect(lambda: self.echoTx(self.checked(0x2)))
 
-		self.ui.Boot.clicked.connect(self.listenBoot)
-		self.ui.Reconnect.clicked.connect(self.noListenBoot)
-		self.ui.Init.clicked.connect(lambda: self.echoTx([0x7F]))
-		self.ui.Rdp.clicked.connect(lambda: self.echoTx(self.checked(0x92)))
-		self.ui.Erase.clicked.connect(lambda: self.echoTx(self.checked(0x44)))
-		self.ui.Pages.clicked.connect(lambda: self.echoTx(self.checksummed([0xFF,0xFF])))
-		self.ui.Write.clicked.connect(lambda: self.echoTx(self.checked(0x31)))
-		self.ui.Address.clicked.connect(lambda: self.echoTx(self.checksummed([8,0,0,0])))
-		self.ui.Data.clicked.connect(lambda: self.echoTx(self.checksummed([7,1,2,3,4,5,6,7,8])))
-		self.ui.Get.clicked.connect(lambda: self.echoTx(self.checked(0x0)))
-		self.ui.Getrpd.clicked.connect(lambda: self.echoTx(self.checked(0x1)))
-		self.ui.Getid.clicked.connect(lambda: self.echoTx(self.checked(0x2)))
-		self.ui.Go.clicked.connect(self.goButton)
+		# send jam file
+ 		self.jam = jamSender(self)
+		self.jam.setName.connect(self.ui.jamFile.setText)
+		self.jam.setSize.connect(self.ui.jamSize.setText)
+ 		self.ui.jamSelect.clicked.connect(lambda: self.jam.selectFile(QFileDialog().getOpenFileName(directory=self.jam.dir)))
+		self.ui.sendJam.clicked.connect(self.jam.sendFile)
+		self.ui.jamLoaderProgressBar.reset()
+		self.ui.jamLoaderProgressBar.setMaximum(1000)
+		self.jam.setProgress.connect(lambda n: self.ui.jamLoaderProgressBar.setValue(n*1000))
+		self.jam.setAction.connect(lambda: self.ui.sendJam.setText)
 
 		# monitor ports - should make a common class and instantiate multiple times
 		self.sptimer = QTimer()
@@ -99,218 +117,7 @@ class utilityPane(QWidget):
 		self.ui.MonitorBaud2.activated.connect(self.selectRate2)
 
 		self.ui.setDateTime.clicked.connect(self.setDateTimeNow)
-		
-	def selectFile(self):
-		if printme: print >>sys.stderr, 'selectBoot'
-		try:
-			file = QFileDialog().getOpenFileName()
-			if file:
-				self.image = imageRecord(file)
-				self.ui.bootFile.setText(self.image.name)
-				self.ui.bootStart.setText(hex(self.image.start))
-				self.ui.bootSize.setText(str(self.image.size))
-		except Exception, e:
-			print >>sys.stderr, e
-			traceback.print_exc(file=sys.stderr)
-	
-	# Boot downloader
-	def listenBoot(self):
-		note('Redirecting serial port to boot listener')
-		self.parent.disconnectPort()
-		def showRx(rx):
-			note('Rx:%s'%''.join(map(lambda x: ' '+hex(ord(x))[2:],  rx)))
-		self.parent.serialPort.source.connect(showRx)
-		self.setParam(self.parent.serialPort, 'E', 8, 1)
-	
-	def noListenBoot(self):
-		self.parent.connectPort()
-		note('Serial port reconnected')
-
-	def echoTx(self, tx):
-		note('Tx:%s'%''.join(map(lambda x: ' '+hex(x)[2:],  tx)))
-		self.parent.serialPort.sink(tx)
-
-	# support for sequencing off of replies
-	def onAck(self, sequence, successor, failure=None): # setup callback for next step
-		if self.ui.verbose.isChecked():
-			note('Tx:%s'%''.join(map(lambda x: ' '+hex(x)[2:],  sequence)))
-		self.parent.serialPort.sink(sequence)
-		self.nextState = successor
-		self.failState = failure
-
-	def nextSuccessor(self,ack): # invoke callback if acked
-		if self.ui.verbose.isChecked():
-			note('Rx: %s'% hex(ord(ack[0]))[2:])
-		if ack == self.ACK:
-			self.nextState()
-			return
-		if ack == self.NACK:
-			if self.failState:
-				self.failState()
-				return
-		error('NACK'+ack)
-		self.abortBoot()
-
-	def progressBar(self, n):
-		if printme: print >>sys.stderr, 'progress'
-		if n:
-			self.ui.bootLoaderProgressBar.setValue(n*1000)
-		else:
-			self.ui.bootLoaderProgressBar.reset()
-			self.ui.bootLoaderProgressBar.setMaximum(1000)
-
-	# states
-	def sendBoot(self):
-		if self.transferTimer.isActive():
-			self.abortBoot()
-		else:
-			if self.image:
-				self.startTransferTime = time.time()
-				self.connectBoot()
-				self.transferTimer.start(2000)
-				self.ui.sendBoot.setText('Abort')
-				if self.image.checkUpdates():
-					self.ui.bootSize.setText(str(self.image.size))
-			else:
-				error("No image for downloading")
-		
-	def connectBoot(self):
-		note('Acquiring serial port for boot loader')
-		self.progress.emit(0)
-		self.parent.disconnectPort()
-		self.setParam(self.parent.serialPort, 'E', 8, 1)
-		self.parent.serialPort.source.connect(self.nextSuccessor)
-		note('Connect with stm32 boot loader... ')
-		self.onAck([0x7F], self.eraseBoot)
-		self.progress.emit(.025)
-	
-	def eraseBoot(self):
-		message('connected')
-		note('Erasing...')
-		self.transferTimer.start(20000)
-		self.onAck(self.checked(0x44), self.erasePages)
-		self.progress.emit(.05)
-
-	def erasePages(self): # erase pages not supported; erase all
-		self.onAck(self.checksummed([0xFF,0xFF]), self.downloadBoot)
-
-	def downloadBoot(self):
-		elapsed = time.time() - self.startTransferTime
-		message(' flash erased in %.1f seconds'%elapsed,'note')
-
-		note('Download image ')
-		self.pointer = self.image.start
-		self.writeCommand()
-		self.chunk = 256
-
-	def writeCommand(self): # progress bar from .1 to .9
-		self.transferTimer.start(2000)
-		self.progress.emit(.1 + (.8*(self.pointer - self.image.start)/self.image.size))
-		if self.pointer < self.image.end:
-			self.onAck(self.checked(0x31), self.writeAddress)
-		else:
-			self.verifyBoot()
-
-	def writeAddress(self):
-		address = self.checksummed(longList(self.pointer))
-		self.onAck(address, self.writeData)
-
-	def writeData(self):
-		if not self.ui.verbose.isChecked():
-			message('.', "note")
-		self.chunk = min(self.chunk, self.image.end - self.pointer)
-		if self.chunk % 4:
-			error('Transfer size not a multiple of 4')
-		index = self.pointer - self.image.start
-		self.pointer += self.chunk
-		data = self.image.image[index:index+self.chunk]
-		self.onAck(self.checksummed([self.chunk-1] + data), self.writeCommand)
-
-	def verifyBoot(self): # not verified, just trusted
-		# note('\nverify image')
-		if self.ui.run.isChecked():
-			self.goCommand()
-		else:
-			self.reconnectSerial()
-	
-	def goButton(self):
-		self.listenBoot()
-		self.parent.serialPort.source.connect(self.nextSuccessor)
-		self.startTransferTime = 0
-		self.onAck([0x7F], self.goCommand, self.goCommand)
-		
-	def goCommand(self):
-		self.onAck(self.checked(0x21), self.goAddress)
-
-	def goAddress(self):
-		address = self.ui.bootStart.text()
-		if not address:
-			address = "0x8000000"
-		self.echoTx(self.checksummed(longList(int(address, 0))))
-		self.reconnectSerial()
-	
-	def reconnectSerial(self):
-		self.progress.emit(1)
-		if self.startTransferTime:
-			elapsed = time.time() - self.startTransferTime
-			transferMsg = 'Finished in %.1f seconds'%elapsed
-			rate = (8*self.image.size)/(elapsed*1000)
-			rateMsg = ' @ %.1fkbps'%rate
-			note(transferMsg+rateMsg)
-		self.finishBoot()
-	
-	def timedOut(self):
-		error('Timed out')
-		self.abortBoot()
-
-	def abortBoot(self):
-		error('Transfer aborted.')
-		self.finishBoot()
-
-	def finishBoot(self):
-		self.transferTimer.stop()
-		self.parent.connectPort()
-		note('serial port reconnected')
-		self.ui.sendBoot.setText('Transfer')
-
-	# STM32 Boot Loader
-	def sendHex(self, bytes):
-		try:
-			note('sending: '+ reduce(lambda a,b: a+b, map(hex, bytes)))
-			self.parent.serialPort.sink(bytes)
-		except Exception, e:
-			print >>sys.stderr, e
-			traceback.print_exc(file=sys.stderr)
-
-	def checksummed(self, bytes):
-		bytes.append(reduce(lambda a,b: a^b, bytes))
-		return bytes
-	
-	def checked(self, byte):
-		return (byte, ~byte&0xFF)
-
-	# command sequencer using signal from receive and iterator on sequences
-	# need to include a timeout
-	def bootSequence(self, sequences):
-		self.parent.serialPort.source.connect(self.nextSequence)
-		self.sequences = iter(sequences)
-		self.nextSequence(self.ACK)
-	
-	def nextSequence(self,ack):
-		try:
-			seq = self.sequences.next()
-			if ack != self.ACK:
-				error('NACK'+ack)
-				raise(StopIteration)
-			print seq
-			self.sendHex(seq)
-		except StopIteration:
-			self.parent.serialPort.source.disconnect(self.nextSequence)
-			note('done command')
-		except Exception, e:
-			print >>sys.stderr, e
-			traceback.print_exc(file=sys.stderr)
-
+					
 	# printme
 	def setupPrintme(self):
 		import buildversion, endian, infopane, machines
