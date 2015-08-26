@@ -18,6 +18,7 @@ class imageRecord():
 		self.name = ''
 		self.timestamp = 0
 		self.size = 0
+		self.checksum = 0
 		if self.file:
 			x = self.file.rsplit('/', 1)
 			if len(x) > 1:
@@ -52,6 +53,7 @@ class imageRecord():
 			self.image.extend(map(ord, open(self.file,'rb').read()))
 			self.start = 0
 			self.size = self.end = len(self.image)
+			self.checksum = fletcher32(self.image, len(self.image))
 			return
 		else:
 			error('Unknown format. File suffix not .hex, .srec, .S19, .elf, .jbc, .jam: %s'%self.name)
@@ -59,6 +61,7 @@ class imageRecord():
 			self.start = 0
 		self.size = self.end - self.start
 		self.createImage()
+		self.checksum = fletcher32(self.image, len(self.image))
 
 	def createImage(self): # direct memory image from hex strings with holes as 0xFF
 		del self.image[:]
@@ -75,8 +78,7 @@ class imageRecord():
 					self.image[a+i/2] = int(data[i:i+2], 16)
 	
 	def recordImage(self): # return built image, checksum
-		check = fletcher32(self.image, len(self.image))
-		return self.image, check
+		return self.image, self.checksum
 	
 	'''
 	Intel Hex format from Wikipedia:

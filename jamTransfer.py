@@ -15,12 +15,14 @@ printme = 0
 (JAM_REQUEST,	# size in bytes (32 bit), name (count prefixed), type (byte)
 JAM_REPLY,		# status (byte)
 JAM_DATA,		# data
-JAM_RESULT)	= range(0,4) # status
-
-
+JAM_RESULT, 	# status
+JAM_DONE,		# send checksum
 # results
-REQUEST_OK, REQUEST_TOOBIG, JAM_BUSY, TRANSFER_OK, CHECK_ERROR, TRANSFER_INCOMPLETE, UNSUPORTED_TYPE \
-= range(0,7)
+REQUEST_OK, REQUEST_TOOBIG, JAM_BUSY, # from request
+TRANSFER_OK, CHECK_ERROR, TRANSFER_INCOMPLETE, UNSUPORTED_TYPE, # from transfer
+# types
+UNKNOWN, JAM_PLAYER, JBC_PLAYER) = range (0,15)
+
 resultText = {
 	REQUEST_OK:'REQUEST_OK',
 	REQUEST_TOOBIG:' REQUEST_TOOBIG',
@@ -30,8 +32,6 @@ resultText = {
 	TRANSFER_INCOMPLETE:' TRANSFER_INCOMPLETE',
 	UNSUPORTED_TYPE:'UNSUPORTED_TYPE'}
 
-# types
-UNKNOWN, JAM_PLAYER, JBC_PLAYER = range (0,3)
 jamType = {'.jam':JAM_PLAYER, '.jbc':JBC_PLAYER}
 
 class jamSender(QObject):
@@ -68,7 +68,7 @@ class jamSender(QObject):
 		spid, result = cast('BBBB', packet)[2:4]
 		if spid == JAM_REPLY:
 			if result == REQUEST_OK:
-				note('Starting data transfer...')
+				note('Request approved. Starting data transfer...')
 				self.startTransfer()
 			else:
 				error('Request denied:'+resultText.get(result,'Unknown'))
@@ -76,6 +76,7 @@ class jamSender(QObject):
 		elif spid == JAM_RESULT:
 			if result == TRANSFER_OK:
 				note('Transfer complete')
+				self.finish()
 			else:
 				error('Transfer failed. '+resultText.get(result,'Unknown'))
 				self.abort()
@@ -120,25 +121,41 @@ class jamSender(QObject):
 		payload = self.who() + spid + size + name + type
 		self.protocol.sendNPS(pids.JTAG, payload)
 	
-	def startTransfer(self):
-		spid = [JAM_DATA]
-		i = 0
-		pointer = 0
-		chunk = 245
-		size = self.size
-		while size:
-			if size > chunk:
-				sendsize = chunk
-				size -= chunk
+	def transferChunk(self):
+		if self.left:
+			if self.left > self.chunk:
+				sendsize = self.chunk
+				self.left -= self.chunk
 			else:
-				sendsize = size
-				size = 0
-			data = self.image.image[pointer:pointer+sendsize]
-			payload = self.who + spid + longList(i) + data
+				sendsize = self.left
+				self.left = 0
+			data = self.image.image[self.pointer:self.pointer+sendsize]
+			payload = self.who() + self.spid + longList(self.i) + data
 			self.protocol.sendNPS(pids.JTAG, payload)
-			i += 1
-			pointer += sendsize
-	
+			self.setProgress.emit((self.size - self.left)/self.size)
+			self.i += 1
+			self.pointer += sendsize
+			self.transferTimer.start(0)
+		else:
+			payload = self.who() + [JAM_DONE] + longList(self.image.checksum)
+			print hex(self.image.checksum), map(lambda x: hex(x)[2:], longList(self.image.checksum))
+			self.protocol.sendNPS(pids.JTAG, payload)
+
+			self.transferTimer.timeout.disconnect()
+			self.transferTimer.timeout.connect(self.timedOut)
+			self.transferTimer.start(5000)
+
+	def startTransfer(self):
+		self.spid = [JAM_DATA]
+		self.i = 0
+		self.pointer = 0
+		self.chunk = 240
+		self.left = self.size
+
+		self.transferTimer.timeout.disconnect()
+		self.transferTimer.timeout.connect(self.transferChunk)
+		self.transferTimer.start(0)
+
 	# possible end sequences
 	def timedOut(self):
 		error('Timed out')
@@ -151,3 +168,5 @@ class jamSender(QObject):
 	def finish(self):
 		self.transferTimer.stop()
 		self.setAction.emit('Transfer')
+		elapsed = time.time() - self.startTransferTime
+		message(' finished in %.1f seconds'%elapsed,'note')
