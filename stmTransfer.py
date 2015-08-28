@@ -93,7 +93,7 @@ class stmSender(QObject):
 			if self.failState:
 				self.failState()
 				return
-		error('NACK:'+hex(ack))
+		error('NACK:'+ack)
 		self.abortBoot()
 
 	# states

@@ -138,12 +138,11 @@ class jamSender(QObject):
 			self.transferTimer.start(0)
 		else:
 			payload = self.who() + [JAM_DONE] + longList(self.image.checksum)
-			print hex(self.image.checksum), map(lambda x: hex(x)[2:], longList(self.image.checksum))
 			self.protocol.sendNPS(pids.JTAG, payload)
 
 			self.transferTimer.timeout.disconnect()
 			self.transferTimer.timeout.connect(self.timedOut)
-			self.transferTimer.start(5000)
+			self.transferTimer.start(20000)
 
 	def startTransfer(self):
 		self.spid = [JAM_DATA]
