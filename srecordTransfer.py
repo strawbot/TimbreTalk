@@ -12,7 +12,7 @@ from endian import *
 from message import *
 from checksum import fletcher32
 from targets import *
-import sys, traceback	
+import sys
 from buildversion import *
 from cpuids import *
 

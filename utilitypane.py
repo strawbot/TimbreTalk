@@ -52,6 +52,7 @@ class utilityPane(QWidget):
 		self.protocol = parent.protocol
 		self.startTransferTime = 0
 		self.image = None
+		self.dir = ''
 
 		# printme
 		self.setupPrintme()
@@ -103,9 +104,10 @@ class utilityPane(QWidget):
 	def selectFile(self):
 		if printme: print >>sys.stderr, 'selectBoot'
 		try:
-			file = QFileDialog().getOpenFileName()
+			file = QFileDialog().getOpenFileName(directory=self.dir)
 			if file:
 				self.image = imageRecord(file)
+				self.dir = self.image.dir
 				self.ui.bootFile.setText(self.image.name)
 				self.ui.bootStart.setText(hex(self.image.start))
 				self.ui.bootSize.setText(str(self.image.size))
