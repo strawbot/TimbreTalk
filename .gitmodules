@@ -1,0 +1,4 @@
+[submodule "PyInstaller"]
+	path = PyInstaller
+	url = https://github.com/pyinstaller/pyinstaller.git
+	branch = master
