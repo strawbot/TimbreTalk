@@ -5,12 +5,12 @@
 import sys, os
 
 if sys.platform == 'win32':
-	os.system('python PyInstaller-2.1\pyinstaller.py --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.ico --noupx -p . tt.py')
+	os.system('python PyInstaller\pyinstaller.py --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.ico --noupx -p . tt.py')
 elif sys.platform == 'darwin':
-#this doesn't work:	subprocess.call('PyInstaller-2.1/pyinstaller.py --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.icns -p .  tt.py')
-	os.system('PyInstaller-2.1/pyinstaller.py --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.icns -p .  tt.py')
+#this doesn't work:	subprocess.call('PyInstaller/pyinstaller.py --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.icns -p .  tt.py')
+	os.system('PyInstaller/pyinstaller.py --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.icns -p .  tt.py')
 elif sys.platform[:5] == 'linux':
-	os.system('PyInstaller-2.1/pyinstaller.py --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.ico -p . tt.py')
+	os.system('PyInstaller/pyinstaller.py --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.ico -p . tt.py')
 else:
 	print >>sys.stderr, 'unknown system platform: %s'%sys.platform
 	sys.exit()
