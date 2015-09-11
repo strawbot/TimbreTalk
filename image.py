@@ -33,6 +33,7 @@ class imageRecord():
 		if self.timestamp != os.path.getmtime(self.file):
 			warning(' disk image is newer - reloading ')
 			self.addRecord()
+			self.createImage()
 			return True
 		return False
 

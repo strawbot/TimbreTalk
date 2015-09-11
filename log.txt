@@ -15,7 +15,8 @@ Issues:
  3. errors should be caught throughout and put into a log either on a tab or a file
     and or printed to launch window. no error should happen without notifying anyone
  4. when the serial port is bombed, the gui should still function. there should be a
-    throttle back option to keep sane
+    throttle back option to keep sane. perhaps dump to fixed size buffer and have display
+    pull from there but don't tie up whole GUI.
  5. shift base over to pyside to resolve any license issues
  6. generalize code base for Timbre Talk and accept plug ins for:
      protocol, pids, cpuids, targets

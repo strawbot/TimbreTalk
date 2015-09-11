@@ -80,7 +80,9 @@ class sfpProtocol(QThread):
 				while True:
 					try:
 						packet = self.q.get()
-					except:
+					except Exception, e:
+						print >>sys.stderr, e
+						traceback.print_exc(file=sys.stderr)
 						break;
 					pid = packet[0]
 					handler = self.ph.get(pid)
