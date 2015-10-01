@@ -59,7 +59,8 @@ class jamSender(QObject):
 		self.protocol = self.parent.parent.protocol
 
 		# protocol
-		self.protocol.packetSource(pids.JTAG, self.jamResponse)
+		if  "JTAG" in dir(pids):
+			self.protocol.packetSource(pids.JTAG, self.jamResponse)
 	
 	def who(self):
 		return self.parent.parent.who() # packet routing
