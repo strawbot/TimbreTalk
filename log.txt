@@ -52,7 +52,8 @@ Issues:
      but still be able to get general updates to GUI.
  31. when in buffered IO mode, better editing facilities should be available such as 
      inline editing, front of line, back of line, history with up down cursor
- 32. remember target directory in utility pane like transfer pane: selectFile...
+ 33. include or exclude panels and tools by detecting presence of code. Such as JTAG in
+     pids. If not there then no tool panel.
 
 Updates:
  1. removed unneccessary files from folder
@@ -65,3 +66,4 @@ Updates:
     8. make it easy to release a binary for windows and mac
  7. Done: 20. need to make bootloader check for file changed on disk
  8. fixed a bug in size for STM32 file not updating when file on disk changed
+ 9. done:  32. remember target directory in utility pane like transfer pane: selectFile...
