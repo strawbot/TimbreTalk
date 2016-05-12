@@ -7,7 +7,8 @@ slots: stopSending, startSending
 from pyqtapi2 import *
 
 import os, time, traceback
-import image, pids
+from imageTransfer import imageTransfer
+import pids
 from endian import *
 from message import *
 from checksum import fletcher32
@@ -46,7 +47,7 @@ MEMORY_PACKET_OVERHEAD = 4 + 1 # 32bit address + length
 maxMemTransfer = MAX_WHO_PACKET_PAYLOAD - MEMORY_PACKET_OVERHEAD
 ALLOWABLE_GAP = 0x100 # maximum gap between image and header
 
-class sRecordTransfer(QObject):
+class sRecordTransfer(imageTransfer):
 	starting = Signal()
 	aborted = Signal()
 	done = Signal() # signal for done
@@ -66,16 +67,11 @@ class sRecordTransfer(QObject):
 
 	def __init__(self, parent, file='', target=0, header=0, whofor=0, endian='big'):
 		if printme: print >>sys.stderr, '__init__'
-		QObject.__init__(self) # needed for signals to work!!
-
-		self.parent = parent
+		super(sRecordTransfer, self).__init__(parent)
 
 		# parameters derived
 		self.start = 0
-		self.size = 0
 		self.entry = 0
-		self.checksum = 0
-		self.dir = ''
 		self.version = 0
 		# parameters passed
 		self.target = target
@@ -144,11 +140,7 @@ class sRecordTransfer(QObject):
 	def loadSrecord(self):
 		try:
 			if printme: print >>sys.stderr, 'loadSrecord', self.endian
-			srec = image.imageRecord(self.file)
-			self.start = srec.start
-			self.size = srec.size
-			self.entry = srec.entry
-			self.image, self.checksum = srec.recordImage()
+			self.createImage(self.file)
 			self.appName, self.releaseDate, self.version = \
 			 extractNameDateVersion(self.image, self.endian)
 		except Exception, e:

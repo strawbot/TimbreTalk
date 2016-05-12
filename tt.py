@@ -27,35 +27,10 @@ class timbreTalk(qterm.terminal):
 		infopane.infoPane(self)
 		self.listRoutes()
 
-		self.statTimer = QTimer()
-		self.statTimer.timeout.connect(self.showStats)
-		self.statTimer.setInterval(1000)
-		self.statTimer.start()
-		self.ui.clearTranStats.clicked.connect(self.clearStats)
 		# default
 		self.whofrom = MAIN_HOST
 		self.ui.whoFrom.setCurrentIndex(self.whofrom)
 		QErrorMessage.qtHandler()
-	
-	def showStats(self):
-		self.ui.serialInputs.setText(str(self.serialPort.inputs))
-		self.ui.serialOutputs.setText(str(self.serialPort.outputs))
-		self.ui.sfpLoInputs.setText(str(self.protocol.loinputs))
-		self.ui.sfpLoOutputs.setText(str(self.protocol.looutputs))
-		self.ui.sfpHiInputs.setText(str(self.protocol.hiinputs))
-		self.ui.sfpHiOutputs.setText(str(self.protocol.hioutputs))
-		self.ui.inPackets.setText(str(self.protocol.inpackets))
-		self.ui.outPackets.setText(str(self.protocol.outpackets))
-
-	def clearStats(self):
-		self.serialPort.inputs = 0
-		self.serialPort.outputs = 0
-		self.protocol.loinputs = 0
-		self.protocol.looutputs = 0
-		self.protocol.hiinputs = 0
-		self.protocol.hioutputs = 0
-		self.protocol.inpackets = 0
-		self.protocol.outpackets = 0
 
 	# overrides
 	def UiAdjust(self):

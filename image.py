@@ -1,25 +1,36 @@
 # build image from intel hex or motorola Srecord file  Robert Chapman III  May 7, 2015
 
+from pyqtapi2 import *
+
+import sys, traceback
 from message import *
 from checksum import fletcher32
 import os
 from ctypes import *
 
-class imageRecord():
+class imageRecord(QObject):
 	MAX_IMAGE_SIZE = 1024 * 1024 * 2 # 2MB
 	HOLE_FILL = 0xFF
 	records = []
+	setSize = Signal(object)
+	setName = Signal(object)
+	setStart = Signal(object)
 
-	def __init__(self, file):
+	def __init__(self, parent):
+		QObject.__init__(self) # needed for signals to work!!
+		self.parent = parent
 		self.records = []
 		self.image = []
-		self.file = file
+		self.file = ''
 		self.dir = ''
 		self.name = ''
 		self.timestamp = 0
 		self.size = 0
 		self.checksum = 0
-		if self.file:
+
+	def createImage(self, file):
+		if file:
+			self.file = file
 			x = self.file.rsplit('/', 1)
 			if len(x) > 1:
 				self.dir, self.name = x
@@ -29,11 +40,22 @@ class imageRecord():
 			self.type = self.name.rsplit('.', 1)[-1]
 			self.addRecord()
 
+	def selectFile(self, file):
+		if not file: return
+		try:
+			self.createImage(file)
+			self.setName.emit(self.name)
+			self.setSize.emit(str(self.size))
+			self.setStart.emit(hex(self.start))
+		except Exception, e:
+			print >>sys.stderr, e
+			traceback.print_exc(file=sys.stderr)
+	
 	def checkUpdates(self):
 		if self.timestamp != os.path.getmtime(self.file):
 			warning(' disk image is newer - reloading ')
 			self.addRecord()
-			self.createImage()
+			self.makeImage()
 			return True
 		return False
 
@@ -61,10 +83,10 @@ class imageRecord():
 		if self.start == 0xFFFFFFFF:
 			self.start = 0
 		self.size = self.end - self.start
-		self.createImage()
+		self.makeImage()
 		self.checksum = fletcher32(self.image, len(self.image))
 
-	def createImage(self): # direct memory image from hex strings with holes as 0xFF
+	def makeImage(self): # direct memory image from hex strings with holes as 0xFF
 		del self.image[:]
 		if self.size > self.MAX_IMAGE_SIZE:
 			error('Image is too large! %d'%self.size)
@@ -75,11 +97,8 @@ class imageRecord():
 				data = record[1]
 				for i in range(0,len(data),2):
 					if self.image[a+i/2] != 0xFF:
-						warning('\nimageRecord.createImage: Overwrite data at %x'%(self.start + a + i/2))
+						warning('\nimageRecord.makeImage: Overwrite data at %x'%(self.start + a + i/2))
 					self.image[a+i/2] = int(data[i:i+2], 16)
-	
-	def recordImage(self): # return built image, checksum
-		return self.image, self.checksum
 	
 	'''
 	Intel Hex format from Wikipedia:

@@ -5,59 +5,25 @@ from pyqtapi2 import *
 import sys, traceback	
 from endian import *
 from message import *
-from checksum import fletcher32
-import image, pids
-from cpuids import *
+from imageTransfer import imageTransfer
+import pids
 
 printme = 0
 
-class stmSender(QObject):
-	setProgress = Signal(object)
-	setSize = Signal(object)
-	setName = Signal(object)
-	setAction = Signal(object)
+class stmSender(imageTransfer):
 	setStart = Signal(object)
 
 	ACK = chr(0x79)
 	NACK = chr(0x1F)
 	
 	def __init__(self, parent):
-		if printme: print >>sys.stderr, '__init__'
-		QObject.__init__(self) # needed for signals to work!!
-
-		self.parent = parent
-
-		# parameters derived
-		self.start = 0
+		super(stmSender, self).__init__(parent)
+		# extra parameters
 		self.address = ""
-		self.size = 0
-		self.entry = 0
-		self.checksum = 0
-		self.dir = ''
 		self.version = 0
 		self.verbose = 0
 		self.run = 0
-		# timing
-		self.transferTimer = QTimer()
-		self.transferTimer.timeout.connect(self.timedOut)
-		self.transferTimer.setSingleShot(True)
 
-	def selectFile(self, file):
-		if printme: print >>sys.stderr, 'selectFile'
-		if not file: return
-		try:
-			self.image = image.imageRecord(file)
-			self.dir = self.image.dir
-			self.setName.emit(self.image.name)
-			self.size = self.image.size
-			self.setSize.emit(str(self.image.size))
-			self.start = self.image.start
-			self.address = hex(self.start)
-			self.setStart.emit(hex(self.image.start))
-		except Exception, e:
-			print >>sys.stderr, e
-			traceback.print_exc(file=sys.stderr)
-	
 	# Boot downloader
 	def listenBoot(self):
 		note('Redirecting serial port to boot listener')
@@ -76,42 +42,30 @@ class stmSender(QObject):
 		self.parent.parent.serialPort.sink(tx)
 
 	# support for sequencing off of replies
-	def onAck(self, sequence, successor, failure=None): # setup callback for next step
+	def fail(self):
+		error('NACK:')
+		self.abortBoot()
+
+	def onAck(self, sequence, successor, failure=0): # setup callback for next step
 		if self.verbose:
 			note('Tx:%s'%''.join(map(lambda x: ' '+hex(x)[2:],  sequence)))
 		self.parent.parent.serialPort.sink(sequence)
 		self.nextState = successor
-		self.failState = failure
+		self.failState = failure if failure else self.fail
 
 	def nextSuccessor(self,ack): # invoke callback if acked
 		if self.verbose:
 			note('Rx: %s'% hex(ord(ack[0]))[2:])
 		if ack == self.ACK:
 			self.nextState()
-			return
-		if ack == self.NACK:
-			if self.failState:
-				self.failState()
-				return
-		error('NACK:'+ack)
-		self.abortBoot()
+		elif ack == self.NACK:
+			self.failState()
+		else:
+			error('NACK:'+ack)
+			self.abortBoot()
 
 	# states
-	def sendFile(self):
-		if self.transferTimer.isActive():
-			self.abortBoot()
-		else:
-			if self.image:
-				self.startTransferTime = time.time()
-				self.connectBoot()
-				self.transferTimer.start(2000)
-				self.setAction.emit('Abort')
-				if self.image.checkUpdates():
-					self.setSize.emit(str(self.image.size))
-			else:
-				error("No image for downloading")
-		
-	def connectBoot(self):
+	def requestTransfer(self):
 		note('Acquiring serial port for boot loader')
 		self.setProgress.emit(0)
 		self.parent.parent.disconnectPort()
@@ -201,20 +155,6 @@ class stmSender(QObject):
 			note(transferMsg+rateMsg)
 		self.finishBoot()
 	
-	def timedOut(self):
-		error('Timed out')
-		self.abortBoot()
-
-	def abortBoot(self):
-		error('Transfer aborted.')
-		self.finishBoot()
-
-	def finishBoot(self):
-		self.transferTimer.stop()
-		self.parent.parent.connectPort()
-		note('serial port reconnected')
-		self.setAction.emit('Transfer')
-
 	# STM32 Boot Loader
 	def sendHex(self, bytes):
 		try:

@@ -52,7 +52,7 @@ class terminal(QMainWindow):
 		self.charwidth = self.ui.textEdit.fontMetrics().width(' ')*1.1
 			
 		# widget connections
-		self.ui.SerialPort.activated.connect(self.selectPort)
+		self.ui.PortSelect.activated.connect(self.selectPort)
 		self.ui.BaudRate.activated.connect(self.selectRate)
 		self.ui.BaudRate.currentIndexChanged.connect(self.selectRate)
 		self.ui.LoopBack.stateChanged.connect(self.connectPort)
@@ -244,7 +244,7 @@ class terminal(QMainWindow):
 	def listPorts(self):
 		select, disc = '(Select a Port)', '(Disconnect)'
 
-		uiPort = self.ui.SerialPort
+		uiPort = self.ui.PortSelect
 		items = [uiPort.itemText(i) for i in range(1, uiPort.count())]
 		self.prefix, ports = listports.listports()
 		
@@ -273,8 +273,8 @@ class terminal(QMainWindow):
 	def selectPort(self):
 		if self.serialPort.isOpen():
 			self.serialPort.close()
-		if self.ui.SerialPort.currentIndex():
-			self.portname = self.ui.SerialPort.currentText()
+		if self.ui.PortSelect.currentIndex():
+			self.portname = self.ui.PortSelect.currentText()
 			self.serialPort.open(self.prefix, self.portname, self.serialPort.rate)
 			if self.serialPort.isOpen():
 				self.serialPort.closed.connect(self.serialDone)
@@ -282,7 +282,7 @@ class terminal(QMainWindow):
 				self.serialPort.ioException.connect(self.ioError)
 				self.connectPort()
 			else:
-				self.ui.SerialPort.setCurrentIndex(0)
+				self.ui.PortSelect.setCurrentIndex(0)
 				self.portname = None
 		else:
 			self.portname = None
