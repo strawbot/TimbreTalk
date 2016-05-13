@@ -11,8 +11,6 @@ import pids
 printme = 0
 
 class stmSender(imageTransfer):
-	setStart = Signal(object)
-
 	ACK = chr(0x79)
 	NACK = chr(0x1F)
 	

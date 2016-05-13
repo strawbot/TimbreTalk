@@ -7,11 +7,17 @@ from endian import *
 from message import *
 from checksum import fletcher32
 import image
+from transfer import *
 
 class imageTransfer(image.imageRecord):
 	setProgress = Signal(object)
 	setAction = Signal(object)
-	chunk = 240 # default size to transfer
+	# perhaps the following parameters should be in the children files which use SFP
+	# or bring pids into this module and have it as an SFP transfer but make a super
+	# class which is protocol independant
+	chunk = 240 # default size to transfer; should derive from MAX_FRAME_LENGTH
+	transferPid = 0 # pid for transfer operations
+	transferType = 0 # type of file if needed
 
 	def __init__(self, parent):
 		super(imageTransfer, self).__init__(parent)
@@ -20,6 +26,10 @@ class imageTransfer(image.imageRecord):
 		self.transferTimer = QTimer()
 		self.transferTimer.timeout.connect(self.timedOut)
 		self.transferTimer.setSingleShot(True)
+
+		# shortcuts
+		self.protocol = self.parent.protocol
+		
 
 	def who(self):
 		return self.parent.parent.who() # packet routing
@@ -34,12 +44,16 @@ class imageTransfer(image.imageRecord):
 					self.setSize(str(self.size))
 				self.startTransferTime = time.time()
 				self.setProgress.emit(0)
+				self.setupTransfer()
 				self.requestTransfer()
 				self.transferTimer.start(2000)
 				self.setAction.emit('Abort')
 			else:
 				error("No image for downloading")
 		
+	def setupTransfer(self):
+		pass
+
 	def startTransfer(self):
 		self.i = 0
 		self.pointer = 0
@@ -48,15 +62,6 @@ class imageTransfer(image.imageRecord):
 		self.transferTimer.timeout.disconnect()
 		self.transferTimer.timeout.connect(self.transferChunk)
 		self.transferTimer.start(0)
-
-	def requestTransfer(self): # can be used to inform/check/erase
-		pass
-	
-	def transferData(self, data): # used for all data transfers
-		pass
-	
-	def transferDone(self): # can be used to verify
-		pass
 
 	def transferChunk(self):
 		if self.left:
@@ -76,6 +81,42 @@ class imageTransfer(image.imageRecord):
 			self.transferTimer.timeout.disconnect()
 			self.transferTimer.timeout.connect(self.timedOut)
 			self.transferTimer.start(20000)
+
+	# states
+	def requestTransfer(self):
+		size = longList(self.size)
+		name = [len(self.name)] + list(self.name)
+		type = [self.transferType]
+		payload = self.who() + [TRANSFER_REQUEST] + size + name + type
+		self.protocol.sendNPS(self.transferPid, payload)
+	
+	def transferData(self, data):
+		payload = self.who() + [TRANSFER_DATA] + longList(self.i) + data
+		self.protocol.sendNPS(self.transferPid, payload)
+	
+	def transferDone(self):
+		payload = self.who() + [TRANSFER_DONE] + longList(self.checksum)
+		self.protocol.sendNPS(self.transferPid, payload)
+
+	def transferResponse(self, packet):
+		spid, result = cast('BBBB', packet)[2:4]
+		if spid == TRANSFER_REPLY:
+			if result == REQUEST_OK:
+				note('Request approved. Starting data transfer...')
+				self.startTransfer()
+			else:
+				error('Request denied:'+resultText.get(result,'Unknown'))
+				self.abort()
+		elif spid == TRANSFER_RESULT:
+			if result == TRANSFER_OK:
+				note('Transfer complete')
+				self.finish()
+			else:
+				error('Transfer failed. '+resultText.get(result,'Unknown'))
+				self.abort()
+		else:
+			error('Unknown spid:'+hex(spid))
+			self.abort()
 
 	# possible end sequences
 	def timedOut(self):

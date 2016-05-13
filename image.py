@@ -27,6 +27,7 @@ class imageRecord(QObject):
 		self.timestamp = 0
 		self.size = 0
 		self.checksum = 0
+		self.ext = ''
 
 	def createImage(self, file):
 		if file:
@@ -37,7 +38,7 @@ class imageRecord(QObject):
 			else:
 				self.name = x[0]
 
-			self.type = self.name.rsplit('.', 1)[-1]
+			self.ext = self.name.rsplit('.', 1)[-1]
 			self.addRecord()
 
 	def selectFile(self, file):
@@ -65,21 +66,22 @@ class imageRecord(QObject):
 		self.end = self.entry = 0
 		del self.records[:]
 
-		if self.type in ['srec', 'S19']:
+		if self.ext in ['srec', 'S19']:
 			self.addSrecord()
-		elif self.type in ['hex']:
+		elif self.ext in ['hex']:
 			self.addHexRecord()
-		elif self.type in ['elf']:
+		elif self.ext in ['elf']:
 			self.addElfRecord()
-		elif self.type in ['jbc', 'jam']:
+		elif self.ext in ['jbc', 'jam', 'txt', 'text']:
 			del self.image[:]
 			self.image.extend(map(ord, open(self.file,'rb').read()))
 			self.start = 0
 			self.size = self.end = len(self.image)
 			self.checksum = fletcher32(self.image, len(self.image))
+			print(''.join(map(chr, self.image)))
 			return
 		else:
-			error('Unknown format. File suffix not .hex, .srec, .S19, .elf, .jbc, .jam: %s'%self.name)
+			error('Unknown format. File suffix not any of: .hex, .srec, .S19, .elf, .jbc, .jam, .txt, .text: %s'%self.name)
 		if self.start == 0xFFFFFFFF:
 			self.start = 0
 		self.size = self.end - self.start

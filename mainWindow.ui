@@ -1473,8 +1473,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>100</width>
-                 <height>30</height>
+                 <width>360</width>
+                 <height>247</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1851,8 +1851,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>100</width>
-                 <height>30</height>
+                 <width>360</width>
+                 <height>247</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2525,7 +2525,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <item>
                  <layout class="QGridLayout" name="gridLayout_10">
                   <item row="4" column="3">
-                   <widget class="QPushButton" name="sendScript">
+                   <widget class="QPushButton" name="sendEeprom">
                     <property name="minimumSize">
                      <size>
                       <width>71</width>
@@ -2544,7 +2544,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                    </widget>
                   </item>
                   <item row="2" column="1">
-                   <widget class="QPushButton" name="scriptSelect">
+                   <widget class="QPushButton" name="eepromSelect">
                     <property name="enabled">
                      <bool>true</bool>
                     </property>
@@ -2575,7 +2575,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                    </widget>
                   </item>
                   <item row="2" column="2">
-                   <widget class="QLineEdit" name="scriptFile"/>
+                   <widget class="QLineEdit" name="eepromFile"/>
                   </item>
                   <item row="4" column="1">
                    <widget class="QLabel" name="label_72">
@@ -2588,7 +2588,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                    </widget>
                   </item>
                   <item row="5" column="1" colspan="3">
-                   <widget class="QProgressBar" name="scriptProgressBar">
+                   <widget class="QProgressBar" name="eepromLoaderProgressBar">
                     <property name="minimumSize">
                      <size>
                       <width>200</width>
@@ -2607,7 +2607,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                    </widget>
                   </item>
                   <item row="4" column="2">
-                   <widget class="QLineEdit" name="scriptSize">
+                   <widget class="QLineEdit" name="eepromSize">
                     <property name="maximumSize">
                      <size>
                       <width>120</width>
@@ -2620,7 +2620,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                    </widget>
                   </item>
                   <item row="2" column="3">
-                   <widget class="QPushButton" name="readScript">
+                   <widget class="QPushButton" name="readEeprom">
                     <property name="minimumSize">
                      <size>
                       <width>71</width>

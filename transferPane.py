@@ -20,6 +20,7 @@ class srecordPane(QWidget):
 		QWidget.__init__(self, parent)
 		self.parent = parent
 		self.ui = parent.ui
+		self.protocol = self.parent.protocol
 		
 		# defaults
 		self.sending = 0
@@ -171,8 +172,8 @@ class srecordPane(QWidget):
 			note('\n%s  %d.%d.%X  %s'%(name, major, minor, build, date))
 
 		who = [self.parent.whoto, self.parent.whofrom]
-		self.parent.protocol.packetSource(pids.VERSION_NO, version)
-		self.parent.protocol.sendNPS(pids.GET_VERSION, who)
+		self.protocol.packetSource(pids.VERSION_NO, version)
+		self.protocol.sendNPS(pids.GET_VERSION, who)
 	
 	# recover
 	def selectRecover(self):

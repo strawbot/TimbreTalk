@@ -5,6 +5,7 @@ version='1.1'
 
 from pyqtapi2 import *
 from cpuids import MAIN_HOST
+import sfp
 
 # update GUI from designer
 from compileui import updateUi
@@ -20,6 +21,7 @@ import sys
 class timbreTalk(qterm.terminal):
 	def __init__(self):
 		qterm.terminal.__init__(self)
+		self.protocol = sfp.sfpProtocol()
 		self.whoto = self.whofrom = 0
 		self.serialPane = serialPane.serialPane(self)
 		transferPane.srecordPane(self)

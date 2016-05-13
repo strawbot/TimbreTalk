@@ -9,8 +9,8 @@ class serialPane(QWidget):
 	def __init__(self, parent):
 		QWidget.__init__(self, parent)
 		self.parent = parent
+		self.protocol = parent.protocol
 		self.ui = parent.ui
-		parent.protocol = sfp.sfpProtocol()
 
 		self.portParametersMenu()
 
@@ -27,7 +27,7 @@ class serialPane(QWidget):
 		
 		# setup
 		self.ui.SFP.click()
-		self.parent.protocol.packetSource(pids.TALK_OUT, self.talkPacket)
+		self.protocol.packetSource(pids.TALK_OUT, self.talkPacket)
 
 	def portParametersMenu(self):
 		# menu for serial port parameters
@@ -95,7 +95,7 @@ class serialPane(QWidget):
 				signal.disconnect()
 			except:
 				pass
-		disconnectSignals(self.parent.protocol.source)
+		disconnectSignals(self.protocol.source)
 		disconnectSignals(self.parent.serialPort.source)
 		disconnectSignals(self.parent.source)
 
@@ -124,11 +124,11 @@ class serialPane(QWidget):
 		self.disconnectFlows()
 		if self.ui.LoopBack.isChecked():
 			self.parent.serialPort.source.connect(self.parent.serialPort.sink)
-			self.parent.protocol.source.connect(self.parent.protocol.sink)
+			self.protocol.source.connect(self.protocol.sink)
 			self.parent.source.connect(self.talkSink)
 		else:
-			self.parent.protocol.source.connect(self.parent.serialPort.sink)
-			self.parent.serialPort.source.connect(self.parent.protocol.sink)
+			self.protocol.source.connect(self.parent.serialPort.sink)
+			self.parent.serialPort.source.connect(self.protocol.sink)
 			self.parent.source.connect(self.talkSink)
 	
 	def selectAt(self):
@@ -137,15 +137,15 @@ class serialPane(QWidget):
 		self.disconnectFlows()
 		if self.ui.LoopBack.isChecked():
 			self.parent.serialPort.source.connect(self.parent.serialPort.sink)
-			self.parent.protocol.source.connect(self.parent.protocol.sink)
+			self.protocol.source.connect(self.protocol.sink)
 			self.parent.source.connect(self.ATSink)
 		else:
-			self.parent.protocol.source.connect(self.parent.serialPort.sink)
-			self.parent.serialPort.source.connect(self.parent.protocol.sink)
+			self.protocol.source.connect(self.parent.serialPort.sink)
+			self.parent.serialPort.source.connect(self.protocol.sink)
 			self.parent.source.connect(self.ATSink)
 	
 	def protocolDump(self, flag):
-		self.parent.protocol.VERBOSE = flag
+		self.protocol.VERBOSE = flag
 		note('protocol dump ')
 
 	# talk connections
@@ -161,7 +161,7 @@ class serialPane(QWidget):
 		else:
 			talkout = pids.TALK_IN
 			payload = map(ord,s)
-		self.parent.protocol.sendNPS(talkout, self.parent.who()+payload)
+		self.protocol.sendNPS(talkout, self.parent.who()+payload)
 
 	def ATSink(self, s): # sent through as AT PID
 		s = str(s)
@@ -170,19 +170,19 @@ class serialPane(QWidget):
 			payload = map(ord,s)+[0xD]
 		else:
 			payload = map(ord,s)
-		self.parent.protocol.sendNPS(pids.AT_CMD, self.parent.who()+payload)
+		self.protocol.sendNPS(pids.AT_CMD, self.parent.who()+payload)
 
 	def sendPing(self, flag):
-		self.parent.protocol.sendNPS(pids.PING, [self.parent.whoto, self.parent.whofrom])
+		self.protocol.sendNPS(pids.PING, [self.parent.whoto, self.parent.whofrom])
 
 	def resetRcvr(self):
 		try:
-			self.parent.protocol.initRx()
+			self.protocol.initRx()
 		except Exception, e:
 			print >>sys.stderr, e
 			traceback.print_exc(file=sys.stderr)
 			error("can't reset receiver")
 
 	def setId(self):
-		self.parent.protocol.sendNPS(pids.SET_ID, [self.parent.whoto])
+		self.protocol.sendNPS(pids.SET_ID, [self.parent.whoto])
 

@@ -79,7 +79,8 @@ class sRecordTransfer(imageTransfer):
 		self.endian = endian
 		self.whofor = whofor
 		self.useFile(file)
-		
+		self.protocol = self.parent.protocol
+
 		if file:
 			self.getSrecord(file)
 
@@ -204,9 +205,9 @@ class sRecordTransfer(imageTransfer):
 				self.left = self.length = len(self.download)
 				self.startTransferTime = time.time()
 				self.progress.emit(0)
-				self.parent.protocol.packetSource(pids.ERASE_CONF, self.eraseConfirmed)
-				self.parent.protocol.packetSource(pids.WRITE_CONF, self.transferConfirmed)
-				self.parent.protocol.packetSource(pids.MEM_CHECK, self.verifyConfirmed)
+				self.protocol.packetSource(pids.ERASE_CONF, self.eraseConfirmed)
+				self.protocol.packetSource(pids.WRITE_CONF, self.transferConfirmed)
+				self.protocol.packetSource(pids.MEM_CHECK, self.verifyConfirmed)
 				self.starting.emit()
 				operation()
 				self.transferTimer.setInterval(15000)
@@ -294,7 +295,7 @@ class sRecordTransfer(imageTransfer):
 		start = longList(self.targetPointer)
 		end = longList(end)
 		payload = [self.whoto, self.whofrom] + start + end
-		self.parent.protocol.sendNPS(pids.ERASE_MEM, payload)
+		self.protocol.sendNPS(pids.ERASE_MEM, payload)
 		
 	def ecPacketHandler(self, packet): # confirmed that memory has been erased
 		if printme: print >>sys.stderr, 'ecPacketHandler'
@@ -344,7 +345,7 @@ class sRecordTransfer(imageTransfer):
 		length = [self.sent]
 		data = self.download[self.imagePointer:self.imagePointer+self.sent]
 		payload = who+address+length+data
-		self.parent.protocol.sendNPS(pids.FLASH_WRITE, payload)
+		self.protocol.sendNPS(pids.FLASH_WRITE, payload)
 
 	def tcPacketHandler(self, packet):
 		if printme: print >>sys.stderr, 'tcPacketHandler'
@@ -380,7 +381,7 @@ class sRecordTransfer(imageTransfer):
 		address = longList(self.target)
 		length = longList(len(self.download))
 		payload = who+address+length
-		self.parent.protocol.sendNPS(pids.CHECK_MEM, payload)
+		self.protocol.sendNPS(pids.CHECK_MEM, payload)
 		self.progress.emit(0)
 		self.progress.emit(.50)
 		self.verifyStart.emit()

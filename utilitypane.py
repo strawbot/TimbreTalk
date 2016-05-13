@@ -11,6 +11,7 @@ import traceback
 import listports, serialio
 from stmTransfer import stmSender
 from jamTransfer import jamSender
+from eepromTransfer import eepromTransfer
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
@@ -82,6 +83,16 @@ class utilityPane(QWidget):
 		self.jam.setAction.connect(lambda: self.ui.sendJam.setText)
 
 		# Transfer EEPROM Script
+ 		self.eeprom = eepromTransfer(self)
+		self.eeprom.setName.connect(self.ui.eepromFile.setText)
+		self.eeprom.setSize.connect(self.ui.eepromSize.setText)
+ 		self.ui.eepromSelect.clicked.connect(lambda: self.eeprom.selectFile(QFileDialog().getOpenFileName(directory=self.eeprom.dir)))
+		self.ui.sendEeprom.clicked.connect(self.eeprom.sendFile)
+		self.ui.eepromLoaderProgressBar.reset()
+		self.ui.eepromLoaderProgressBar.setMaximum(1000)
+		self.eeprom.setProgress.connect(lambda n: self.ui.eepromLoaderProgressBar.setValue(n*1000))
+		self.eeprom.setAction.connect(lambda: self.ui.sendEeprom.setText)
+
 		
 		# monitor ports - should make a common class and instantiate multiple times
 		self.sptimer = QTimer()
@@ -215,4 +226,4 @@ class utilityPane(QWidget):
 		cmd = "%d %d %d setdate %d %d %d settime date"% \
 		       (n.year%100, n.month, n.day, n.hour, n.minute, n.second)
 		payload = map(ord, cmd) + [0]
-		self.parent.protocol.sendNPS(pids.EVAL, self.parent.who() + payload)
+		self.protocol.sendNPS(pids.EVAL, self.parent.who() + payload)

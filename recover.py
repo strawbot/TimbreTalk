@@ -32,6 +32,7 @@ class recover(QObject):
 		QObject.__init__(self) # needed for signals to work!!
 		# recovery inits
 		self.parent = parent
+		self.protocol = parent.protocol
 		self.attempts = attempts
 		self.recoverTimer = QTimer()
 		self.recoverTimer.setInterval(500)
@@ -46,7 +47,7 @@ class recover(QObject):
 
 	def startRecovery(self): # initial call
 		self.started.emit()
-		self.parent.protocol.packetSource(pids.PARAM, self.readParam)
+		self.protocol.packetSource(pids.PARAM, self.readParam)
 		self.startTimer.emit()
 	
 	def stopRecovery(self):
@@ -61,8 +62,8 @@ class recover(QObject):
 			value1 = longList(0)
 			set = who + parameter1 + value1
 			get = who + parameter1
-			self.parent.protocol.sendNPS(pids.SET_PARAM, set)
-			self.parent.protocol.sendNPS(pids.GET_PARAM, get)
+			self.protocol.sendNPS(pids.SET_PARAM, set)
+			self.protocol.sendNPS(pids.GET_PARAM, get)
 			note('\nsent stop autobooting.')
 		else:
 			note('\nRecovery gave up after too many attempts.')
