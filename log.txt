@@ -54,6 +54,9 @@ Issues:
      inline editing, front of line, back of line, history with up down cursor
  33. include or exclude panels and tools by detecting presence of code. Such as JTAG in
      pids. If not there then no tool panel.
+ 34. treat line 0 in terminal window as input only. Output only goes to lines above it.
+     This would allow command history and cleaner output to window from target. The prompt
+     could even be on the host.
 
 Updates:
  1. removed unneccessary files from folder
@@ -67,3 +70,5 @@ Updates:
  7. Done: 20. need to make bootloader check for file changed on disk
  8. fixed a bug in size for STM32 file not updating when file on disk changed
  9. done:  32. remember target directory in utility pane like transfer pane: selectFile...
+ 10. factored transfer protocol out and created class hierarchy:
+      QObject -> image -> imageTransfer -> jam player, eeprom transfer
