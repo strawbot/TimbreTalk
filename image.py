@@ -15,6 +15,7 @@ class imageRecord(QObject):
 	setSize = Signal(object)
 	setName = Signal(object)
 	setStart = Signal(object)
+	imageLoaded = Signal()
 
 	def __init__(self, parent):
 		QObject.__init__(self) # needed for signals to work!!
@@ -40,6 +41,7 @@ class imageRecord(QObject):
 
 			self.ext = self.name.rsplit('.', 1)[-1]
 			self.addRecord()
+			self.imageLoaded.emit()
 
 	def selectFile(self, file):
 		if not file: return
@@ -78,7 +80,6 @@ class imageRecord(QObject):
 			self.start = 0
 			self.size = self.end = len(self.image)
 			self.checksum = fletcher32(self.image, len(self.image))
-			print(''.join(map(chr, self.image)))
 			return
 		else:
 			error('Unknown format. File suffix not any of: .hex, .srec, .S19, .elf, .jbc, .jam, .txt, .text: %s'%self.name)

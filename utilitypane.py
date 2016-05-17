@@ -92,8 +92,9 @@ class utilityPane(QWidget):
 		self.ui.eepromLoaderProgressBar.setMaximum(1000)
 		self.eeprom.setProgress.connect(lambda n: self.ui.eepromLoaderProgressBar.setValue(n*1000))
 		self.eeprom.setAction.connect(lambda: self.ui.sendEeprom.setText)
+		self.eeprom.scriptOk.connect(self.crcStatus)
+		self.eeprom.imageLoaded.connect(self.eeprom.checkScriptCrc)
 
-		
 		# monitor ports - should make a common class and instantiate multiple times
 		self.sptimer = QTimer()
 		self.portname1 = None
@@ -227,3 +228,7 @@ class utilityPane(QWidget):
 		       (n.year%100, n.month, n.day, n.hour, n.minute, n.second)
 		payload = map(ord, cmd) + [0]
 		self.protocol.sendNPS(pids.EVAL, self.parent.who() + payload)
+
+	def crcStatus(self, flag):
+		self.ui.crcValue.setText('%08X' % self.eeprom.scriptCrc)
+		self.ui.crcStatus.setText('ok' if flag else 'bad')
