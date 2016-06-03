@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'mainWindow.ui'
 #
-# Created: Mon May 16 16:22:43 2016
+# Created: Tue May 31 16:42:26 2016
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -1551,7 +1551,7 @@ class Ui_MainWindow(object):
         self.toolBox.setItemText(self.toolBox.indexOf(self.smcPower), QtGui.QApplication.translate("MainWindow", "SMC Power", None, QtGui.QApplication.UnicodeUTF8))
         self.label_72.setText(QtGui.QApplication.translate("MainWindow", "Size:", None, QtGui.QApplication.UnicodeUTF8))
         self.eepromTarget.setItemText(0, QtGui.QApplication.translate("MainWindow", "MotherBoard", None, QtGui.QApplication.UnicodeUTF8))
-        self.label_10.setText(QtGui.QApplication.translate("MainWindow", "Crc:", None, QtGui.QApplication.UnicodeUTF8))
+        self.label_10.setText(QtGui.QApplication.translate("MainWindow", "CRC:", None, QtGui.QApplication.UnicodeUTF8))
         self.eepromSelect.setText(QtGui.QApplication.translate("MainWindow", "File:", None, QtGui.QApplication.UnicodeUTF8))
         self.label.setText(QtGui.QApplication.translate("MainWindow", "Target:", None, QtGui.QApplication.UnicodeUTF8))
         self.sendEeprom.setText(QtGui.QApplication.translate("MainWindow", "Write EEPROM", None, QtGui.QApplication.UnicodeUTF8))
