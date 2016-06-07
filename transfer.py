@@ -8,12 +8,12 @@ TRANSFER_DONE,		# send checksum
 REQUEST_OK, REQUEST_TOOBIG, TRANSFER_BUSY, # from request
 TRANSFER_OK, CHECK_ERROR, TRANSFER_INCOMPLETE, UNSUPORTED_TYPE, # from transfer
 # types
-UNKNOWN, JAM_PLAYER, JBC_PLAYER, TEXT_TRANSFER
+UNKNOWN, JAM_PLAYER, JBC_PLAYER, TEXT_TRANSFER,
 # upload
 TRANSFER_FILE, # file name, type > reply with size and checksum
 TRANSFER_CHUNK, # address, size > address (32), size (32), data
 FILE_UNAVAILABLE # either the file name is wrong or resource unavailble
-) = range (0,16)
+) = range (0,19)
 
 resultText = {
 	REQUEST_OK:'REQUEST_OK',

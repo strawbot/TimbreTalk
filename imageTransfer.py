@@ -146,4 +146,4 @@ class imageTransfer(image.imageRecord):
 			self.setAction.emit('Abort')
 	
 	def requestFile(self):
-		
+		pass
