@@ -132,3 +132,18 @@ class imageTransfer(image.imageRecord):
 		self.setAction.emit('Transfer')
 		elapsed = time.time() - self.startTransferTime
 		message(' finished in %.1f seconds'%elapsed,'note')
+
+	# receive file
+	def getFile(self):
+		if self.transferTimer.isActive():
+			self.abort()
+		else:
+			self.emptyImage()
+			self.startTransferTime = time.time()
+			self.setProgress.emit(0)
+			self.requestFile()
+			self.transferTimer.start(2000)
+			self.setAction.emit('Abort')
+	
+	def requestFile(self):
+		

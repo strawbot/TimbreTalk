@@ -75,7 +75,7 @@ class imageRecord(QObject):
 		elif self.ext in ['elf']:
 			self.addElfRecord()
 		elif self.ext in ['jbc', 'jam', 'txt', 'text']:
-			del self.image[:]
+			self.emptyImage()
 			self.image.extend(map(ord, open(self.file,'rb').read()))
 			self.start = 0
 			self.size = self.end = len(self.image)
@@ -89,8 +89,11 @@ class imageRecord(QObject):
 		self.makeImage()
 		self.checksum = fletcher32(self.image, len(self.image))
 
-	def makeImage(self): # direct memory image from hex strings with holes as 0xFF
+	def emptyImage(self):
 		del self.image[:]
+		
+	def makeImage(self): # direct memory image from hex strings with holes as 0xFF
+		self.emptyImage()
 		if self.size > self.MAX_IMAGE_SIZE:
 			error('Image is too large! %d'%self.size)
 		else:
