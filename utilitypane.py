@@ -71,6 +71,8 @@ class utilityPane(QWidget):
 		self.ui.bootStart.textChanged.connect(lambda t: self.stm.address)
  		self.ui.Go.clicked.connect(self.stm.goButton)
 		
+		self.ui.setDateTime.clicked.connect(self.setDateTimeNow)
+
 		# send jam file
  		self.jam = jamSender(self)
 		self.jam.setName.connect(self.ui.jamFile.setText)
