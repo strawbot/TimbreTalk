@@ -57,8 +57,7 @@ class imageRecord(QObject):
 	def checkUpdates(self):
 		if self.timestamp != os.path.getmtime(self.file):
 			warning(' disk image is newer - reloading ')
-			self.addRecord()
-			self.makeImage()
+			self.selectFile(self.file)
 			return True
 		return False
 
@@ -70,23 +69,23 @@ class imageRecord(QObject):
 
 		if self.ext in ['srec', 'S19']:
 			self.addSrecord()
+			self.makeImage()
 		elif self.ext in ['hex']:
 			self.addHexRecord()
+			self.makeImage()
 		elif self.ext in ['elf']:
 			self.addElfRecord()
+			self.makeImage()
 		elif self.ext in ['jbc', 'jam', 'txt', 'text']:
 			self.emptyImage()
 			self.image.extend(map(ord, open(self.file,'rb').read()))
 			self.start = 0
-			self.size = self.end = len(self.image)
-			self.checksum = fletcher32(self.image, len(self.image))
-			return
+			self.end = len(self.image)
 		else:
 			error('Unknown format. File suffix not any of: .hex, .srec, .S19, .elf, .jbc, .jam, .txt, .text: %s'%self.name)
 		if self.start == 0xFFFFFFFF:
 			self.start = 0
 		self.size = self.end - self.start
-		self.makeImage()
 		self.checksum = fletcher32(self.image, len(self.image))
 
 	def emptyImage(self):

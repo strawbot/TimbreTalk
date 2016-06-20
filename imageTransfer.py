@@ -40,8 +40,7 @@ class imageTransfer(image.imageRecord):
 			self.abort()
 		else:
 			if self.image:
-				if self.checkUpdates():
-					self.setSize(str(self.size))
+				self.checkUpdates():
 				self.startTransferTime = time.time()
 				self.setProgress.emit(0)
 				self.setupTransfer()

@@ -27,10 +27,12 @@ class eepromTransfer(imageTransfer):
 		else:
 			endp = image.find(self.endToken);
 			endp += len(self.endToken)
-			self.scriptCrc = binascii.crc32(image[:endp]) & 0xFFFFFFFF
+			self.scriptCrc = 0
+			calcCrc = binascii.crc32(image[:endp]) & 0xFFFFFFFF
 			if len(image[endp:]) >= 8:
-				if self.scriptCrc == int(image[endp:endp+8], 16):
+				self.scriptCrc = int(image[endp:endp+8], 16)
+				if calcCrc == self.scriptCrc:
 					self.scriptOk.emit(True)
 					return
-			note('Calculated CRC should be: %08X' % self.scriptCrc)
+			note('Calculated CRC should be: %08X' % calcCrc)
 			self.scriptOk.emit(False)
