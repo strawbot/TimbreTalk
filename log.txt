@@ -57,6 +57,8 @@ Issues:
  34. treat line 0 in terminal window as input only. Output only goes to lines above it.
      This would allow command history and cleaner output to window from target. The prompt
      could even be on the host.
+ 35. Allow the window to have a title so that when multiple ones are showing they can be
+     distinguished.
 
 Updates:
  1. removed unneccessary files from folder
