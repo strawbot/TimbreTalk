@@ -8,6 +8,8 @@ from checksum import fletcher32
 import os
 from ctypes import *
 
+printme = 0
+
 class imageRecord(QObject):
 	MAX_IMAGE_SIZE = 1024 * 1024 * 2 # 2MB
 	HOLE_FILL = 0xFF
@@ -32,6 +34,7 @@ class imageRecord(QObject):
 
 	def createImage(self, file):
 		if file:
+			if printme: print("Creating Image for: "+file)
 			self.file = file
 			x = self.file.rsplit('/', 1)
 			if len(x) > 1:
@@ -64,28 +67,24 @@ class imageRecord(QObject):
 	def addRecord(self): # turn file into list of address,data tuples
 		self.timestamp = os.path.getmtime(self.file) # remember for checking later
 		self.start = 0xFFFFFFFF
-		self.end = self.entry = 0
+		self.end = self.entry = self.size = 0
 		del self.records[:]
 
-		if self.ext in ['srec', 'S19']:
-			self.addSrecord()
-			self.makeImage()
-		elif self.ext in ['hex']:
-			self.addHexRecord()
-			self.makeImage()
-		elif self.ext in ['elf']:
-			self.addElfRecord()
-			self.makeImage()
-		elif self.ext in ['jbc', 'jam', 'txt', 'text']:
+		if self.ext in ['jbc', 'jam', 'txt', 'text']:
 			self.emptyImage()
 			self.image.extend(map(ord, open(self.file,'rb').read()))
-			self.start = 0
-			self.end = len(self.image)
+			self.end = self.size = len(self.image)
 		else:
-			error('Unknown format. File suffix not any of: .hex, .srec, .S19, .elf, .jbc, .jam, .txt, .text: %s'%self.name)
+			if self.ext in ['srec', 'S19']: self.addSrecord()
+			elif self.ext in ['hex']: self.addHexRecord()
+			elif self.ext in ['elf']: self.addElfRecord()
+			else:
+				error('Unknown format. File suffix not any of: .hex, .srec, .S19, .elf, .jbc, .jam, .txt, .text: %s'%self.name)
+				self.start = 0
+				return
+			self.makeImage()
 		if self.start == 0xFFFFFFFF:
 			self.start = 0
-		self.size = self.end - self.start
 		self.checksum = fletcher32(self.image, len(self.image))
 
 	def emptyImage(self):
@@ -93,13 +92,17 @@ class imageRecord(QObject):
 		
 	def makeImage(self): # direct memory image from hex strings with holes as 0xFF
 		self.emptyImage()
+		self.size = self.end - self.start
+		self.size = (self.size + 3) & ~3  # round up to multiple of 4
 		if self.size > self.MAX_IMAGE_SIZE:
 			error('Image is too large! %d'%self.size)
 		else:
 			self.image = [self.HOLE_FILL]*self.size
+			if printme: print("Size: %d"%self.size)
 			for record in self.records:
 				a = record[0] - self.start
 				data = record[1]
+				if printme: print(" a = %x  data = %s "%(a,data[0:20]))
 				for i in range(0,len(data),2):
 					if self.image[a+i/2] != 0xFF:
 						warning('\nimageRecord.makeImage: Overwrite data at %x'%(self.start + a + i/2))
@@ -141,6 +144,7 @@ class imageRecord(QObject):
 							self.entry = int(data, 16)
 						else:
 							raise Exception('Unknown hex record:%s'%line)
+			if printme: print("Start: %X  End: %X"%(self.start, self.end))
 		except:
 			error('Error parsing hex-record file! Unknown format')
 
@@ -250,6 +254,7 @@ class imageRecord(QObject):
 	information about the parts to build the image.
 	'''
 	def addElfRecord(self):
+		if printme: print("adding elf record")
 		# named constants
 		EI_MAG0, EI_MAG1, EI_MAG2, EI_MAG3, EI_CLASS, EI_DATA, EI_VERSION, EI_PAD, EI_NIDENT = range(8) + [16]
 		ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3 = '\x7f', 'E', 'L', 'F'
@@ -326,7 +331,8 @@ class imageRecord(QObject):
 				self.records.append((address,data))
 				self.start = min(self.start, address)
 				self.end = max(self.end, address+len(data)/2)
-
+				if printme: print("address: %x  start: %x  end: %x"%(address, self.start, self.end))
+				
 		file.close()
 
 # unit test code: convert srec and hex file to images and compare checksums

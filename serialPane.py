@@ -71,10 +71,10 @@ class serialPane(QWidget):
 			self.setParamButtonText()
 
 			if sp.port:
-				sp.port.setParity(sp.parity)
-				sp.port.setByteSize(sp.bytesize)
-				sp.port.setStopbits(sp.stopbits)
-				note('Changed port settings to %s%d%d'%(sp.port.getParity(),sp.port.getByteSize(),sp.port.getStopbits()))
+				sp.port.parity = sp.parity
+				sp.port.bytesize = sp.bytesize
+				sp.port.stopbits = sp.stopbits
+				note('Changed port settings to %s%d%d'%(sp.port.parity,sp.port.bytesize,sp.port.stopbits))
 		except Exception, e:
 			print >>sys.stderr, e
 			traceback.print_exc(file=sys.stderr)

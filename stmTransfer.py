@@ -75,9 +75,9 @@ class stmSender(imageTransfer):
 	
 	def setParam(self, sp, parity, bytesize, stopbits):
 		if sp.port:
-			sp.port.setParity(parity)
-			sp.port.setByteSize(bytesize)
-			sp.port.setStopbits(stopbits)
+			sp.port.parity = parity
+			sp.port.bytesize = bytesize
+			sp.port.stopbits = stopbits
 
 	def eraseBoot(self):
 		message('connected')
@@ -94,14 +94,14 @@ class stmSender(imageTransfer):
 		message(' flash erased in %.1f seconds'%elapsed,'note')
 
 		note('Download image ')
-		self.pointer = self.image.start
+		self.pointer = self.start
 		self.writeCommand()
 		self.chunk = 256
 
 	def writeCommand(self): # progress bar from .1 to .9
 		self.transferTimer.start(2000)
-		self.setProgress.emit(.1 + (.8*(self.pointer - self.image.start)/self.image.size))
-		if self.pointer < self.image.end:
+		self.setProgress.emit(.1 + (.8*(self.pointer - self.start)/self.size))
+		if self.pointer < self.end:
 			self.onAck(self.checked(0x31), self.writeAddress)
 		else:
 			self.verifyBoot()
@@ -113,12 +113,13 @@ class stmSender(imageTransfer):
 	def writeData(self):
 		if not self.verbose:
 			message('.', "note")
-		self.chunk = min(self.chunk, self.image.end - self.pointer)
+		self.chunk = min(self.chunk, self.end - self.pointer)
 		if self.chunk % 4:
-			error('Transfer size not a multiple of 4')
-		index = self.pointer - self.image.start
+			error('Transfer size not a multiple of 4: %d'%self.chunk)
+			note('Image size: %d'%self.size)
+		index = self.pointer - self.start
 		self.pointer += self.chunk
-		data = self.image.image[index:index+self.chunk]
+		data = self.image[index:index+self.chunk]
 		self.onAck(self.checksummed([self.chunk-1] + data), self.writeCommand)
 
 	def verifyBoot(self): # not verified, just trusted
@@ -148,10 +149,16 @@ class stmSender(imageTransfer):
 		if self.startTransferTime:
 			elapsed = time.time() - self.startTransferTime
 			transferMsg = 'Finished in %.1f seconds'%elapsed
-			rate = (8*self.image.size)/(elapsed*1000)
+			rate = (8*self.size)/(elapsed*1000)
 			rateMsg = ' @ %.1fkbps'%rate
 			note(transferMsg+rateMsg)
 		self.finishBoot()
+
+	def finishBoot(self):
+		self.transferTimer.stop()
+		self.parent.parent.connectPort()
+		note('serial port reconnected')
+		self.setAction.emit('Transfer')
 	
 	# STM32 Boot Loader
 	def sendHex(self, bytes):

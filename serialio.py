@@ -120,7 +120,7 @@ class serialPort(QThread):
 			note('Baudrate changed to %d'%rate)
 			self.rate = rate
 		if self.isOpen():
-			self.port.setBaudrate(rate)
+			self.port.baudrate = rate
 
 	def isOpen(self):
 		if self.port:
