@@ -6,3 +6,4 @@ dist
 tt.spec
 cpuids.py
 pids.py
+netifaces
