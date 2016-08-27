@@ -34,6 +34,12 @@ class timbreTalk(qterm.terminal):
 		self.ui.whoFrom.setCurrentIndex(self.whofrom)
 		QErrorMessage.qtHandler()
 
+		# to handle warnings about tablets when running under a VM
+		# http://stackoverflow.com/questions/25660597/hide-critical-pyqt-warning-when-clicking-a-checkboc
+		def handler(msg_type, msg_string):
+			pass
+		qInstallMsgHandler(handler)
+
 	# overrides
 	def UiAdjust(self):
 		# tab defines
