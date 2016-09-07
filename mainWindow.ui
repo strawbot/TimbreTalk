@@ -58,7 +58,7 @@
            <enum>Qt::NoContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>4</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="Interface">
            <attribute name="title">
@@ -1247,6 +1247,19 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
               </item>
              </layout>
             </item>
+            <item>
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
            </layout>
           </widget>
           <widget class="QWidget" name="Info">
@@ -1466,7 +1479,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
             <item>
              <widget class="QToolBox" name="toolBox">
               <property name="currentIndex">
-               <number>3</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="page">
                <property name="geometry">
@@ -1851,8 +1864,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>360</width>
-                 <height>247</height>
+                 <width>98</width>
+                 <height>28</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2739,8 +2752,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>100</width>
-                 <height>30</height>
+                 <width>98</width>
+                 <height>28</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -3531,9 +3544,22 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
               <number>6</number>
              </property>
              <item>
-              <widget class="QCheckBox" name="checkBox_3">
+              <widget class="QLabel" name="label_11">
                <property name="text">
-                <string>Log to file</string>
+                <string>Size</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="fontSize">
+               <property name="minimum">
+                <number>5</number>
+               </property>
+               <property name="maximum">
+                <number>40</number>
+               </property>
+               <property name="value">
+                <number>12</number>
                </property>
               </widget>
              </item>
@@ -3606,11 +3632,11 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
    <slot>hide()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>199</x>
+     <x>192</x>
      <y>146</y>
     </hint>
     <hint type="destinationlabel">
-     <x>321</x>
+     <x>304</x>
      <y>184</y>
     </hint>
    </hints>
@@ -3622,11 +3648,11 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>199</x>
+     <x>192</x>
      <y>146</y>
     </hint>
     <hint type="destinationlabel">
-     <x>313</x>
+     <x>296</x>
      <y>151</y>
     </hint>
    </hints>
@@ -3638,11 +3664,11 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>112</x>
+     <x>105</x>
      <y>146</y>
     </hint>
     <hint type="destinationlabel">
-     <x>321</x>
+     <x>304</x>
      <y>184</y>
     </hint>
    </hints>
@@ -3654,19 +3680,19 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
    <slot>hide()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>112</x>
+     <x>105</x>
      <y>146</y>
     </hint>
     <hint type="destinationlabel">
-     <x>313</x>
+     <x>296</x>
      <y>151</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="serialProtocol"/>
   <buttongroup name="LfOut"/>
   <buttongroup name="CrOut"/>
+  <buttongroup name="serialProtocol"/>
  </buttongroups>
 </ui>

@@ -30,6 +30,8 @@ class terminal(QMainWindow):
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 		self.banner()
+		# connect(fontSizeSpin, SIGNAL(valueChanged(int), textEdit, SLOT(setFontPointSize(int));
+		self.ui.fontSize.valueChanged.connect(self.setFontSize)
 		
 		# serial port
 		self.sptimer = QTimer()
@@ -49,6 +51,7 @@ class terminal(QMainWindow):
 			font = self.ui.textEdit.font()
 			font.setPointSize(font.pointSize() - 3)
 			self.ui.textEdit.setFont(font)
+			self.ui.fontSize.setValue(font.pointSize())
 		self.charwidth = self.ui.textEdit.fontMetrics().width(' ')*1.1
 			
 		# widget connections
@@ -115,6 +118,11 @@ class terminal(QMainWindow):
 		self.ui.phrase7.returnPressed.connect(self.sendPhrase7)
 		self.ui.phrase8.returnPressed.connect(self.sendPhrase8)
 
+	def setFontSize(self, size):
+		font = self.ui.textEdit.font()
+		font.setPointSize(size)
+		self.ui.textEdit.setFont(font)
+		
 	def sendPhrase(self, s):
 		s = s+'\r'
 		for c in s:
