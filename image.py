@@ -13,7 +13,6 @@ printme = 0
 class imageRecord(QObject):
 	MAX_IMAGE_SIZE = 1024 * 1024 * 2 # 2MB
 	HOLE_FILL = 0xFF
-	records = []
 	setSize = Signal(object)
 	setName = Signal(object)
 	setStart = Signal(object)

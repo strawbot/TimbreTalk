@@ -26,6 +26,7 @@ class imageTransfer(image.imageRecord):
 		self.transferTimer = QTimer()
 		self.transferTimer.timeout.connect(self.timedOut)
 		self.transferTimer.setSingleShot(True)
+		self.transferDelay = 0
 
 		# shortcuts
 		self.protocol = self.parent.protocol
@@ -60,7 +61,7 @@ class imageTransfer(image.imageRecord):
 
 		self.transferTimer.timeout.disconnect()
 		self.transferTimer.timeout.connect(self.transferChunk)
-		self.transferTimer.start(0)
+		self.transferTimer.start(self.transferDelay)
 
 	def transferChunk(self):
 		if self.left:
@@ -74,7 +75,7 @@ class imageTransfer(image.imageRecord):
 			self.setProgress.emit((self.size - self.left)/self.size)
 			self.i += 1
 			self.pointer += sendsize
-			self.transferTimer.start(0)
+			self.transferTimer.start(self.transferDelay)
 		else:
 			self.transferDone()
 			self.transferTimer.timeout.disconnect()
