@@ -48,6 +48,7 @@ Issues:
      to make it easy to see what operational mode the interface is in
  29. Tab text does not show up in Yosemite as it doesn't fit. Instead it is a letter
      followed by an ellipse.
+     - this happens when launching from a terminal window in the retina display only
  30. GUI should be hierarchial and plugable so that projects can add their special parts
      but still be able to get general updates to GUI.
  31. when in buffered IO mode, better editing facilities should be available such as 
@@ -59,7 +60,14 @@ Issues:
      could even be on the host.
  35. Allow the window to have a title so that when multiple ones are showing they can be
      distinguished.
-
+ 36. when adding in support for ethernet, change ping button to IP ping
+ 37. PIDs should be general classes subclassed by SPIDs. In terms of SPIDs, there should
+     be a common set such as suportted or not, read/write; transfer of working parameters
+     such as buffer sizes; The MEM... PIDs should be consolodated around memory - include
+     flash as well.
+ 38. File transfer not happening in the background. Nothing can happen when doing a Jam
+     Player write file, for example.
+ 
 Updates:
  1. removed unneccessary files from folder
  2. modified applist to take arguments
@@ -74,3 +82,4 @@ Updates:
  9. done:  32. remember target directory in utility pane like transfer pane: selectFile...
  10. factored transfer protocol out and created class hierarchy:
       QObject -> image -> imageTransfer -> jam player, eeprom transfer
+ 11. added font size adjuster for text window
