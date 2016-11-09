@@ -10,9 +10,10 @@ jamType = {'.jam':JAM_PLAYER, '.jbc':JBC_PLAYER}
 class jamSender(imageTransfer):
 	def __init__(self, parent):
 		super(jamSender, self).__init__(parent)
-		self.protocol.packetSource(pids.JAM, self.transferResponse)
-		self.protocol.packetSource(pids.FILES, self.transferResponse)
-		self.transferDelay = 100
+		if 'JAM' in pids.pids.keys():
+			self.protocol.packetSource(pids.JAM, self.transferResponse)
+			self.protocol.packetSource(pids.FILES, self.transferResponse)
+			self.transferDelay = 100
 
 	def sendJam(self):
 		imageTransfer.transferPid = pids.JAM
