@@ -67,6 +67,10 @@ Issues:
      flash as well.
  38. File transfer not happening in the background. Nothing can happen when doing a Jam
      Player write file, for example.
+ 39. There is no default cpuids or pids file so it cannot work when freshly downloaded
+ 40. Also pyqt4 must be downloaded before it can work. Perhaps the user should be helped out.
+     Maybe a link to the most recent binary release should be there. There should be a readme.txt.
+ 41. Either add all standard baud rates or allow user to enter a baudrate.
  
 Updates:
  1. removed unneccessary files from folder
