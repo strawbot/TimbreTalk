@@ -71,6 +71,7 @@ Issues:
  40. Also pyqt4 must be downloaded before it can work. Perhaps the user should be helped out.
      Maybe a link to the most recent binary release should be there. There should be a readme.txt.
  41. Either add all standard baud rates or allow user to enter a baudrate.
+ 42. Add regular expression to text search in main window.
  
 Updates:
  1. removed unneccessary files from folder
