@@ -72,6 +72,11 @@ Issues:
  40. Detect that Qt is not available and run from the command line in a terminal window.
      Accept command line parameters for all the major features. Also detect if pyserial
      is not installed and recover gracefully. Either run without Qt or exit gracefully.
+ 41. There is no default cpuids or pids file so it cannot work when freshly downloaded
+ 42. Also pyqt4 must be downloaded before it can work. Perhaps the user should be helped out.
+     Maybe a link to the most recent binary release should be there. There should be a readme.txt.
+ 43. Either add all standard baud rates or allow user to enter a baudrate.
+ 44. Add regular expression to text search in main window.
  
 Updates:
  1. removed unneccessary files from folder
