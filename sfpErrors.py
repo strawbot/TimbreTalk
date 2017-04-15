@@ -1,0 +1,17 @@
+# sfp error tags  Robert Chapman III  Sun Apr  9 13:16:52 2017
+
+# status for length checks for frames
+(NO_ERROR,
+LENGTH_IGNORE,
+LENGTH_OK,
+LENGTH_SHORT,
+LENGTH_LONG,
+RX_RESET,
+FRAME_TIMEOUT,
+FRAME_SYNCED,
+NOT_SYNCED,
+GOOD_FRAME,
+IGNORE_FRAME,
+BAD_CHECKSUM,
+NO_HANDLER,
+UNKNOWN_PACKET) = (range(0,-14,-1))
