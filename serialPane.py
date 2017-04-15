@@ -27,7 +27,7 @@ class serialPane(QWidget):
 		
 		# setup
 		self.ui.SFP.click()
-		self.protocol.packetSource(pids.TALK_OUT, self.talkPacket)
+		self.protocol.setHandler(pids.TALK_OUT, self.talkPacket)
 
 	def portParametersMenu(self):
 		# menu for serial port parameters

@@ -11,8 +11,8 @@ class jamSender(imageTransfer):
 	def __init__(self, parent):
 		super(jamSender, self).__init__(parent)
 		if 'JAM' in pids.pids.keys():
-			self.protocol.packetSource(pids.JAM, self.transferResponse)
-			self.protocol.packetSource(pids.FILES, self.transferResponse)
+			self.protocol.setHandler(pids.JAM, self.transferResponse)
+			self.protocol.setHandler(pids.FILES, self.transferResponse)
 		self.transferDelay = 100
 
 	def sendJam(self):

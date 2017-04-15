@@ -1,26 +1,21 @@
-# SFP Small Frame Synchronous Protocol  Robert Chapman III  Jul 4, 2012
+# SFP Small Frame Synchronous Protocol	Robert Chapman III	Jul 4, 2012
+# Bytes in and out are binary
+# doesn't implement: SPS or routing
+# callouts: newFrame, newPacket
+# redefine newFrame and newPacket to get signals to know when to call
+# distributer or txBytes
+# call ins: rxBytes and sendNPS
+
+import time, Queue
+from collections import deque
+from pids import MAX_FRAME_LENGTH, SFP_FRAME_TIME, pids, PID_BITS
+from sfpErrors import *
 
 # sfp format: |0 length |1 sync |2 pid |3 payload | checksum |
 #  sync = ~length
-#  length = sizeof payload + 4
+#  length = sizeof sync + sizeof pid + sizeof payload + sizeof checksum
 #  pid = TALK_OUT
-#  payload = k
-#  checksum = length + sync + pid + payload
-
-from pyqtapi2 import *
-
-import sys, time, os, Queue
-from signalcatch import initSignalCatcher
-from message import *
-from endian import cast
-
-# packet ids
-from pids import *
-
-# no more than 254; set according to link resources; this should be shared with embedded side or derived
-MAX_FRAME_LENGTH = 254
-
-# frame trappings
+#  checksum covers: length + sync + pid + payload
 LENGTH_LENGTH = 1
 SYNC_LENGTH = 1
 PID_LENGTH = 1
@@ -30,242 +25,183 @@ CHECKSUM_LENGTH = 2
 MIN_FRAME_LENGTH = (SYNC_LENGTH + PID_LENGTH + CHECKSUM_LENGTH)
 MAX_SFP_SIZE = (LENGTH_LENGTH + MAX_FRAME_LENGTH)
 MIN_SFP_SIZE = (LENGTH_LENGTH + MIN_FRAME_LENGTH)
-MAX_PACKET_LENGTH = (MAX_FRAME_LENGTH - MIN_FRAME_LENGTH)
-MAX_PAYLOAD_LENGTH = (MAX_PACKET_LENGTH - PID_LENGTH)
-WHO_LENGTH = 2
-WHO_HEADER_SIZE = (PID_LENGTH + WHO_LENGTH)
-MAX_WHO_PAYLOAD_LENGTH = (MAX_PACKET_LENGTH - WHO_HEADER_SIZE)
 FRAME_OVERHEAD = (MIN_FRAME_LENGTH - PID_LENGTH)
-FRAME_HEADER = (LENGTH_LENGTH + SYNC_LENGTH)
-PACKET_HEADER = (PID_LENGTH)
-
-# status for lengths
-LENGTH_OK = 1
-LENGTH_LONG = 2
-LENGTH_SHORT = 3
 
 # protocol class
-class sfpProtocol(QThread):
-	
-	source = Signal(object)
-	byteTimeout = Signal()
-	sinkBytes = Signal()
-	packetHandler = {}
-	frame = []
-	VERBOSE = 0
+class sfpProtocol(object):
+	VERBOSE = 0	 # set to non zero for debugging
 
 	def __init__(self):
-		super(sfpProtocol, self).__init__() # needed for signals to work!!
-		self.sfpState = self.hunting	# states: hunting, syncing, receiving
-		self.talkTarget = 0
-		self.lastsink = time.time()
-		self.loinputs = 0
-		self.looutputs = 0
-		self.hiinputs = 0
-		self.hioutputs = 0
-		self.inpackets = 0
-		self.outpackets = 0
- 		self.packetSource(SPS, self.spsHandler)
-	
-#		initSignalCatcher()
+		self.receivedPool = Queue.Queue()  # holds received frames
+		self.transmitPool = Queue.Queue()  # holds outgoing frames
+		self.handler = {}  # for associating handlers with PIDs
+		self.frame = deque() # incoming data
+		self.sfpState = self.hunting  # receive states: hunting, syncing, receiving
+		self.frameTime = time.time()  # to know when data is stale
+		self.length = 0
+		self.result = NO_ERROR
+		self.message = ""
 
-		# separate thread for packet distributer
-		class packetDistributer(QThread): # distribute packets from queue
-			def __init__(self, q, ph):
-				QThread.__init__(self)
-				self.q = q
-				self.ph = ph
-				
-			def run(self): # route packet to proper place
-				while True:
-					try:
-						packet = self.q.get()
-					except Exception, e:
-						print >>sys.stderr, e
-						traceback.print_exc(file=sys.stderr)
-						break;
-					pid = packet[0]
-					handler = self.ph.get(pid)
-					if handler:
-						handler(packet[1:])
-					else:
-						self.unknownPacket(packet)
+	# receiver: frame contains received bytes and is parsed for a frame
+	def rxBytes(self, bytes):  # run rx state machine receiver
+		if self.VERBOSE:
+			self.dump('RX: ', bytes)
 
-			def unknownPacket(self, packet): # no handler for this packet
-				if pids.get(packet[0]):
-					error("Error: no handler for %s (0x%x)" %(pids[packet[0]], packet[0]))
-				else:
-					messageDump("Error: unknown packet: 0x%x " %(packet[0]), packet)
+		if self.frame and (time.time() - self.frameTime) > SFP_FRAME_TIME:
+			self.error(FRAME_TIMEOUT,"Frame timeout - resetting receiver")
+			self.resetRx()
+		else:
+			self.frame.extend(bytes)
+			while self.sfpState():
+				pass
+			if bytes:
+				self.frameTime = time.time()
 
-		self.packetq = Queue.Queue()
-		self.pd = packetDistributer(self.packetq, self.packetHandler)
-		self.pd.start()
-		
-		# incoming byte stream
-		self.sinkBytes.connect(self.processBytes)
-		self.byteTimer = QTimer()
-		self.byteTimer.timeout.connect(self.processBytes)
-		self.byteTimer.setInterval(100)
-		self.byteTimer.start()
+	# states
+	def hunting(self):  # look for frame length
+		if not self.frame:
+			return False
 
-		self.byteTimeout.connect(self.initRx)
-		
-		def pingBack(packet): # responder
-			whoto, whofrom = cast('BB', packet)[0:2]
-			self.sendNPS(PING_BACK, [whofrom, whoto])
-		self.packetSource(PING, pingBack)
+		self.length = self.frame.popleft()
+		self.result = self.checkLength()
+		if self.result is LENGTH_OK:
+			self.sfpState = self.syncing
+			self.frameTime = time.time()
+		elif self.result is LENGTH_SHORT:
+			self.error(LENGTH_SHORT,"host: short frame")
+		elif self.result is LENGTH_LONG:
+			self.error(LENGTH_LONG,"host: long frame")
+		return True
 
-	def spsHandler(self, packet):
-		pass
+	def syncing(self):  # wait for sync byte
+		if not self.frame:
+			return False
 
-	# thread for receiver
-	def processBytes(self): # run rx state machine receiver
-		t = time.time()
-		if len(self.frame):
-			if (t - self.lastsink) > 15:
-				error("Frame timeout - resetting receiver")
-				self.byteTimeout.emit()
+		if self.checkSync(self.frame[0]):
+			if self.VERBOSE:
+				self.note(FRAME_SYNCED,"host: synced")
+			self.sfpState = self.receiving
+		else:
+			if self.VERBOSE:
+				self.error(NOT_SYNCED,"host: not synced")
+			self.sfpState = self.hunting
+		return True
+
+	def receiving(self):  # receive rest of frame
+		if len(self.frame) < self.length:
+			return False
+
+		self.sfpState = self.hunting
+		if self.frameOk():
+			frame = list(self.frame) # convert to list for slicing
+			self.frame.clear()
+			self.frame.extend(frame[self.length:])
+
+			if frame[1] & ~PID_BITS: # ignore SPS frames since not supported
+				self.result = IGNORE_FRAME
 			else:
-				self.sfpState()					
-		self.lastsink = t
+				if self.VERBOSE:
+					self.note(GOOD_FRAME, "host: good frame")
+				self.receivedPool.put(frame[1:self.length - CHECKSUM_LENGTH])
+				self.newPacket()
+		else:
+			self.error(BAD_CHECKSUM,"host: bad checksum")
+		return True
 
-	# shutdown signal
-	def shutdown(self):
-		pass
-#		note('shutting down SFP\n\r')
-
+	# support
 	def resetRx(self):
 		self.sfpState = self.hunting
-		del self.frame[:]
+		self.frame.clear()
 
-	def initRx(self): # to reinitialize an unsynced recevier
- 		warning("Receiver reset from state: %s  frame size: %i"%(self.sfpState.__name__, len(self.frame)))
+	def initRx(self):  # to reinitialize an unsynced recevier
+		self.warning(RX_RESET,"Receiver reset from state: %s	frame size: %i" % (self.sfpState.__name__, len(self.frame)))
 		self.resetRx()
 
-	# sending SFP frames
-	def sendNPS(self, pid, payload): # send a payload via normal packet service
-		self.outpackets += 1
-		self.hioutputs += len(payload) + 1
-		length = len(payload) + FRAME_OVERHEAD + 1 # pid is separate from payload
-		sync = ~length & 0xff
-		frame = [length, sync, pid]
-		for c in payload:
-			try:
-				i = ord(c)
-			except:
-				i = int(c)
-			frame.append(i)
-		sum1, sum2 = self.checkSum(frame)
-		frame.extend([sum1 & 0xff, sum2 & 0xff])
-#		print >>sys.stderr, 'sfp lower source %s'%type(frame)
-		self.source.emit(''.join(map(chr, frame)))
-		if self.VERBOSE:
-			messageDump("\nFrame TX:",frame)
-		self.looutputs += len(frame)
-	
-	# receiving SFP frames
-	
-	def routeFrame(self): # pass frame to packet layer
-		#print >>sys.stderr, 'sfp upper source %s'%type(self.frame)
-		pid = self.frame[2]
-		if pid: # pid of zero is empty sps packet
-			self.packetq.put(self.frame[2:self.frame[0]-1])
-			# [6,~6,pid,x,y,cs1,cs2] packet = pid,x,y
-	
-	# support
-	def sfpLengthOk(self, length):
-		if length >= MIN_SFP_SIZE:
-			if length <= MAX_SFP_SIZE:
-				return LENGTH_OK
-			elif length < 255:
-				return LENGTH_LONG
-		else:
+	def checkLength(self):
+		if MIN_FRAME_LENGTH <= self.length <= MAX_FRAME_LENGTH:
+			return LENGTH_OK
+
+		if self.length == 0 or self.length == 0xFF:
+			return LENGTH_IGNORE
+
+		if self.length < MIN_FRAME_LENGTH:
 			return LENGTH_SHORT
-	
-	def sfpSync(self, length, sync):
-		return (~length & 0xFF) == sync
 
-	def frameOk(self): # check checksum
-		sum1, sum2 = self.checkSum(self.frame)
-		end = self.frame[0]
-		return (sum1 == self.frame[end-1]  and  sum2 == self.frame[end])
-	
-	def checkSum(self, frame): # calculate checksum
-		sum1 = sum2 = 0
-		for i in range(0, frame[0]-1):
-			sum1 += frame[i]
-			sum2 += sum1
-		return ((sum1 & 0xFF), (sum2 & 0xFF))
-	
-	# Receiver states
-	def hunting(self): # look for frame length
-		if len(self.frame) > 0:
-			lengthValue = self.sfpLengthOk(self.frame[0])
-			if lengthValue is LENGTH_OK:
-				self.sfpState = self.syncing
-				self.frameStart = time.time() # use to discard stale bytes
-				self.bytesToReceive = self.frame[0]
-				self.sfpState() # recursive
-			else:
-				if lengthValue is LENGTH_SHORT:
-					error("host: short frame")
-				else:
-					error("host: long frame")
-				del(self.frame[0])
-				
-	def syncing(self): # wait for sync byte
-		if len(self.frame) > 2:
-			if self.sfpSync(self.frame[0], self.frame[1]):
-				if self.VERBOSE:
-					note("host: synced")
-				self.sfpState = self.receiving
-				self.sfpState() # recursive
-			else:
-				if self.VERBOSE:
-					error("host: not synced")
-				del(self.frame[0:2])
+		return LENGTH_LONG
 
-	def receiving(self): # receive rest of frame
-		if len(self.frame) > self.frame[0]:
-			self.sfpState = self.hunting
-			if self.frameOk():
-				if self.VERBOSE:
-					note("host: good frame")
-				if self.frame[2] & ACK_BIT:
-					self.spsFrame()
-				self.routeFrame()
-				self.inpackets += 1
-				self.hiinputs += self.frame[0] - 3
-				del self.frame[0:self.frame[0]+1]
-				self.sfpState() # recursive
-			else:
-				error("host: bad checksum")
-				del self.frame[0]
-			
-	def dumping(self): # dump rest of received frame
-		pass
+	def checkSync(self, sync):
+		return (~self.length & 0xFF) == sync
 
-	def spsFrame(self): # handle sps frames
-#			frame.after_idle(faketransfer)
-		self.sendNPS(SPS_ACK, [])
-		self.frame[2] &= PID_BITS
+	def frameOk(self):	# check checksum
+		sum = sumsum = self.length
+		for index in range(self.length-CHECKSUM_LENGTH):
+			sum += self.frame[index]
+			sumsum += sum
+		return sum&0xFF == self.frame[self.length-2] and sumsum&0xFF == self.frame[self.length-1]
 
-	def sink(self, c): # external sink
-		#print >>sys.stderr, 'sfp lower sink %s'%type(c)
-		self.loinputs += len(c)
-		self.frame += map(ord,c)
-		if self.VERBOSE:
-#			o = ord(c)
-#			if c < ' ' or c > '~':
-#				c = '<>'
-#			string = 'RX: %X "%s"'%(o,c)
-			messageDump('RX: ',c)
-		self.sinkBytes.emit()
+	def checkSum(self, frame):	# calculate checksum
+		sum = sumsum = 0
+		for byte in frame:
+			sum += byte
+			sumsum += sum
+		return (sum & 0xFF), (sumsum & 0xFF)
 
 	# packet handlers
-	def packetSource(self, pid, handler): # route packets to handler
-		self.packetHandler[pid] = handler
-	
-	def removeHandler(self, pid): # remove packet handler
-		if self.packetHandler.get(pid):
-			self.packetHandler.pop(pid)
+	def newPacket(self):  # redefine to receive packets
+		pass
+
+	def distributer(self):	 # distribute packets from queue
+		if not self.receivedPool.empty():
+			packet = self.receivedPool.get()
+			pid = packet[0]
+			handler = self.handler.get(pid)
+			if handler:
+				handler(packet[1:])
+			elif pids.get(packet[0]):
+				self.error(NO_HANDLER,"Error: no handler for %s (0x%x)" % (pids[packet[0]], packet[0]))
+			else:
+				self.dump("Error: unknown packet: 0x%x " % (packet[0]), packet)
+
+	def setHandler(self, pid, handler):  # route packets to handler
+		self.handler[pid] = handler
+
+	def removeHandler(self, pid):  # remove packet handler
+		if self.handler.get(pid):
+			self.handler.pop(pid)
+
+	# sending SFP frames
+	def sendNPS(self, pid, payload):  # send a payload via normal packet service
+		length = len(payload) + FRAME_OVERHEAD + 1	 # pid is separate from payload
+		sync = ~length & 0xff
+		frame = [length, sync, pid] + payload
+		sum, sumsum = self.checkSum(frame)
+		frame.extend([sum, sumsum])
+		if self.VERBOSE:
+			self.dump("\nFrame TX:", frame)
+		self.transmitPool.put(frame)
+		self.newFrame()
+
+	def newFrame(self):  # redefine to send a new frame
+		pass
+
+	def txBytes(self):
+		if self.transmitPool:
+			return self.transmitPool.get()
+		return []
+
+	# errors and messages
+	def error(self, code = 0, string = ""):
+		self.result = code
+		self.message = string
+
+	def warning(self, code = 0, string = ""):
+		self.result = code
+		self.message = string
+
+	def note(self, code = 0, string = ""):
+		self.result = code
+		self.message = string
+
+	def dump(self, tag, buffer):
+		self.result = buffer
+		self.message = tag

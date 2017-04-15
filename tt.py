@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # GUI for serial transactions using Qt	Robert Chapman III	Sep 28, 2012
-version='1.3'
+version='1.5'
 
 from pyqtapi2 import *
 from cpuids import MAIN_HOST
@@ -18,10 +18,41 @@ import infopane
 import utilitypane, cpuids
 import sys
 
+class sfpQt (QObject, sfp.sfpProtocol):
+	source = Signal(object)
+
+	def __init__(self):
+		QObject.__init__(self)
+		sfp.sfpProtocol.__init__(self)
+
+	def sink(self, bytes):
+		self.rxBytes(map(ord, bytes))
+
+	def newFrame(self):
+		self.source.emit(''.join(map(chr, self.txBytes())))
+
+	def newPacket(self):
+		self.distributer()
+
+	def error(self, code = 0, string = ""):
+		self.result = code
+		error(string)
+
+	def warning(self, code = 0, string = ""):
+		self.result = code
+		warning(string)
+
+	def note(self, code = 0, string = ""):
+		self.result = code
+		note(string)
+
+	def dump(self, tag, buffer):
+		messageDump(tag, buffer)
+
 class timbreTalk(qterm.terminal):
 	def __init__(self):
 		qterm.terminal.__init__(self)
-		self.protocol = sfp.sfpProtocol()
+		self.protocol = sfpQt()
 		self.whoto = self.whofrom = 0
 		self.serialPane = serialPane.serialPane(self)
 		transferPane.srecordPane(self)
@@ -51,13 +82,13 @@ class timbreTalk(qterm.terminal):
 		PhraseTab = range(5)
 		# adjustments for terminal app
 		self.ui.Controls.setCurrentIndex(SerialTab)
-	
+
 	def banner(self):
 		self.setWindowTitle('Timbre Talk '+version)
 
 	def connectPort(self):
 		self.serialPane.connectPort()
-	
+
 	def disconnectPort(self):
 		self.serialPane.disconnectFlows()
 
@@ -75,7 +106,7 @@ class timbreTalk(qterm.terminal):
 		self.ui.whoFrom.insertItems(0, points)
 		self.ui.whoTo.activated.connect(self.selectWhoTo)
 		self.ui.whoFrom.activated.connect(self.selectWhoFrom)
-	
+
 	def selectWhoTo(self, index):
 		self.whoto = index
 		note('changed target to '+self.ui.whoTo.currentText())
@@ -83,12 +114,12 @@ class timbreTalk(qterm.terminal):
 	def selectWhoFrom(self, index):
 		self.whofrom = index
 		note('changed source to ' + self.ui.whoFrom.currentText())
-	
+
 	def who(self): # return latest who list
 		return [self.whoto, self.whofrom]
 
 if __name__ == "__main__":
-	import sys, traceback	
+	import sys, traceback
 # 	kwargs = dict(x.split('=', 1) for x in sys.argv[1:])
 # 	name = kwargs.get('name', '')
 # 	port = kwargs.get('port', '/dev/ttyACM0')

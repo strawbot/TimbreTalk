@@ -15,7 +15,7 @@ class eepromTransfer(imageTransfer):
 	scriptCrc = 0
 
 	def setupTransfer(self):
-		self.protocol.packetSource(pids.EEPROM, self.transferResponse)
+		self.protocol.setHandler(pids.EEPROM, self.transferResponse)
 		self.transferPid = pids.EEPROM
 		self.transferType = TEXT_TRANSFER
 

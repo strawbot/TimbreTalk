@@ -64,7 +64,7 @@ def messageDump(who,s=[], text=0): # dump message in hex or text to terminal
 			framedump = ' '.join(map (lambda i:hex(i)[2:].upper().zfill(2), s))
 	note(who + framedump)
 
-class stdMessage: # for redirecting standard out
+class stdMessage(object): # for redirecting standard out
 	@classmethod
 	def write(cls, string):
 		textout(string)

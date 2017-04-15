@@ -29,7 +29,6 @@ Issues:
  13. Phrases should be able to have delays between characters to interface with slow
      links.
  14. add srecord and intel hex file generator
- 15. fix popup menu in terminal window so it is not blue
  16. change copied text to be not blue?
  17. should check to make sure pyserial 2.7 or greater is being used
  18. add parity, size and stopbits to monitor utility
@@ -67,6 +66,12 @@ Issues:
      flash as well.
  38. File transfer not happening in the background. Nothing can happen when doing a Jam
      Player write file, for example.
+ 39. Make command line entry the default for text to target. With this mode the text is
+     buffered on the host and every line that is sent, is kept and can be accessed using
+     the up/down arrows. When in single character mode, this option is disabled.
+ 40. Detect that Qt is not available and run from the command line in a terminal window.
+     Accept command line parameters for all the major features. Also detect if pyserial
+     is not installed and recover gracefully. Either run without Qt or exit gracefully.
  
 Updates:
  1. removed unneccessary files from folder
@@ -83,3 +88,5 @@ Updates:
  10. factored transfer protocol out and created class hierarchy:
       QObject -> image -> imageTransfer -> jam player, eeprom transfer
  11. added font size adjuster for text window
+ 12. fixed color of context menu text in terminal window;
+     issue 15. fix popup menu in terminal window so it is not blue

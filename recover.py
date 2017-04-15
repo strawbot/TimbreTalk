@@ -47,7 +47,7 @@ class recover(QObject):
 
 	def startRecovery(self): # initial call
 		self.started.emit()
-		self.protocol.packetSource(pids.PARAM, self.readParam)
+		self.protocol.setHandler(pids.PARAM, self.readParam)
 		self.startTimer.emit()
 	
 	def stopRecovery(self):

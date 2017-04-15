@@ -98,6 +98,7 @@ class terminal(QMainWindow):
 		self.ui.LfOut.buttonClicked.connect(self.setLf)
 		self.ui.CRCR.click()
 		self.ui.LFnada.click()
+		self.ui.linewrap.stateChanged.connect(self.selectLinewrap)
 
 		# phrases
 		self.ui.send1.clicked.connect(self.ui.phrase1.returnPressed)
@@ -335,6 +336,9 @@ class terminal(QMainWindow):
 		self.ui.Ping.setVisible(0)
 		self.ui.groupBox_3.setVisible(0)
 		self.ui.ResetRcvr.setVisible(0)
+
+	def selectLinewrap(self, flag):
+		self.ui.textEdit.LineWrapMode = QPlainTextEdit.WidgetWidth if flag else QPlainTextEdit.NoWrap
 
 	def keyin(self, key): # input is a qstring
 #		self.ui.textEdit.ensureCursorVisible()

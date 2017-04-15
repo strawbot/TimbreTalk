@@ -56,7 +56,7 @@ def deactivate(machine):
 def noop(n=0):
 	pass
 
-class Qt():
+class Qt(object):
 	QueuedConnection = 0
 
 class Signal(object):
@@ -117,7 +117,7 @@ class QCoreApplication(QObject):
 		if printme: print >>sys.stderr, 'starting up application'
 		runMachines()
 
-class QTimer():
+class QTimer(object):
 	terminate = 0
 
 	def __init__(self):
