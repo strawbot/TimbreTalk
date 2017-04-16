@@ -29,7 +29,7 @@ class sfpQt (QObject, sfp.sfpProtocol):
         self.rxBytes(bytelist)
 
 	def newFrame(self):
-		self.source.emit(''.join(map(chr, self.txBytes())))
+        self.source.emit(self.txBytes())
 
 	def newPacket(self):
 		self.distributer()
@@ -96,12 +96,9 @@ class timbreTalk(qterm.terminal):
 
 	# Routing
 	def listRoutes(self):
-		routes = [['Direct',0]]
-		for name,value in cpuids.whoDict.iteritems():
-			if value:
-				routes.append([name,value])
-		points = [point[0] for point in sorted(routes, key = lambda x: x[1])]
-		del(points[-1]) # remove routing points
+        points = ['Direct']
+        d = pids.whoDict  # use simpler name for comprehension
+        points += [k for k in sorted(d, key=d.get) if d[k]][:-1]  # skip 0's and last point
 		self.ui.whoTo.clear()
 		self.ui.whoTo.insertItems(0, points)
 		self.ui.whoFrom.clear()

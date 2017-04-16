@@ -18,9 +18,13 @@ Could detect if qt api is available and then call it instead.
 printme = 0
 done = 0
 
-import Queue, threading, time
-import os
+import threading, time
 import sys
+if sys.version_info > (3, 0):
+	import queue as Queue
+else:
+	import Queue
+
 
 machineq = Queue.Queue()
 

@@ -1,7 +1,12 @@
 # messages  Rob Chapman  Jan 30, 2011
 
 #from PyQt4.QtCore import QMutex
-import Queue, time
+import sys
+if sys.version_info > (3, 0):
+	import queue as Queue
+else:
+	import Queue
+
 maxMessages = 1000 # maximum queue size before blocking input
 #writeMutex = QMutex()
 

@@ -6,7 +6,12 @@
 # distributer or txBytes
 # call ins: rxBytes and sendNPS
 
-import time, Queue
+import time
+import sys
+if sys.version_info > (3, 0):
+	import queue as Queue
+else:
+	import Queue
 from collections import deque
 from pids import MAX_FRAME_LENGTH, SFP_FRAME_TIME, pids, PID_BITS
 from sfpErrors import *

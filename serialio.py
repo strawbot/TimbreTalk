@@ -114,7 +114,10 @@ class serialPort(QThread):
 				self.ioError.emit('Alert: device closed while writing ')
 			except Exception as e:
 				if self.port:
-					self.ioException.emit("Error: sink - serial port exception: %s" % e)
+					fi = getframeinfo(currentframe())
+					name = ntpath.basename(fi.filename)
+					line = fi.lineno
+					self.ioException.emit("Error[%s, %s]: sink - serial port exception: %s" % (name, line,e))
 
 	def setRate(self, rate):
 		if self.rate != rate:

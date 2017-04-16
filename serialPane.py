@@ -114,8 +114,11 @@ class serialPane(QWidget):
 		if self.ui.LoopBack.isChecked():
 			self.parent.source.connect(self.parent.sink)
 		else:
+			def notUnicode(u):
+				s = list(map(ord, u))
+				self.parent.serialPort.sink(s)
 			self.parent.serialPort.source.connect(self.parent.sink)
-			self.parent.source.connect(self.parent.serialPort.sink)
+			self.parent.source.connect(notUnicode)
 
 	def selectSfp(self):
 		if not self.ui.SFP.isChecked():
