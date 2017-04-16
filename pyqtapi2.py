@@ -1,4 +1,5 @@
 # select pyqt api 2
+import sys
 
 def useQt():
 	try:
@@ -15,10 +16,21 @@ if useQt():
 	for name in API_NAMES:
 		sip.setapi(name, API_VERSION)
 
-	from PyQt4.QtCore import *
-	from PyQt4.QtGui import *
-	from PyQt4.QtSvg import *
-	from PyQt4.QtCore import pyqtSignal as Signal
-	from PyQt4.QtCore import pyqtSlot as Slot
+	try:
+		from PyQt5.QtCore import *
+		from PyQt5.QtGui import *
+		from PyQt5.QtWidgets import *
+		from PyQt5.QtSvg import *
+		from PyQt5.QtCore import pyqtSignal as Signal
+		from PyQt5.QtCore import pyqtSlot as Slot
+		from PyQt5.uic import compileUi
+		qInstallMsgHandler = qInstallMessageHandler
+	except:
+		from PyQt4.QtCore import *
+		from PyQt4.QtGui import *
+		from PyQt4.QtSvg import *
+		from PyQt4.QtCore import pyqtSignal as Signal
+		from PyQt4.QtCore import pyqtSlot as Slot
+		from PyQt4.uic import compileUi
 else:
 	from machines import *
