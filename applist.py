@@ -22,10 +22,10 @@ def parseList(file):
 							parseList(words[1])
 
 for app in sys.argv[1:]:
-	print 'Files used in %s.py:'%app
+	print ('Files used in %s.py:'%app)
 	del files[:]
 	parseList(app)
 	files.sort()
 	for file in files:
 		if file:
-			print '  ',file
+			print ('  ',file)

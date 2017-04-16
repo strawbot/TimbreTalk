@@ -66,33 +66,33 @@ types = {ET_NONE:'no file type', ET_REL:'relocatable file', ET_EXEC:'executable 
 machines = {EM_NONE:'no machine', EM_M32:'AT&T WE 32100', EM_SPARC:'SPARC', EM_386:'Intel 80386', EM_68K:'Motorola 68000', EM_88K:'Motorola 88000', EM_86O:'Intel 80860', EM_MIPS:'MIPS RS3000', EM_ARM:'ARM'}
 
 def ehDump(elf):
-	print 'ident: %s'%chr(elf.ident[EI_MAG1])+chr(elf.ident[EI_MAG2])+chr(elf.ident[EI_MAG3])
-	print 'class: %s'%classes.get(elf.ident[EI_CLASS], str(elf.ident[EI_CLASS]))
-	print 'encoding: %s'%encodings.get(elf.ident[EI_DATA], str(elf.ident[EI_DATA]))
-	print 'version: %d'%elf.ident[EI_VERSION]
-	print 'type: %s'%types.get(elf.type, str(elf.type))
-	print 'machine: %s'%machines.get(elf.machine, str(elf.machine))
-	print 'version: %d'%elf.version
-	print 'entry: 0x%X'%elf.entry
-	print 'phoff: %d'%elf.phoff
-	print 'shoff: %d'%elf.shoff
-	print 'flags: 0x%X'%elf.flags
-	print 'ehsize: %d'%elf.ehsize
-	print 'phentsize: %d'%elf.phentsize
-	print 'phnum: %d'%elf.phnum
-	print 'shentsize: %d'%elf.shentsize
-	print 'shnum: %d'%elf.shnum
-	print 'shstrndx: %d'%elf.shstrndx
+	print('ident: %s'%chr(elf.ident[EI_MAG1])+chr(elf.ident[EI_MAG2])+chr(elf.ident[EI_MAG3]))
+	print('class: %s'%classes.get(elf.ident[EI_CLASS], str(elf.ident[EI_CLASS])))
+	print('encoding: %s'%encodings.get(elf.ident[EI_DATA], str(elf.ident[EI_DATA])))
+	print('version: %d'%elf.ident[EI_VERSION])
+	print('type: %s'%types.get(elf.type, str(elf.type)))
+	print('machine: %s'%machines.get(elf.machine, str(elf.machine)))
+	print('version: %d'%elf.version)
+	print('entry: 0x%X'%elf.entry)
+	print('phoff: %d'%elf.phoff)
+	print('shoff: %d'%elf.shoff)
+	print('flags: 0x%X'%elf.flags)
+	print('ehsize: %d'%elf.ehsize)
+	print('phentsize: %d'%elf.phentsize)
+	print('phnum: %d'%elf.phnum)
+	print('shentsize: %d'%elf.shentsize)
+	print('shnum: %d'%elf.shnum)
+	print('shstrndx: %d'%elf.shstrndx)
 
 def phDump(ph):
-	print 'p_type:', ph.p_type
-	print 'p_offset', ph.p_offset
-	print 'p_vaddr 0x%X'%ph.p_vaddr
-	print 'p_paddr 0x%X'%ph.p_paddr
-	print 'p_filesz', ph.p_filesz
-	print 'p_memsz', ph.p_memsz
-	print 'p_flags 0x%X'%ph.p_flags
-	print 'p_align', ph.p_align
+	print()('p_type:', ph.p_type)
+	print('p_offset', ph.p_offset)
+	print('p_vaddr 0x%X'%ph.p_vaddr)
+	print('p_paddr 0x%X'%ph.p_paddr)
+	print('p_filesz', ph.p_filesz)
+	print('p_memsz', ph.p_memsz)
+	print('p_flags 0x%X'%ph.p_flags)
+	print('p_align', ph.p_align)
 
 def elfDump(file):
 	# determine endian
@@ -116,7 +116,7 @@ def elfDump(file):
 	
 	if elf.type == ET_EXEC:
 		for i in range(elf.phnum):
-			print 'PH#',i
+			print ('PH#',i)
 			file.seek(elf.phoff + i * sizeof(ph))
 			file.readinto(ph)
 			phDump(ph)
@@ -124,8 +124,8 @@ def elfDump(file):
 			# image
 			file.seek(ph.p_offset)
 			image += file.read(ph.p_filesz)
-		print 'size', size
-		print 'image length:',len(image)
+		print ('size', size)
+		print('image length:', len(image))
 
 	file.close()
 

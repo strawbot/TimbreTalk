@@ -165,8 +165,8 @@ class stmSender(imageTransfer):
 		try:
 			note('sending: '+ reduce(lambda a,b: a+b, map(hex, bytes)))
 			self.parent.serialPort.sink(bytes)
-		except Exception, e:
-			print >>sys.stderr, e
+		except Exception as e:
+			print(e)
 			traceback.print_exc(file=sys.stderr)
 
 	def checksummed(self, bytes):
@@ -189,13 +189,13 @@ class stmSender(imageTransfer):
 			if ack != self.ACK:
 				error('NACK'+ack)
 				raise(StopIteration)
-			print seq
+			print(seq)
 			self.sendHex(seq)
 		except StopIteration:
 			self.parent.parent.serialPort.source.disconnect(self.nextSequence)
 			note('done command')
 		except Exception, e:
-			print >>sys.stderr, e
+			print(e)
 			traceback.print_exc(file=sys.stderr)
 
 

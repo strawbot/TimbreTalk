@@ -75,16 +75,16 @@ class serialPane(QWidget):
 				sp.port.bytesize = sp.bytesize
 				sp.port.stopbits = sp.stopbits
 				note('Changed port settings to %s%d%d'%(sp.port.parity,sp.port.bytesize,sp.port.stopbits))
-		except Exception, e:
-			print >>sys.stderr, e
+		except Exception as e:
+			print(e)
 			traceback.print_exc(file=sys.stderr)
 			error("can't set Params")
 	
 	def sendHex(self):
 		try:
 			self.parent.serialPort.sink(bytearray.fromhex(self.ui.hexNum.text()))
-		except Exception, e:
-			print >>sys.stderr, e
+		except Exception as e:
+			print(e)
 			traceback.print_exc(file=sys.stderr)
 			error("can't set Params")
 	
@@ -178,8 +178,8 @@ class serialPane(QWidget):
 	def resetRcvr(self):
 		try:
 			self.protocol.initRx()
-		except Exception, e:
-			print >>sys.stderr, e
+		except Exception as e:
+			print(e)
 			traceback.print_exc(file=sys.stderr)
 			error("can't reset receiver")
 

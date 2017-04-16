@@ -178,10 +178,10 @@ class terminal(QMainWindow):
 						if s:
 							self.output.emit(s)
 					except Empty:
-						print 'Empty exception'
+						print('Empty exception')
 						pass
-					except Exception, e:
-						print >>sys.stderr, e
+					except Exception as e:
+						print(e)
 						traceback.print_exc(file=sys.stderr)
 		
 		self.mthread = messageThread(self, q)
@@ -447,8 +447,8 @@ class terminal(QMainWindow):
 				self.ui.textEdit.find(text, QTextDocument().FindBackward)
 			else:
 				self.ui.textEdit.find(text)
-		except Exception, e:
-			print >>sys.stderr, e
+		except Exception as e:
+			print(e)
 			traceback.print_exc(file=sys.stderr)
 
 	def clearText(self):
@@ -460,8 +460,8 @@ class terminal(QMainWindow):
 			try:
 				text = self.ui.textEdit.toPlainText()
 				open(filename, "w").write(text.encode("utf-8"))
-			except Exception, e:
-				print >>sys.stderr, e
+			except Exception as e:
+				print(e)
 				traceback.print_exc(file=sys.stderr)
 
 if __name__ == "__main__":

@@ -49,9 +49,9 @@ def listports():
 		ports.extend(portsextra)
 
 	else:
-		print >>sys.stderr, 'unknown system platform: %s'%sys.platform
+		print('unknown system platform: %s' % sys.platform)
 
 	return (prefix, ports)
 
 if __name__ == '__main__':
-	print >>sys.stderr, listports()  #enumerate_serial_ports()
+	print(listports())

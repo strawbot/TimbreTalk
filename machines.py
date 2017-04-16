@@ -28,21 +28,21 @@ def doneMachines():
 	global done
 	done = 1
 	if printme:
-		print >>sys.stderr, 'threads running:'
+		print ('threads running:',file=sys.stderr)
 		threading.enumerate()
 
 def runMachines():
-	if printme: print >>sys.stderr, 'running machines'
+	if printme: print ('running machines',file=sys.stderr)
 	while not done:
 		machineq.get()() # run the gotten machine
-	if printme: print >>sys.stderr, 'machines done'
+	if printme: print ('machines done',file=sys.stderr)
 
 def activate(machine):
-	if printme: print >>sys.stderr, 'activating %s'%machine.func_name
+	if printme: print ('activating %s'%machine.func_name,file=sys.stderr)
 	machineq.put(machine)
 
 def deactivate(machine):
-	if printme: print >>sys.stderr, 'deactivating %s'%machine.func_name
+	if printme: print ('deactivating %s'%machine.func_name,file=sys.stderr)
 	name = machine.func_name
 	size = machineq.qsize()
 	while size:
@@ -64,15 +64,15 @@ class Signal(object):
 		self.disconnect()
 		
 	def connect(self, vector, option=0):
-		if printme: print >>sys.stderr, 'connecting to %s'%(vector.func_name)
+		if printme: print('connecting to %s' % vector.func_name, file=sys.stderr)
 		if self.vector != noop:
-			print >>sys.stderr, 'overwriting connection with %s'%vector.func_name
+			print ('overwriting connection with %s'%vector.func_name,file=sys.stderr)
 		self.vector = vector
 
 	def emit(self, arg=None):
 		if printme:
 			#self.print_my_name()
-			print >>sys.stderr, 'emitting'
+			print ('emitting',file=sys.stderr)
 		if arg == None:
 			activate(self.vector)
 		else:
@@ -114,7 +114,7 @@ class QCoreApplication(QObject):
 		os._exit(n)
 
 	def exec_(self):
-		if printme: print >>sys.stderr, 'starting up application'
+		if printme: print ('starting up application',file=sys.stderr)
 		runMachines()
 
 class QTimer(object):
@@ -151,7 +151,7 @@ class QTimer(object):
 		
 
 	def stop(self):
-		print >>sys.stderr, "QTimer stop"
+		print ("QTimer stop",file=sys.stderr)
 		if self.timer:
 			self.sec = 0
 			self.timer.cancel()
@@ -163,7 +163,7 @@ if __name__ == '__main__':
 	def test1():
 		global n
 		if n:
-			print >>sys.stderr, n
+			print (n,file=sys.stderr)
 			n -= 1
 			activate(test1)
 			if n == 5:
@@ -172,7 +172,7 @@ if __name__ == '__main__':
 			doneMachines()
 		
 	def test2():
-		print >>sys.stderr, 'beep'
+		print('beep')
 		activate(test2)
 
 	activate(test1)

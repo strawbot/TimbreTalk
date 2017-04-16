@@ -15,7 +15,7 @@ def initSignalCatcher(hook=doNothing):
 	beforeIdie = hook
 
 	def die(signum=0, stack=0):
-		print >>sys.stderr, 'got signal:', signum
+		print('got signal:', signum)
 		beforeIdie()
 		os._exit(-1)
 

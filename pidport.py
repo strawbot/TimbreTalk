@@ -30,7 +30,7 @@ class pidServer(QThread):
 	 pid32in.readline()[:-1]
 	'''
 	def __init__(self, pid):
-		if printme: print >>sys.stderr, '__init__'
+		if printme: print ('__init__',file=sys.stderr)
 		QThread.__init__(self) # needed for signals to work!!
 		initSignalCatcher()
 		
@@ -49,19 +49,19 @@ class pidServer(QThread):
 		self.pin = self.pidInOpen(pid)
 					
 	def pidInOpen(self, pid):
-		if printme: print >>sys.stderr, 'pidInOpen'
+		if printme: print ('pidInOpen',file=sys.stderr)
 		return os.open(pidinport(pid), os.O_WRONLY)
 	
 	def pidOutOpen(self, pid):
-		if printme: print >>sys.stderr, 'pidOutOpen'
+		if printme: print ('pidOutOpen',file=sys.stderr)
 		return open(pidoutport(pid), 'r')
 	
 	def read(self):
-		if printme: print >>sys.stderr, 'read'
-		print >>sys.stderr, self.pin.readline()[:-1]
+		if printme: print ('read',file=sys.stderr)
+		print (self.pin.readline()[:-1],file=sys.stderr)
 	
 	def write(self, s):
-		if printme: print >>sys.stderr, 'write'
+		if printme: print ('write',file=sys.stderr)
 		os.write(self.pout, s)
 
 class pidClient(QThread):
@@ -69,34 +69,34 @@ class pidClient(QThread):
 	Client for server above. Server should go first
 	'''
 	def __init__(self, pid):
-		if printme: print >>sys.stderr, '__init__'
+		if printme: print ('__init__',file=sys.stderr)
 		QThread.__init__(self) # needed for signals to work!!
 	
 		pidin = pidinport(pid)
 		pidout = pidoutport(pid)
 		
 		if not os.path.exists(pidin):
-			print >>sys.stderr, 'no port from server found'
+			print ('no port from server found',file=sys.stderr)
 		if not os.path.exists(pidout):
-			print >>sys.stderr, 'no port from server found'
+			print ('no port from server found',file=sys.stderr)
 		
 		self.pin = self.pidInOpen(pid)
 		self.pout = self.pidOutOpen(pid)
 					
 	def pidInOpen(self, pid):
-		if printme: print >>sys.stderr, 'pidInOpen'
+		if printme: print('pidInOpen',file=sys.stderr)
 		return os.open(pidoutport(pid), os.O_WRONLY)
 	
 	def pidOutOpen(self, pid):
-		if printme: print >>sys.stderr, 'pidOutOpen'
+		if printme: print('pidOutOpen',file=sys.stderr)
 		return open(pidinport(pid), 'r')
 
 	def read(self):
-		if printme: print >>sys.stderr, 'read'
-		print >>sys.stderr, self.pin.readline()[:-1]
+		if printme: print ('read',file=sys.stderr)
+		print(self.pin.readline()[:-1])
 	
 	def write(self, s):
-		if printme: print >>sys.stderr, 'write'
+		if printme: print('write')
 		os.write(self.pout, s)
 
 if __name__ == "__main__":

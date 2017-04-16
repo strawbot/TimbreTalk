@@ -29,21 +29,20 @@ Mac OSX
  
  to run from command line to catch errors: ./dist/tt.app/Contents/MacOS/tt
 '''
-import sys, os
+import sys, os, shutil
 
 if sys.platform == 'win32':
-	print "Building app for Windows"
+	print("Building app for Windows")
 	os.system('python PyInstaller\pyinstaller.py --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.ico --noupx -p . tt.py')
 elif sys.platform == 'darwin':
-	print "Building app for Mac OSX"
-	import shutil
+	print ("Building app for Mac OSX")
 	shutil.rmtree('dist/tt.app') # save a step for builder by removing previous build
 	os.system('pyinstaller --clean --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.icns  --noupx -p . --osx-bundle-identifier="TimbreTalk" tt.py')
 elif sys.platform[:5] == 'linux':
 	"Building app for Linux"
 	os.system('PyInstaller/pyinstaller.py --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.ico -p . tt.py')
 else:
-	print >>sys.stderr, 'unknown system platform: %s'%sys.platform
+	print ('unknown system platform: %s'%sys.platform, file=sys.stderr)
 	sys.exit()
 
-print 'Your application image is available in "dist/"'
+print ('Your application image is available in "dist/"')

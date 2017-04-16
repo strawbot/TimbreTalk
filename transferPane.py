@@ -16,7 +16,7 @@ SEND,TRANSFER,VERIFY = range(3)
 
 class srecordPane(QWidget):
 	def __init__(self, parent):
-		if printme: print >>sys.stderr, '__init__'
+		if printme: print('__init__')
 		QWidget.__init__(self, parent)
 		self.parent = parent
 		self.ui = parent.ui
@@ -84,18 +84,18 @@ class srecordPane(QWidget):
 		self.parent.keyin("\x0d")
 
 	def clearLeds(self):
-		if printme: print >>sys.stderr, 'clearLeds'
+		if printme: print('clearLeds')
 		self.eled.off()
 		self.tled.off()
 		self.vled.off()
 
 	# target selection; saving and restoring values to gui
 	def target(self):
-		if printme: print >>sys.stderr, 'target'
+		if printme: print('target')
 		return self.targets[self.ui.targetSelect.currentIndex()][1]
 		
 	def showSrecordValues(self):
-		if printme: print >>sys.stderr, 'showSrecordValues'
+		if printme: print('showSrecordValues')
 		target = self.target()
 		self.lastTarget = target
 		self.ui.srecordFile.setText(target.filename)
@@ -108,7 +108,7 @@ class srecordPane(QWidget):
 		self.ui.endian.setChecked(target.endian == 'big')
 	
 	def saveSrecordValues(self): # this saves values to last target and shows current
-		if printme: print >>sys.stderr, 'saveSrecordValues'
+		if printme: print('saveSrecordValues')
 		if self.lastTarget:
 			target = self.lastTarget
 			target.filename = self.ui.srecordFile.text()
@@ -128,11 +128,11 @@ class srecordPane(QWidget):
 		try:
 			self.runCommand(SEND)
 		except Exception, e:
-			print >>sys.stderr, e
+			print(e)
 			traceback.print_exc(file=sys.stderr)
 		
 	def selectFile(self):
-		if printme: print >>sys.stderr, 'selectFile'
+		if printme: print('selectFile')
 		try:
 			target = self.target()
 			file = QFileDialog().getOpenFileName(directory=target.dir)
@@ -140,11 +140,11 @@ class srecordPane(QWidget):
 				target.useFile(file)
 			self.showSrecordValues()
 		except Exception, e:
-			print >>sys.stderr, e
+			print(e)
 			traceback.print_exc(file=sys.stderr)
 		
 	def progress(self, n):
-		if printme: print >>sys.stderr, 'progress'
+		if printme: print('progress')
 		if n:
 			self.ui.progressBar.setValue(n*1000)
 		else:
@@ -152,14 +152,14 @@ class srecordPane(QWidget):
 			self.ui.progressBar.setMaximum(1000)
 
 	def srecordDone(self):
-		if printme: print >>sys.stderr, 'srecordDone'
+		if printme: print('srecordDone')
 		self.sending = 0
 		self.ui.sendSrecord.setText('Send')
 		self.ui.progressBar.reset()
 	
 	# get version from target
 	def getVersion(self):
-		if printme: print >>sys.stderr, 'getVersion'
+		if printme: print('getVersion')
 
 		def version(packet):
 			payload = cast('BBHB20sB', packet[2:28])
@@ -177,7 +177,7 @@ class srecordPane(QWidget):
 	
 	# recover
 	def selectRecover(self):
-		if printme: print >>sys.stderr, 'selectRecover'
+		if printme: print('selectRecover')
 		if self.recovering == 0:
 			self.recovering = 1
 			self.ui.Recover.setText(" Abort ")
@@ -191,7 +191,7 @@ class srecordPane(QWidget):
 			self.recover.stopRecovery()
 	
 	def recoverDone(self):
-		if printme: print >>sys.stderr, 'recoverDone'
+		if printme: print('recoverDone')
 		self.recovering = 0
 		self.ui.Recover.setText("Recover")
 
@@ -206,13 +206,13 @@ class srecordPane(QWidget):
 		self.runCommand(VERIFY)
 		
 	def runCommand(self, command):
-		if printme: print >>sys.stderr, command
+		if printme: print(command)
 		if self.sending == 0:
 			target = self.target()
 			if not target.file:
 				self.selectFile()
 				if not target.file:
-					print >>sys.stderr, 'no target file'
+					print('no target file')
 					return
 			self.saveSrecordValues()
 			if command == SEND:

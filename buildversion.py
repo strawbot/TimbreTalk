@@ -38,19 +38,19 @@ uimageTag = 'uImage'
 versionTag = 0xB11DDA7E # build date
 
 def dumpUimage(file):
-	image = map(ord, open(file, 'rb').read(64)) # header is 64 bytes
-	print >>sys.stderr, 'magic: %X'%endian.long(image[0:4])
-	print >>sys.stderr, 'hcrc: %X'%endian.long(image[4:8])
-	print >>sys.stderr, 'time: %X'%endian.long(image[8:12])
-	print >>sys.stderr, 'size: %X'%endian.long(image[12:16]) # size of image following header
-	print >>sys.stderr, 'load: %X'%endian.long(image[16:20])
-	print >>sys.stderr, 'ep: %X'%endian.long(image[20:24])
-	print >>sys.stderr, 'dcrc: %X'%endian.long(image[24:28])
-	print >>sys.stderr, 'os: %X'%image[28]
-	print >>sys.stderr, 'arch: %X'%image[29]
-	print >>sys.stderr, 'type: %X'%image[30]
-	print >>sys.stderr, 'comp: %X'%image[31]
-	print >>sys.stderr, 'name: %s'%''.join(map(chr, image[32:])).strip()
+	image = list(map(ord, open(file, 'rb').read(64))) # header is 64 bytes
+	print('magic: %X' % endian.long(image[0:4]))
+	print ('hcrc: %X'%endian.long(image[4:8]),file=sys.stderr)
+	print ('time: %X'%endian.long(image[8:12]),file=sys.stderr)
+	print ('size: %X'%endian.long(image[12:16]),file=sys.stderr) # size of image following header
+	print ('load: %X'%endian.long(image[16:20]),file=sys.stderr)
+	print ('ep: %X'%endian.long(image[20:24]),file=sys.stderr)
+	print ('dcrc: %X'%endian.long(image[24:28]),file=sys.stderr)
+	print ('os: %X'%image[28],file=sys.stderr)
+	print ('arch: %X'%image[29],file=sys.stderr)
+	print ('type: %X'%image[30],file=sys.stderr)
+	print ('comp: %X'%image[31],file=sys.stderr)
+	print ('name: %s'%''.join(list(map(chr, image[32:]))).strip(),file=sys.stderr)
 
 def listfind(source, match): # find string match in source list
 	m = map(ord, match)
@@ -123,11 +123,11 @@ def extractUimageDate(image): # grab and convert timestamp from header
 # utilities
 def printVersionDate(version):
 	year,month,day,hour,minute = buildDate(version)
-	print >>sys.stderr, dateString(year,month,day,hour,minute,0)
+	print (dateString(year,month,day,hour,minute,0),file=sys.stderr)
 
 def printVersion(version):
 	major, minor, build = unpackMMB(version)
-	print >>sys.stderr, '%d.%d.%d'%(major,minor,build)
+	print ('%d.%d.%d'%(major,minor,build),file=sys.stderr)
 
 # boot and apps version, name and date
 '''
@@ -151,9 +151,9 @@ versionStruct = "L16s32s"
 
 def versionNumber(image):
 	if endian.long(image[VERSION_MAGIC_OFFSET:]) == IMAGE_HEADER_ID:
-		if printme: print 'Build Version:', buildVersion(versionDate(image))
+		if printme: print('Build Version:', buildVersion(versionDate(image)))
 		return buildVersion(versionDate(image))
-	if printme: print 'No version because magic number is wrong', endian.long(image[VERSION_MAGIC_OFFSET:])
+	if printme: print('No version because magic number is wrong', endian.long(image[VERSION_MAGIC_OFFSET:]))
 	return 0
 	
 def versionName(image):
@@ -168,10 +168,10 @@ def versionDate(image):
 	try:
 		string = endian.cast(versionStruct, image[VERSION_MAGIC_OFFSET:])[2].rstrip('\0')
 		if string:
-			if printme: print 'input string:', string, '  converted to:', MDYHMSasYMDHMS(string)
+			if printme: print ('input string:', string, '  converted to:', MDYHMSasYMDHMS(string))
 			result = MDYHMSasYMDHMS(string)
-	except Exception, e:
-		print >>sys.stderr, e
+	except Exception as e:
+		print (e, file=sys.stderr)
 		traceback.print_exc(file=sys.stderr)
 	finally:
 		return result
@@ -195,7 +195,7 @@ def testAppVD():
 	import image
 	srec = image.imageRecord('Test/testApp.srec')
 	name, date, version = extractNameDateVersion(srec.image, 'little')
-	print 'image name: ', name, ' and date: ', date, ' version:', version
+	print ('image name: ', name, ' and date: ', date, ' version:', version)
 
 if __name__ == '__main__':
 	testAppVD()
@@ -204,11 +204,11 @@ if __name__ == '__main__':
 	d = datetime.datetime.strptime(date, MDY_HMS)
 	build = buildNumber(d.day, d.hour, d.minute)
 	version = packMMB(d.year, d.month, build)
-	print >>sys.stderr, 'version:',
+	print ('version:',file=sys.stderr)
 	printVersion(version)
-	print >>sys.stderr, 'Dates should be same except seconds: ',date,' == ',
+	print ('Dates should be same except seconds: ',date,' == ',file=sys.stderr)
 	printVersionDate(version)
 	s = currentDate()
 	if s != dateString(*dateTuple(s)):
-		print >>sys.stderr, 'conversion failed: currentDate, dateString, dateTuple'
-	print 'Version Date:', MDYHMSasYMDHMS('Jan 19 2015 17:02:09')
+		print ('conversion failed: currentDate, dateString, dateTuple',file=sys.stderr)
+	print ('Version Date:', MDYHMSasYMDHMS('Jan 19 2015 17:02:09'))

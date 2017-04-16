@@ -13,7 +13,7 @@ def hexList (string, endian='big'):
 
 # numbers to lists of bytes
 def byteList (integer, length, endian="big"): # turn an integer into a list of values
-	if printme: print 'endian:',endian
+	if printme: print ('endian:',endian)
 	n = length - 1
 	l = [(integer/(2**((n-i)*8)) & 0xFF) for i in range(length)]
 	if endian == "big":
@@ -117,7 +117,6 @@ def cast(format, list, endian="big"):
 	listsize = len(list)
 	fmtsize = struct.calcsize(format)
 	if fmtsize > listsize:
-		print >>sys.stderr, 'error: structure bigger than list: str=%i list=%i'%(fmtsize, listsize)
+		print('error: structure bigger than list: str=%i list=%i' % (fmtsize, listsize))
 		return [0 for i in range(fmtsize)]
 	return struct.unpack(format, l2s(list[0:fmtsize]))
-	

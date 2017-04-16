@@ -66,7 +66,7 @@ class sRecordTransfer(imageTransfer):
 	vcPacket = Signal(object)
 
 	def __init__(self, parent, file='', target=0, header=0, whofor=0, endian='big'):
-		if printme: print >>sys.stderr, '__init__'
+		if printme: print ('__init__',file=sys.stderr)
 		super(sRecordTransfer, self).__init__(parent)
 
 		# parameters derived
@@ -112,13 +112,13 @@ class sRecordTransfer(imageTransfer):
 
 	# shutdown signal
 	def shutdown(self):
-		if printme: print >>sys.stderr, 'shutdown'
+		if printme: print ('shutdown',file=sys.stderr)
 		pass
 #		note('shutting down srecord transfer\r')
 
 	# set filename and directory
 	def useFile(self, file):
-		if printme: print >>sys.stderr, 'useFile'
+		if printme: print ('useFile',file=sys.stderr)
 		self.file = file
 		self.dir = ''
 		self.time = 0
@@ -134,22 +134,22 @@ class sRecordTransfer(imageTransfer):
 
 	# load srecord as image
 	def getSrecord(self, file):
-		if printme: print >>sys.stderr, 'getSrecord'
+		if printme: print ('getSrecord',file=sys.stderr)
 		note('loading srecord: %s'%file)
 		self.useFile(file)
 
 	def loadSrecord(self):
 		try:
-			if printme: print >>sys.stderr, 'loadSrecord', self.endian
+			if printme: print('loadSrecord', self.endian)
 			self.createImage(self.file)
 			self.appName, self.releaseDate, self.version = \
 			 extractNameDateVersion(self.image, self.endian)
-		except Exception, e:
-			print >>sys.stderr, e
+		except Exception as e:
+			print (e,file=sys.stderr)
 			traceback.print_exc(file=sys.stderr)
 	
 	def checkLatest(self):
-		if printme: print >>sys.stderr, 'checkLatest'
+		if printme: print ('checkLatest',file=sys.stderr)
 		if self.time != os.path.getmtime(self.file):
 			warning(' disk image is newer - reloading ')
 			t = self.target	# remember old addresses
@@ -159,14 +159,14 @@ class sRecordTransfer(imageTransfer):
 				self.target = t
 
 	def headersize(self): # adjust header size for srecord
-		if printme: print >>sys.stderr, 'headersize'
+		if printme: print ('headersize',file=sys.stderr)
 		if self.headerFlag:
 			return HEADER_SIZE
 		return 0
 
 	def header(self, gap):
 		#	[ version# start dest size entry checksum headerSize releaseDate appName headerChecksum ]
-		if printme: print >>sys.stderr, 'header', self.endian
+		if printme: print ('header', self.endian,file=sys.stderr)
 		if self.headersize():
 			version = longList(self.version, self.endian)
 			start = longList(self.target + self.headersize() + gap, self.endian)			
@@ -186,7 +186,7 @@ class sRecordTransfer(imageTransfer):
 	# srecord downloading
 	def fileOperation(self, operation):
 		try:
-			if printme: print >>sys.stderr, 'starting'
+			if printme: print ('starting',file=sys.stderr)
 			if self.sendState == IDLE:
 				self.whoto, self.whofrom = self.who()
 				self.checkLatest()
@@ -215,8 +215,8 @@ class sRecordTransfer(imageTransfer):
 				self.retries = 5
 			else:
 				self.stopSending()
-		except Exception, e:
-			print >>sys.stderr, e
+		except Exception as e:
+			print(e,file=sys.stderr)
 			traceback.print_exc(file=sys.stderr)
 			self.stopSending()
 
@@ -227,7 +227,7 @@ class sRecordTransfer(imageTransfer):
 		self.fileOperation(self.verify)
 
 	def abortSignal(self):
-		if printme: print >>sys.stderr, 'abortSignal'
+		if printme: print('abortSignal',file=sys.stderr)
 		if self.sendState == ERASE:
 			self.eraseFail.emit()
 		elif self.sendState == TRANSFER:
@@ -236,7 +236,7 @@ class sRecordTransfer(imageTransfer):
 			self.verifyFail.emit()
 
 	def stopSending(self):
-		if printme: print >>sys.stderr, 'stopping'
+		if printme: print('stopping',file=sys.stderr)
 		self.transferTimer.stop()
 		if self.sendState == IDLE:
 			return
@@ -252,7 +252,7 @@ class sRecordTransfer(imageTransfer):
 		self.done.emit()
 
 	def gracefulExit(self):
-		if printme: print >>sys.stderr, 'graceful exit'
+		if printme: print('graceful exit',file=sys.stderr)
 		self.transferTimer.stop()
 		if self.sendState != IDLE:
 			if self.sendState != STOPPING:
@@ -265,7 +265,7 @@ class sRecordTransfer(imageTransfer):
 
 	# send again
 	def sendAgain(self): # timeout occurred
-		if printme: print >>sys.stderr, 'sendAgain'
+		if printme: print( 'sendAgain',file=sys.stderr)
 		if self.sendState != IDLE:
 			if self.retries:
 				self.retries -= 1
@@ -286,7 +286,7 @@ class sRecordTransfer(imageTransfer):
 
 	# erasure
 	def erase(self): # erase a section of flash memory
-		if printme: print >>sys.stderr, 'erase'
+		if printme: print( 'erase',file=sys.stderr)
 		self.sendState = ERASE
 		end = self.targetPointer + self.left
 		note('Erasing flash - start: %X  end: %X ...'%(self.targetPointer,end))
@@ -298,7 +298,7 @@ class sRecordTransfer(imageTransfer):
 		self.protocol.sendNPS(pids.ERASE_MEM, payload)
 		
 	def ecPacketHandler(self, packet): # confirmed that memory has been erased
-		if printme: print >>sys.stderr, 'ecPacketHandler'
+		if printme: print( 'ecPacketHandler',file=sys.stderr)
 		if self.sendState != ERASE:
 			self.stopSending()
 			return
@@ -318,7 +318,7 @@ class sRecordTransfer(imageTransfer):
 
 	# transferring image
 	def transfer(self):
-		if printme: print >>sys.stderr, 'transfer'
+		if printme: print( 'transfer',file=sys.stderr)
 		note('Transferring Image...')
 		self.sendState = TRANSFER
 		self.imagePointer = 0
@@ -328,13 +328,13 @@ class sRecordTransfer(imageTransfer):
 		self.sendChunk()
 		
 	def sendChunk(self):
-		if printme: print >>sys.stderr, 'sendChunk:',
+		if printme: print( 'sendChunk:',file=sys.stderr)
 		if self.sendState != TRANSFER:
 			self.stopSending()
 			return
 		self.transferTimer.start()
 		n = float(self.length - self.left)/self.length
-		if printme: print >>sys.stderr, self.left
+		if printme: print( self.left,file=sys.stderr)
 		self.progress.emit(n)
 		if self.left >= maxMemTransfer:
 			self.sent = maxMemTransfer
@@ -348,7 +348,7 @@ class sRecordTransfer(imageTransfer):
 		self.protocol.sendNPS(pids.FLASH_WRITE, payload)
 
 	def tcPacketHandler(self, packet):
-		if printme: print >>sys.stderr, 'tcPacketHandler'
+		if printme: print( 'tcPacketHandler',file=sys.stderr)
 		if self.sendState != TRANSFER:
 			self.stopSending()
 			return
@@ -374,7 +374,7 @@ class sRecordTransfer(imageTransfer):
 
 	# verifying
 	def verify(self):
-		if printme: print >>sys.stderr, 'verify'
+		if printme: print( 'verify',file=sys.stderr)
 		note('Verifying...')
 		self.sendState = VERIFY
 		who = [self.whoto, self.whofrom]
@@ -387,7 +387,7 @@ class sRecordTransfer(imageTransfer):
 		self.verifyStart.emit()
 		
 	def vcPacketHandler(self, packet):
-		if printme: print >>sys.stderr, 'vcPacketHandler'
+		if printme: print( 'vcPacketHandler',file=sys.stderr)
 		if self.sendState != VERIFY:
 			self.stopSending()
 			return
@@ -405,7 +405,7 @@ class sRecordTransfer(imageTransfer):
 		self.gracefulExit()
 
 	def transferStats(self):
-		if printme: print >>sys.stderr, 'transferStats'
+		if printme: print( 'transferStats',file=sys.stderr)
 		if self.left == 0:
 			elapsed = time.time() - self.startTransferTime
 			transferMsg = 'Finished in %.1f seconds'%elapsed
@@ -418,12 +418,12 @@ class ubootTransfer(sRecordTransfer):
 	HOLE_FILL = 0xFF
 
 	def getSrecord(self, file):
-		if printme: print >>sys.stderr, 'getImage'
+		if printme: print( 'getImage',file=sys.stderr)
 		note('loading image: %s'%file)
 		self.useFile(file) # calls loadSrecord
 
 	def loadSrecord(self):
-		if printme: print >>sys.stderr, 'loadImage'
+		if printme: print( 'loadImage',file=sys.stderr)
 		try:
 			self.image = map(ord, open(self.file, 'rb').read())
 			self.size = len(self.image)
@@ -434,7 +434,7 @@ class ubootTransfer(sRecordTransfer):
 			self.releaseDate[:len(date)] = map(ord, date)
 			self.appName = [0]*APP_NAME_LENGTH
 			self.appName[:len(ubootTag)] = map(ord, ubootTag)
-			if printme: print >>sys.stderr, self.size, self.checksum
 		except Exception, e:
-			print >>sys.stderr, e
+			if printme: print( self.size, self.checksum,file=sys.stderr)
+			print( e,file=sys.stderr)
 			traceback.print_exc(file=sys.stderr)
