@@ -15,11 +15,13 @@ a machine.
 
 Could detect if qt api is available and then call it instead.
 '''
+from __future__ import print_function
 printme = 0
 done = 0
 
 import threading, time
 import sys
+
 if sys.version_info > (3, 0):
 	import queue as Queue
 else:

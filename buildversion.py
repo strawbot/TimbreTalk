@@ -27,6 +27,7 @@ typedef struct image_header {
 	uint8_t     ih_name[IH_NMLEN];    /* Image Name            */
 } image_header_t;
 '''
+from __future__ import print_function
 import datetime
 import endian
 import sys, traceback

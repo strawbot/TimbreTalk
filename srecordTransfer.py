@@ -4,6 +4,7 @@ call with parameters: parent, filename, target address, header flag
 signals: progress, done, aborted
 slots: stopSending, startSending
 '''
+from __future__ import print_function
 from pyqtapi2 import *
 
 import time
