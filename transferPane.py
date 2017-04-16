@@ -7,7 +7,7 @@ from endian import *
 from srecordTransfer import sRecordTransfer, ubootTransfer
 from recover import recover
 import led
-from cpuids import *
+from pids import *
 from targets import *
 import sys, traceback
 
