@@ -387,7 +387,7 @@ class terminal(QMainWindow):
 		if s:
 			width = self.ui.textEdit.width()/self.charwidth
 			if type(s[0]) == type(0):
-				s = ''.join(map(chr, s))
+				s = ''.join(list(map(chr, s)))
 			self.mutex.lock()
 			self.ui.textEdit.moveCursor(QTextCursor.End) # get cursor to end of text
 			visible = self.isCursorVisible()

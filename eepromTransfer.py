@@ -20,7 +20,7 @@ class eepromTransfer(imageTransfer):
 		self.transferType = TEXT_TRANSFER
 
 	def checkScriptCrc(self):
-		image = ''.join(map(chr, self.image))
+		image = ''.join(list(map(chr, image[32:])))
 		if image.find(self.endToken) == -1:
 			warning('Could not find ' + self.endToken + ' within script')
 			self.scriptOk.emit(False)

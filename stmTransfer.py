@@ -27,7 +27,7 @@ class stmSender(imageTransfer):
 		note('Redirecting serial port to boot listener')
 		self.parent.parent.disconnectPort()
 		def showRx(rx):
-			note('Rx:%s'%''.join(map(lambda x: ' '+hex(ord(x))[2:],  rx)))
+			note('Rx:%s'%''.join(list(map(lambda x: ' '+hex(ord(x))[2:],  rx))))
 		self.parent.parent.serialPort.source.connect(showRx)
 		self.setParam(self.parent.parent.serialPort, 'E', 8, 1)
 	
@@ -36,7 +36,7 @@ class stmSender(imageTransfer):
 		note('Serial port reconnected')
 
 	def echoTx(self, tx):
-		note('Tx:%s'%''.join(map(lambda x: ' '+hex(x)[2:],  tx)))
+		note('Tx:%s'%''.join(list(map(lambda x: ' '+hex(x)[2:],  tx))))
 		self.parent.parent.serialPort.sink(tx)
 
 	# support for sequencing off of replies
@@ -46,7 +46,7 @@ class stmSender(imageTransfer):
 
 	def onAck(self, sequence, successor, failure=0): # setup callback for next step
 		if self.verbose:
-			note('Tx:%s'%''.join(map(lambda x: ' '+hex(x)[2:],  sequence)))
+			note('Tx:%s'%''.join(list(map(lambda x: ' '+hex(x)[2:],  sequence))))
 		self.parent.parent.serialPort.sink(sequence)
 		self.nextState = successor
 		self.failState = failure if failure else self.fail

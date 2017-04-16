@@ -53,7 +53,7 @@ def dumpUimage(file):
 	print ('name: %s'%''.join(list(map(chr, image[32:]))).strip(),file=sys.stderr)
 
 def listfind(source, match): # find string match in source list
-	m = map(ord, match)
+	m = list(map(ord, match))
 	offset = [i for i in range(len(source)) if source[i:i+len(m)] == m]
 	if offset:
 		return offset[0]
@@ -110,7 +110,7 @@ def extractUbootDate(image): # must find string inside binary and convert
 		imgdate = image[offset:]
 		openParen = listfind(imgdate, '(')
 		closeParen = listfind(imgdate, ')')
-		date = ''.join(map(chr,imgdate[openParen+1:closeParen]))
+		date = ''.join(list(map(chr,imgdate[openParen+1:closeParen])))
 		d = datetime.datetime.strptime(date, MDY_HMS)
 		return dateString(d.year, d.month, d.day, d.hour, d.minute, d.second)
 	return dateString(*(buildDate(0)+(0,)))
@@ -179,16 +179,16 @@ def versionDate(image):
 # application version name and date
 def extractNameDateVersion(image, endianness='big'):
 	name, date, version = 'naname','2000-01-01 00:00:00',0
-	tag = map(chr, endian.byteList(versionTag,4,endianness))
+	tag = list(map(chr, endian.byteList(versionTag,4,endianness)))
 	offset = listfind(image, tag)
 	if offset != -1:
 		offset += len(tag)
 		name = endian.l2s(image[offset:][:16])
 		date = MDYHMSasYMDHMS(endian.l2s(image[offset+16:][:20]))
 		version = buildVersion(date)
-	name = map(ord, name) + [0]*(APP_NAME_LENGTH - len(name))
-	date = map(ord, date) + [0]*(RELEASE_DATE_LENGTH - len(date))
 	return (name, date, version)
+	name = list(map(ord, name)) + [0]*(APP_NAME_LENGTH - len(name))
+	date = list(map(ord, date)) + [0]*(RELEASE_DATE_LENGTH - len(date))
 
 # test
 def testAppVD():

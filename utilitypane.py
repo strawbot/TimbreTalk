@@ -209,11 +209,11 @@ class utilityPane(QWidget):
 
 	def sink1(self, s):
 		ts = self.timestamp()
-		message(ts+''.join(map(lambda x: ' '+hex(ord(x))[2:],  s)), self.ui.Color1.currentText())	
+		message(ts+''.join(list(map(lambda x: ' '+hex(ord(x))[2:],  s))), self.ui.Color1.currentText())	
 
 	def sink2(self, s):
 		ts = self.timestamp()
-		message(ts+''.join(map(lambda x: ' '+hex(ord(x))[2:],  s)), self.ui.Color2.currentText())	
+		message(ts+''.join(list(map(lambda x: ' '+hex(ord(x))[2:],  s))), self.ui.Color2.currentText())	
 
 	def setParam(self, sp, parity, bytesize, stopbits):
 		if sp.port:
@@ -229,7 +229,7 @@ class utilityPane(QWidget):
 		n = datetime.datetime.now()
 		cmd = "%d %d %d setdate %d %d %d settime date"% \
 		       (n.year%100, n.month, n.day, n.hour, n.minute, n.second)
-		payload = map(ord, cmd) + [0]
+		payload = list(map(ord, cmd)) + [0]
 		self.protocol.sendNPS(pids.EVAL, self.parent.who() + payload)
 
 	def crcStatus(self, flag):

@@ -55,13 +55,13 @@ def messageDump(who,s=[], text=0): # dump message in hex or text to terminal
 			s = [s]
 		elif type(s[0]) == type('a'):
 			if type(s) == type([]):
-				s = map(ord, s[0])
+				s = list(map(ord, s[0]))
 			else:
-				s = map(ord, s)
+				s = list(map(ord, s))
 		if text:
-			framedump = ''.join(map(lambda i: chr(i) if i >= ord(' ') and i <= ord('~')  else ' ', s))
+			framedump = ''.join(list(map(lambda i: chr(i) if i >= ord(' ') and i <= ord('~')  else ' ', s)))
 		else:
-			framedump = ' '.join(map (lambda i:hex(i)[2:].upper().zfill(2), s))
+			framedump = ' '.join(list(map (lambda i:hex(i)[2:].upper().zfill(2), s)))
 	note(who + framedump)
 
 class stdMessage(object): # for redirecting standard out

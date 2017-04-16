@@ -425,16 +425,16 @@ class ubootTransfer(sRecordTransfer):
 	def loadSrecord(self):
 		if printme: print( 'loadImage',file=sys.stderr)
 		try:
-			self.image = map(ord, open(self.file, 'rb').read())
+			self.image = list(map(ord, open(self.file, 'rb').read()))
 			self.size = len(self.image)
 			self.checksum = fletcher32(self.image, self.size)
 			date = extractUbootDate(self.image)
 			self.version = buildVersion(date)
 			self.releaseDate = [0]*RELEASE_DATE_LENGTH
-			self.releaseDate[:len(date)] = map(ord, date)
+			self.releaseDate[:len(date)] = list(map(ord, date))
 			self.appName = [0]*APP_NAME_LENGTH
-			self.appName[:len(ubootTag)] = map(ord, ubootTag)
 		except Exception, e:
+			self.appName[:len(ubootTag)] = list(map(ord, ubootTag))
 			if printme: print( self.size, self.checksum,file=sys.stderr)
 			print( e,file=sys.stderr)
 			traceback.print_exc(file=sys.stderr)

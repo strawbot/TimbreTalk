@@ -150,26 +150,26 @@ class serialPane(QWidget):
 
 	# talk connections
 	def talkPacket(self, packet): # handle text packets
-		self.parent.sink(''.join(map(chr, packet[2:])))
+		self.parent.sink(''.join(list(map(chr, packet[2:]))))
 
 	def talkSink(self, s): # have a text port
 		s = str(s)
 		if self.ui.InBuffered.isChecked():
 			talkout = pids.EVAL
 			s = s.strip()
-			payload = map(ord,s)+[0]
+			payload = [ord(x) for x in s]+[0]
 		else:
 			talkout = pids.TALK_IN
-			payload = map(ord,s)
+			payload = [ord(x) for x in s]
 		self.protocol.sendNPS(talkout, self.parent.who()+payload)
 
 	def ATSink(self, s): # sent through as AT PID
 		s = str(s)
 		if self.ui.InBuffered.isChecked():
 			s = s.strip()
-			payload = map(ord,s)+[0xD]
+			payload = list(map(ord,s))+[0xD]
 		else:
-			payload = map(ord,s)
+			payload = list(map(ord,s))
 		self.protocol.sendNPS(pids.AT_CMD, self.parent.who()+payload)
 
 	def sendPing(self, flag):

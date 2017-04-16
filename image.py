@@ -71,7 +71,7 @@ class imageRecord(QObject):
 
 		if self.ext in ['jbc', 'jam', 'txt', 'text']:
 			self.emptyImage()
-			self.image.extend(map(ord, open(self.file,'rb').read()))
+			self.image.extend(list(map(ord, open(self.file,'rb')).read()))
 			self.end = self.size = len(self.image)
 		else:
 			if self.ext in ['srec', 'S19']: self.addSrecord()
@@ -306,7 +306,7 @@ class imageRecord(QObject):
 		file.seek(EI_MAG0)
 		file.readinto(elf)
 	
-		if elf.ident[EI_MAG0:EI_CLASS] != map(ord, [ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3]):
+		if elf.ident[EI_MAG0:EI_CLASS] != list(map(ord, [ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3])):
 			error('Not an elf file')
 			return
 
