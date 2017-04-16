@@ -1,6 +1,5 @@
 # messages  Rob Chapman  Jan 30, 2011
 
-#from PyQt4.QtCore import QMutex
 import sys
 if sys.version_info > (3, 0):
 	import queue as Queue
@@ -8,26 +7,17 @@ else:
 	import Queue
 
 maxMessages = 1000 # maximum queue size before blocking input
-#writeMutex = QMutex()
 
 def defaultWrite(string, style=''): # default output is to std out
-	import sys
-#	writeMutex.lock()
-#	sys.stdout.write(string)
-#	sys.stdout.flush()
 	print(string)
-#	writeMutex.unlock()
 
 textout = defaultWrite
 
 def messageQueue(): # output to message queue for isolation
 	global textout
 	messageq = Queue.Queue(maxMessages)
-#	mutex = QMutex()
 	def writeq(string, style=''):
-#		mutex.lock()
 		messageq.put((string, style))
-#		mutex.unlock()
 	textout = writeq
 	return messageq
 
@@ -45,7 +35,6 @@ def error(string):
 	textout('\n'+string, style='error')
 
 def message(string, style=''): # mark a message for formatting
-#	string = ''.join(x+hex(x) for x in string)
 	textout(string, style)
 
 def write(text): # route the message to file or window

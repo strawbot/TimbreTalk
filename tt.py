@@ -117,12 +117,10 @@ class timbreTalk(qterm.terminal):
 	def who(self): # return latest who list
 		return [self.whoto, self.whofrom]
 
+
 if __name__ == "__main__":
 	import sys, traceback
-# 	kwargs = dict(x.split('=', 1) for x in sys.argv[1:])
-# 	name = kwargs.get('name', '')
-# 	port = kwargs.get('port', '/dev/ttyACM0')
-#	sys.excepthook = lambda *args: None
+
 	app = QApplication([])
 	try:
 		timbreTalk = timbreTalk()
