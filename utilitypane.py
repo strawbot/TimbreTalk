@@ -1,13 +1,9 @@
 # test panel for qtran  Robert Chapman III  Oct 24, 2012
 
 from pyqtapi2 import *
-import time, datetime
-from message import *
-import sfp, pids
-from endian import *
-from random import randrange
+import datetime
+import pids
 from image import *
-import traceback	
 import listports, serialio
 from stmTransfer import stmSender
 from jamTransfer import jamSender

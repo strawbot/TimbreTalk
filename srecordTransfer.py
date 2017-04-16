@@ -6,16 +6,14 @@ slots: stopSending, startSending
 '''
 from pyqtapi2 import *
 
-import os, time, traceback
+import time
 from imageTransfer import imageTransfer
 import pids
 from endian import *
 from message import *
 from checksum import fletcher32
 from targets import *
-import sys
 from buildversion import *
-from cpuids import *
 
 printme = 0
 
@@ -433,8 +431,8 @@ class ubootTransfer(sRecordTransfer):
 			self.releaseDate = [0]*RELEASE_DATE_LENGTH
 			self.releaseDate[:len(date)] = list(map(ord, date))
 			self.appName = [0]*APP_NAME_LENGTH
-		except Exception, e:
 			self.appName[:len(ubootTag)] = list(map(ord, ubootTag))
 			if printme: print( self.size, self.checksum,file=sys.stderr)
+		except Exception as e:
 			print( e,file=sys.stderr)
 			traceback.print_exc(file=sys.stderr)

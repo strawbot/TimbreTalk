@@ -1,6 +1,5 @@
 # Jam player file sender  Robert Chapman III  Aug 24, 2015
 
-from pyqtapi2 import *
 from imageTransfer import imageTransfer
 from transfer import *
 import pids

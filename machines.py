@@ -101,7 +101,10 @@ class QThread(threading.Thread):
 	# cannot quit a thread but since it is a daemon thread it will end by ending the program
 
 class QCoreApplication(QObject):
-	def __init__(self, args=[]):
+	def __init__(self, args=None):
+		QObject.__init__(QCoreApplication)
+		if args is None:
+			args = []
 		self.aboutToQuit = Signal()
 
 	def quit(self):
@@ -111,7 +114,7 @@ class QCoreApplication(QObject):
 	def exit(self, n):
 		self.aboutToQuit.emit()
 		doneMachines()
-		os._exit(n)
+		sys.exit(n)
 
 	def exec_(self):
 		if printme: print ('starting up application',file=sys.stderr)

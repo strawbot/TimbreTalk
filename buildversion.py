@@ -13,21 +13,20 @@ uImage header format - 64 bytes
 #define IH_NMLEN    32            /* Image Name Length      */
 
 typedef struct image_header {
-    uint32_t    ih_magic;         /* Image Header Magic Number */
-    uint32_t    ih_hcrc;          /* Image Header CRC Checksum */
-    uint32_t    ih_time;          /* Image Creation Timestamp  */
-    uint32_t    ih_size;          /* Image Data Size           */
-    uint32_t    ih_load;          /* Data     Load  Address    */
-    uint32_t    ih_ep;            /* Entry Point Address       */
-    uint32_t    ih_dcrc;          /* Image Data CRC Checksum   */
-    uint8_t     ih_os;            /* Operating System          */
-    uint8_t     ih_arch;          /* CPU architecture          */
-    uint8_t     ih_type;          /* Image Type                */
-    uint8_t     ih_comp;          /* Compression Type          */
-    uint8_t     ih_name[IH_NMLEN];    /* Image Name            */
+	uint32_t    ih_magic;         /* Image Header Magic Number */
+	uint32_t    ih_hcrc;          /* Image Header CRC Checksum */
+	uint32_t    ih_time;          /* Image Creation Timestamp  */
+	uint32_t    ih_size;          /* Image Data Size           */
+	uint32_t    ih_load;          /* Data     Load  Address    */
+	uint32_t    ih_ep;            /* Entry Point Address       */
+	uint32_t    ih_dcrc;          /* Image Data CRC Checksum   */
+	uint8_t     ih_os;            /* Operating System          */
+	uint8_t     ih_arch;          /* CPU architecture          */
+	uint8_t     ih_type;          /* Image Type                */
+	uint8_t     ih_comp;          /* Compression Type          */
+	uint8_t     ih_name[IH_NMLEN];    /* Image Name            */
 } image_header_t;
 '''
-import struct
 import datetime
 import endian
 import sys, traceback
@@ -78,7 +77,7 @@ def packMMB(year, month, build): # return 32 bit packed version
 	return (year%100)<<24 | month<<16 | build
 
 def unpackMMB(version): # return major, minor, build
-	return (version>>24, version>>16 & 0xFF, version &0xFFFF)
+	return version >> 24, version >> 16 & 0xFF, version & 0xFFFF
 
 def buildNumber(day, hour, minute): # derive build number from day, hour, minute
 	return ((day-1)*24 + hour)*60 + minute
@@ -92,7 +91,7 @@ def dayHourMinute(build):
 def buildDate(version): # derive year, month day, hour, minute from build number
 	major, minor, build = unpackMMB(version)
 	day, hour, minute = dayHourMinute(build)
-	return (major+2000,minor,day,hour,minute)
+	return major + 2000, minor, day, hour, minute
 
 def buildVersion(date): # date string to 32 bit version
 	year, month, day, hour, minute, second = dateTuple(date)
@@ -117,7 +116,7 @@ def extractUbootDate(image): # must find string inside binary and convert
 
 def extractUimageDate(image): # grab and convert timestamp from header
 	timestamp = endian.long(image[8:12])
-	d = datetime.fromtimestamp(1367899411)
+	d = datetime.datetime.fromtimestamp(1367899411)
 	return dateString(d.year, d.month, d.day, d.hour, d.minute, d.second)
 
 # utilities
@@ -186,9 +185,9 @@ def extractNameDateVersion(image, endianness='big'):
 		name = endian.l2s(image[offset:][:16])
 		date = MDYHMSasYMDHMS(endian.l2s(image[offset+16:][:20]))
 		version = buildVersion(date)
-	return (name, date, version)
 	name = list(map(ord, name)) + [0]*(APP_NAME_LENGTH - len(name))
 	date = list(map(ord, date)) + [0]*(RELEASE_DATE_LENGTH - len(date))
+	return name, date, version
 
 # test
 def testAppVD():

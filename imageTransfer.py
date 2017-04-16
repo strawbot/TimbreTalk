@@ -1,12 +1,9 @@
 # Generic File Transfer  Robert Chapman III  May 11, 2016
 
-from pyqtapi2 import *
-
-import sys, traceback	
+import image
 from endian import *
 from message import *
-from checksum import fletcher32
-import image
+from pyqtapi2 import *
 from transfer import *
 
 class imageTransfer(image.imageRecord):

@@ -6,9 +6,10 @@
 # port can be opened and closed
 
 from pyqtapi2 import *
-import sys, traceback, serial, time
-from message import warning, error, note, message
-from signalcatch import initSignalCatcher
+import serial
+from message import error, note
+from inspect import currentframe, getframeinfo
+import ntpath
 
 class serialPort(QThread):
 	# define signals
@@ -48,7 +49,7 @@ class serialPort(QThread):
 			except IOError:
 				self.closePort()
 				note('Alert: device removed while open ')
-			except Exception, e:
+			except Exception as e:
 				self.closePort()
 				#error("run - serial port exception: %s" % e)
 		self.closed.emit()
@@ -76,7 +77,7 @@ class serialPort(QThread):
 				note('opened %s at %d'%(port, rate))
 				self.start() # run serial in thread
 				self.opened.emit()
-			except Exception, e:
+			except Exception as e:
 				if self.port:
 					self.port.close()
 				self.port = None
@@ -111,7 +112,7 @@ class serialPort(QThread):
 				self.outputs += len(s)
 			except IOError:
 				self.ioError.emit('Alert: device closed while writing ')
-			except Exception, e:
+			except Exception as e:
 				if self.port:
 					self.ioException.emit("Error: sink - serial port exception: %s" % e)
 

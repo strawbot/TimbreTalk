@@ -17,8 +17,7 @@ from compileui import updateUi
 updateUi('mainWindow')
 
 from mainWindow import Ui_MainWindow
-import time
-import sys, traceback	
+import sys, traceback
 
 import listports, pids, serialio
 from message import *
@@ -124,8 +123,8 @@ class terminal(QMainWindow):
 		font.setPointSize(size)
 		self.ui.textEdit.setFont(font)
 		
-	def sendPhrase(self, s):
-		s = s+'\r'
+	def sendPhrase(self, x):
+		s = x+'\r'
 		for c in s:
 			self.keyin(c)
 
@@ -216,7 +215,7 @@ class terminal(QMainWindow):
 
 	def eventFilter(self, object, event):
 		if event.type() == QEvent.KeyPress:
-			if (event.matches(QKeySequence.Paste)):
+			if event.matches(QKeySequence.Paste):
 				for c in QApplication.clipboard().text():
 					self.keyin(c)
 				return True
@@ -380,7 +379,7 @@ class terminal(QMainWindow):
 
 	def isCursorVisible(self):
 		vbar = self.ui.textEdit.verticalScrollBar()
-		return ((vbar.maximum() - vbar.value()) < vbar.singleStep())
+		return (vbar.maximum() - vbar.value()) < vbar.singleStep()
         
 	def writeStyled(self, t):
 		s, style = t[0], t[1]
@@ -468,5 +467,5 @@ if __name__ == "__main__":
 	import sys	
 	app = QApplication([])
 	terminal = terminal()
-	sys.exit(app.exec_())
 	terminal.close()
+	sys.exit(app.exec_())

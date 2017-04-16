@@ -1,7 +1,6 @@
 # panel for working with packages  Robert Chapman III  Jul 4, 2013
 
 from pyqtapi2 import *
-import sys, traceback	
 
 printme = 0
 

@@ -6,8 +6,6 @@ from transfer import *
 import pids
 from message import *
 import binascii
-import sys
-import traceback
 
 class eepromTransfer(imageTransfer):
 	endToken = "END;"
@@ -25,7 +23,7 @@ class eepromTransfer(imageTransfer):
 			warning('Could not find ' + self.endToken + ' within script')
 			self.scriptOk.emit(False)
 		else:
-			endp = image.find(self.endToken);
+			endp = image.find(self.endToken)
 			endp += len(self.endToken)
 			self.scriptCrc = 0
 			calcCrc = binascii.crc32(image[:endp]) & 0xFFFFFFFF

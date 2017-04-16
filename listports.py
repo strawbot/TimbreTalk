@@ -22,7 +22,7 @@ def listports():
 		try:
 			key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
 		except WindowsError:
-			return (prefix, ports)
+			return prefix, ports
 	
 		for i in itertools.count():
 			try:
@@ -51,7 +51,7 @@ def listports():
 	else:
 		print('unknown system platform: %s' % sys.platform)
 
-	return (prefix, ports)
+	return prefix, ports
 
 if __name__ == '__main__':
 	print(listports())

@@ -5,8 +5,8 @@ import sys
 
 files = []
 
-def parseList(file):
-	file = file+'.py'
+def parseList(thisfile):
+	file = thisfile+'.py'
 	if file not in files:
 		if os.path.isfile(file):
 			files.append(file)

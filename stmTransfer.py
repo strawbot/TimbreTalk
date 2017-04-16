@@ -7,6 +7,7 @@ from endian import *
 from message import *
 from imageTransfer import imageTransfer
 import pids
+from functools import reduce
 
 printme = 0
 
@@ -163,7 +164,7 @@ class stmSender(imageTransfer):
 	# STM32 Boot Loader
 	def sendHex(self, bytes):
 		try:
-			note('sending: '+ reduce(lambda a,b: a+b, map(hex, bytes)))
+			note('sending: '+ ''.join(list(map(hex, bytes))))
 			self.parent.serialPort.sink(bytes)
 		except Exception as e:
 			print(e)
@@ -194,7 +195,7 @@ class stmSender(imageTransfer):
 		except StopIteration:
 			self.parent.parent.serialPort.source.disconnect(self.nextSequence)
 			note('done command')
-		except Exception, e:
+		except Exception as e:
 			print(e)
 			traceback.print_exc(file=sys.stderr)
 

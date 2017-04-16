@@ -2,7 +2,7 @@
 
 # factored to one module because windows uses only a subset
 
-import os, signal, sys
+import signal, sys
 
 
 def doNothing():
@@ -17,7 +17,7 @@ def initSignalCatcher(hook=doNothing):
 	def die(signum=0, stack=0):
 		print('got signal:', signum)
 		beforeIdie()
-		os._exit(-1)
+		sys.exit(-1)
 
 	signal.signal(signal.SIGTERM, die)
 	signal.signal(signal.SIGABRT, die)

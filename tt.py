@@ -9,6 +9,7 @@ import sfp
 
 # update GUI from designer
 from compileui import updateUi
+
 updateUi('mainWindow')
 updateUi('tabs')
 
@@ -16,7 +17,6 @@ from message import *
 import qterm, serialPane, transferPane
 import infopane
 import utilitypane, cpuids
-import sys
 
 class sfpQt (QObject, sfp.sfpProtocol):
 	source = Signal(object)
@@ -25,8 +25,8 @@ class sfpQt (QObject, sfp.sfpProtocol):
 		QObject.__init__(self)
 		sfp.sfpProtocol.__init__(self)
 
-	def sink(self, bytes):
-		self.rxBytes(map(ord, bytes))
+    def sink(self, bytelist):
+        self.rxBytes(bytelist)
 
 	def newFrame(self):
 		self.source.emit(''.join(map(chr, self.txBytes())))
@@ -46,8 +46,9 @@ class sfpQt (QObject, sfp.sfpProtocol):
 		self.result = code
 		note(string)
 
-	def dump(self, tag, buffer):
-		messageDump(tag, buffer)
+    def dump(self, tag, bytebuffer):
+        messageDump(tag, bytebuffer)
+
 
 class timbreTalk(qterm.terminal):
 	def __init__(self):
@@ -63,12 +64,13 @@ class timbreTalk(qterm.terminal):
 		# default
 		self.whofrom = MAIN_HOST
 		self.ui.whoFrom.setCurrentIndex(self.whofrom)
-		QErrorMessage.qtHandler()
+        QErrorMessage().qtHandler()
 
 		# to handle warnings about tablets when running under a VM
 		# http://stackoverflow.com/questions/25660597/hide-critical-pyqt-warning-when-clicking-a-checkboc
 		def handler(msg_type, msg_string):
 			pass
+
 		qInstallMsgHandler(handler)
 
 	# overrides
@@ -128,7 +130,7 @@ if __name__ == "__main__":
 	try:
 		timbreTalk = timbreTalk()
 		sys.exit(app.exec_())
-	except Exception, e:
+    except Exception as e:
         print(e)
 		traceback.print_exc(file=sys.stderr)
 	timbreTalk.close()

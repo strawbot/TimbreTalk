@@ -9,7 +9,7 @@ from recover import recover
 import led
 from cpuids import *
 from targets import *
-import sys
+import sys, traceback
 
 printme = 0
 SEND,TRANSFER,VERIFY = range(3)
@@ -127,7 +127,7 @@ class srecordPane(QWidget):
 	def sendSrecord(self):
 		try:
 			self.runCommand(SEND)
-		except Exception, e:
+		except Exception as e:
 			print(e)
 			traceback.print_exc(file=sys.stderr)
 		
@@ -139,7 +139,7 @@ class srecordPane(QWidget):
 			if file:
 				target.useFile(file)
 			self.showSrecordValues()
-		except Exception, e:
+		except Exception as e:
 			print(e)
 			traceback.print_exc(file=sys.stderr)
 		

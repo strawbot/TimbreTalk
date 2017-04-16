@@ -36,7 +36,7 @@ def toInteger(bytes, length, endian="big"):
 	if endian == "big":
 		return sum((bytes[i]<<(8*(n-i))) for i in range(length))
 	else:
-		return sum((bytes[i]<<(8*(i))) for i in range(length))
+		return sum((bytes[i] << (8 * i)) for i in range(length))
 
 def short(bytes, endian="big"):
 	return toInteger(bytes, 2, endian)
@@ -108,7 +108,6 @@ __int__() is deprecated, and will raise DeprecationWarning.
 '''
 
 import struct
-import sys
 def cast(format, list, endian="big"):
 	if endian == "big":
 		format = '>'+format
