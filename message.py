@@ -40,11 +40,12 @@ def message(string, style=''): # mark a message for formatting
 def write(text): # route the message to file or window
 	message(text)
 	
-def messageDump(who,s=[], text=0): # dump message in hex or text to terminal
+def messageDump(who, s=None, text=0): # dump message in hex or text to terminal
 	# s could be a string, character or integer
+	if s is None:
+		s = []
 	framedump = ''
 	if s:
-		# note(type(s))
 		if type(s) == type(0):
 			s = [s]
 		elif type(s[0]) == type('a'):
