@@ -5,13 +5,6 @@
 from pyqtapi2 import *
 
 import sys
-'''
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4.QtSvg import *
-from PyQt4.QtCore import pyqtSignal as Signal
-from PyQt4.QtCore import pyqtSlot as Slot
-'''
 # update GUI from designer
 from compileui import updateUi
 updateUi('mainWindow')
@@ -19,7 +12,8 @@ updateUi('mainWindow')
 from mainWindow import Ui_MainWindow
 import sys, traceback
 
-import listports, pids, serialio
+import listports, pids
+from serialio import serialThread as serialPort
 from message import *
 
 class terminal(QMainWindow):
@@ -35,7 +29,7 @@ class terminal(QMainWindow):
 		# serial port
 		self.sptimer = QTimer()
 		self.portname = None
-		self.serialPort = serialio.serialPort(int(self.ui.BaudRate.currentText()))
+		self.serialPort = serialPort(int(self.ui.BaudRate.currentText()))
 
 		# adjust ui widgets
 		self.UiAdjust()
