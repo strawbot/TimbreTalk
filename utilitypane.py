@@ -65,15 +65,15 @@ class utilityPane(QWidget):
 		self.ui.run.stateChanged.connect(self.stm.setRun)
 		self.stm.setStart.connect(lambda a: self.ui.bootStart.setText(a))
 		self.ui.bootStart.textChanged.connect(lambda t: self.stm.address)
- 		self.ui.Go.clicked.connect(self.stm.goButton)
+		self.ui.Go.clicked.connect(self.stm.goButton)
 		
 		self.ui.setDateTime.clicked.connect(self.setDateTimeNow)
 
 		# send jam file
- 		self.jam = jamSender(self)
+		self.jam = jamSender(self)
 		self.jam.setName.connect(self.ui.jamFile.setText)
 		self.jam.setSize.connect(self.ui.jamSize.setText)
- 		self.ui.jamSelect.clicked.connect(lambda: self.jam.selectFile(QFileDialog().getOpenFileName(directory=self.jam.dir)))
+		self.ui.jamSelect.clicked.connect(lambda: self.jam.selectFile(QFileDialog().getOpenFileName(directory=self.jam.dir)))
 		self.ui.sendJam.clicked.connect(self.jam.sendJam)
 		self.ui.sendFile.clicked.connect(self.jam.sendFile)
 		self.ui.jamLoaderProgressBar.reset()
@@ -82,10 +82,10 @@ class utilityPane(QWidget):
 		self.jam.setAction.connect(lambda: self.ui.sendJam.setText)
 
 		# Transfer EEPROM Script
- 		self.eeprom = eepromTransfer(self)
+		self.eeprom = eepromTransfer(self)
 		self.eeprom.setName.connect(self.ui.eepromFile.setText)
 		self.eeprom.setSize.connect(self.ui.eepromSize.setText)
- 		self.ui.eepromSelect.clicked.connect(lambda: self.eeprom.selectFile(QFileDialog().getOpenFileName(directory=self.eeprom.dir)))
+		self.ui.eepromSelect.clicked.connect(lambda: self.eeprom.selectFile(QFileDialog().getOpenFileName(directory=self.eeprom.dir)))
 		self.ui.sendEeprom.clicked.connect(self.eeprom.sendFile)
 		self.ui.eepromLoaderProgressBar.reset()
 		self.ui.eepromLoaderProgressBar.setMaximum(1000)
