@@ -34,3 +34,5 @@ if useQt():
 		from PyQt4.uic import compileUi
 else:
 	from machines import *
+	def compileUi(a, b, c=True):
+		pass
