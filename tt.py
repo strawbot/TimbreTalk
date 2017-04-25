@@ -2,7 +2,7 @@
 
 # GUI for serial transactions using Qt	Robert Chapman III	Sep 28, 2012
 
-version = '2.0'
+version = '2.1'
 
 from pyqtapi2 import *
 from pids import MAIN_HOST

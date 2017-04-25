@@ -154,12 +154,20 @@
                       <property name="acceptDrops">
                        <bool>false</bool>
                       </property>
+                      <property name="currentText">
+                       <string>115200</string>
+                      </property>
                       <property name="currentIndex">
-                       <number>5</number>
+                       <number>6</number>
                       </property>
                       <property name="frame">
                        <bool>true</bool>
                       </property>
+                      <item>
+                       <property name="text">
+                        <string>1200</string>
+                       </property>
+                      </item>
                       <item>
                        <property name="text">
                         <string>9600</string>
