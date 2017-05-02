@@ -1504,8 +1504,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>360</width>
-                 <height>281</height>
+                 <width>343</width>
+                 <height>276</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2844,11 +2844,14 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
           <property name="horizontalScrollBarPolicy">
            <enum>Qt::ScrollBarAsNeeded</enum>
           </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+          </property>
           <property name="undoRedoEnabled">
            <bool>false</bool>
           </property>
           <property name="lineWrapMode">
-           <enum>QPlainTextEdit::WidgetWidth</enum>
+           <enum>QPlainTextEdit::NoWrap</enum>
           </property>
           <property name="plainText">
            <string/>
@@ -3072,8 +3075,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="serialProtocol"/>
   <buttongroup name="LfOut"/>
+  <buttongroup name="serialProtocol"/>
   <buttongroup name="CrOut"/>
  </buttongroups>
 </ui>
