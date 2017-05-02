@@ -129,4 +129,3 @@ if __name__ == "__main__":
     except Exception as e:
         print(e)
         traceback.print_exc(file=sys.stderr)
-    timbreTalk.close()
