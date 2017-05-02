@@ -53,7 +53,10 @@ class sfpProtocol(object):
 			self.dump('RX: ', bytes)
 
 		if self.frame and (time.time() - self.frameTime) > SFP_FRAME_TIME:
+			global SFP_FRAME_TIME
+			SFP_FRAME_TIME += SFP_FRAME_TIME
 			self.error(FRAME_TIMEOUT,"Frame timeout - resetting receiver")
+			self.note("doubling timeout to %d"%SFP_FRAME_TIME)
 			self.resetRx()
 		else:
 			self.frame.extend(bytes)
