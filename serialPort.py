@@ -54,7 +54,7 @@ class serialPort(object):
                 c += self.port.read(self.port.inWaiting())  # get rest of chars
                 self.inputs += len(c)
                 if c:
-                    self.rxBytes(c)
+                    self.rxBytes(list(map(ord, c)))
             except IOError:
                 self.closePort()
                 self.note('Alert: device removed while open ')
