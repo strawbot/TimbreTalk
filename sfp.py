@@ -13,7 +13,7 @@ if sys.version_info > (3, 0):
 else:
 	import Queue
 from collections import deque
-from pids import MAX_FRAME_LENGTH, SFP_FRAME_TIME, pids, PID_BITS
+import pids
 from sfpErrors import *
 
 # sfp format: |0 length |1 sync |2 pid |3 payload | checksum |
@@ -28,7 +28,7 @@ CHECKSUM_LENGTH = 2
 
 # defines - lengths in bytes
 MIN_FRAME_LENGTH = (SYNC_LENGTH + PID_LENGTH + CHECKSUM_LENGTH)
-MAX_SFP_SIZE = (LENGTH_LENGTH + MAX_FRAME_LENGTH)
+MAX_SFP_SIZE = (LENGTH_LENGTH + pids.MAX_FRAME_LENGTH)
 MIN_SFP_SIZE = (LENGTH_LENGTH + MIN_FRAME_LENGTH)
 FRAME_OVERHEAD = (MIN_FRAME_LENGTH - PID_LENGTH)
 
@@ -46,17 +46,18 @@ class sfpProtocol(object):
 		self.length = 0
 		self.result = NO_ERROR
 		self.message = ""
+		self.spsbitExpect = None
+		self.frameTimeout = pids.SFP_FRAME_TIME
 
 	# receiver: frame contains received bytes and is parsed for a frame
 	def rxBytes(self, bytes):  # run rx state machine receiver
 		if self.VERBOSE:
 			self.dump('RX: ', bytes)
 
-		if self.frame and (time.time() - self.frameTime) > SFP_FRAME_TIME:
-			global SFP_FRAME_TIME
-			SFP_FRAME_TIME += SFP_FRAME_TIME
+		if self.frame and (time.time() - self.frameTime) > self.frameTimeout:
+			self.frameTimeout += self.frameTimeout
 			self.error(FRAME_TIMEOUT,"Frame timeout - resetting receiver")
-			self.note("doubling timeout to %d"%SFP_FRAME_TIME)
+			self.note("doubling timeout to %d"%self.frameTimeout)
 			self.resetRx()
 		else:
 			self.frame.extend(bytes)
@@ -105,13 +106,10 @@ class sfpProtocol(object):
 			self.frame.clear()
 			self.frame.extend(frame[self.length:])
 
-			if frame[1] & ~PID_BITS: # ignore SPS frames since not supported
-				self.result = IGNORE_FRAME
+			if frame[1] & ~pids.PID_BITS:
+				self.spsFrame(frame)
 			else:
-				if self.VERBOSE:
-					self.note(GOOD_FRAME, "host: good frame")
-				self.receivedPool.put(frame[1:self.length - CHECKSUM_LENGTH])
-				self.newPacket()
+				self.goodFrame(frame)
 		else:
 			self.error(BAD_CHECKSUM,"host: bad checksum")
 		return True
@@ -126,7 +124,7 @@ class sfpProtocol(object):
 		self.resetRx()
 
 	def checkLength(self):
-		if MIN_FRAME_LENGTH <= self.length <= MAX_FRAME_LENGTH:
+		if MIN_FRAME_LENGTH <= self.length <= pids.MAX_FRAME_LENGTH:
 			return LENGTH_OK
 
 		if self.length == 0 or self.length == 0xFF:
@@ -154,6 +152,24 @@ class sfpProtocol(object):
 			sumsum += sum
 		return (sum & 0xFF), (sumsum & 0xFF)
 
+	# frame handlers
+	def goodFrame(self, frame):
+		if self.VERBOSE:
+			self.note(GOOD_FRAME, "host: good frame")
+		self.receivedPool.put(frame[1:self.length - CHECKSUM_LENGTH])
+		self.newPacket()
+
+	# SPS Frame: if ACK_BIT set, send an ack; if SPS_BIT is not expected, ignore frame
+	def spsFrame(self, frame):
+		self.sendNPS(pids.SPS_ACK)
+		spsbit = frame[1] & pids.SPS_BIT
+		if spsbit == self.spsbitExpect or self.spsbitExpect == None:
+			self.spsbitExpect = spsbit ^ pids.SPS_BIT
+			frame[1] &= pids.PID_BITS
+			self.goodFrame(frame)
+		else:
+			self.result = IGNORE_FRAME
+
 	# packet handlers
 	def newPacket(self):  # redefine to receive packets
 		pass
@@ -165,8 +181,8 @@ class sfpProtocol(object):
 			handler = self.handler.get(pid)
 			if handler:
 				handler(packet[1:])
-			elif pids.get(packet[0]):
-				self.error(NO_HANDLER,"Error: no handler for %s (0x%x)" % (pids[packet[0]], packet[0]))
+			elif pids.pids.get(packet[0]):
+				self.error(NO_HANDLER,"Error: no handler for %s (0x%x)" % (pids.pids[packet[0]], packet[0]))
 			else:
 				self.dump("Error: unknown packet: 0x%x " % (packet[0]), packet)
 
@@ -178,7 +194,7 @@ class sfpProtocol(object):
 			self.handler.pop(pid)
 
 	# sending SFP frames
-	def sendNPS(self, pid, payload):  # send a payload via normal packet service
+	def sendNPS(self, pid, payload=[]):  # send a payload via normal packet service
 		length = len(payload) + FRAME_OVERHEAD + 1	 # pid is separate from payload
 		sync = ~length & 0xff
 		frame = [length, sync, pid] + payload

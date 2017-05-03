@@ -5,6 +5,7 @@ from sfpErrors import *
 from pids import MAX_FRAME_LENGTH
 import pids
 
+
 class sfpPlus(sfpProtocol):
     def newPacket(self):
         self.gotPacket = True
@@ -12,20 +13,27 @@ class sfpPlus(sfpProtocol):
     def newFrame(self):
         self.gotFrame = True
 
+
 sp = sfpPlus()
 
-# build a test frame
-payload =  list(range(50))
-packet = [pids.MEMORY] + payload
-length = 1 + len(packet) + 2
-frame = [length, ~length&0xFF] + packet
-sum = sumsum = 0
-for byte in frame:
-    sum += byte
-    sumsum += sum
-frame += [sum&0xFF, sumsum&0xFF]
+# references
 reference = [0x07, 0xF8, 0x07, 0x00, 0x02, 0x6A, 0x72, 0x8C]
 spsframe = [0x06, 0xF9, 0x82, 0x00, 0x01, 0x82, 0x89]
+
+# build a test frame
+payload = list(range(50))
+packet = [pids.MEMORY] + payload
+length = 1 + len(packet) + 2
+frame = [length, ~length & 0xFF] + packet
+
+def checksum(frame):
+    sum = sumsum = 0
+    for byte in frame:
+        sum += byte
+        sumsum += sum
+    return [sum & 0xFF, sumsum & 0xFF]
+
+frame += checksum(frame)
 
 class TestSfpProtocol(TestCase):
     def setUp(self):
@@ -38,6 +46,7 @@ class TestSfpProtocol(TestCase):
         sp.handler.clear()
         sp.gotFrame = False
         sp.gotPacket = False
+        sp.spsbitExpect = None
 
     def test_rxBytes(self):
         self.assertEqual(sp.receivedPool.qsize(), 0)
@@ -86,7 +95,7 @@ class TestSfpProtocol(TestCase):
         self.assertEqual(sp.sfpState, sp.hunting)
 
         self.setUp()
-        sp.frame.extend([~sp.length&0xFF])
+        sp.frame.extend([~sp.length & 0xFF])
         self.assertTrue(sp.syncing())
         self.assertEqual(sp.result, FRAME_SYNCED)
         self.assertEqual(sp.sfpState, sp.receiving)
@@ -95,7 +104,7 @@ class TestSfpProtocol(TestCase):
         sp.length = frame[0]
         self.assertFalse(sp.receiving())
 
-        sp.frame.extend(frame[1:-1] + [~frame[-1]&0xFF])
+        sp.frame.extend(frame[1:-1] + [~frame[-1] & 0xFF])
         self.assertTrue(sp.receiving())
         self.assertEqual(sp.result, BAD_CHECKSUM)
 
@@ -105,11 +114,25 @@ class TestSfpProtocol(TestCase):
         self.assertTrue(sp.receiving())
         self.assertEqual(sp.result, GOOD_FRAME)
 
+    def test_spsframe(self):
         self.setUp()
         sp.length = spsframe[0]
         sp.frame.extend(spsframe[1:])
         self.assertTrue(sp.receiving())
+        self.assertEqual(sp.result, GOOD_FRAME)
+
+        sp.length = spsframe[0]
+        sp.frame.extend(spsframe[1:])
+        self.assertTrue(sp.receiving())
         self.assertEqual(sp.result, IGNORE_FRAME)
+
+        frame = spsframe[:-2]
+        frame[2] ^= pids.SPS_BIT
+        frame += checksum(frame)
+        sp.length = frame[0]
+        sp.frame.extend(frame[1:])
+        self.assertTrue(sp.receiving())
+        self.assertEqual(sp.result, GOOD_FRAME)
 
     def test_resetRx(self):
         sp.sfpState = None
@@ -128,14 +151,16 @@ class TestSfpProtocol(TestCase):
         sp.length = 3
         self.assertEqual(sp.checkLength(), LENGTH_SHORT)
         sp.length = MAX_FRAME_LENGTH + 1
+        if sp.length == 0xFF:
+            sp.length += 1
         self.assertEqual(sp.checkLength(), LENGTH_LONG)
         sp.length = MAX_FRAME_LENGTH
         self.assertEqual(sp.checkLength(), LENGTH_OK)
 
     def test_checkSync(self):
-        sp.length =100
+        sp.length = 100
         for sync in range(256):
-            if sync == ~sp.length&0xFF:
+            if sync == ~sp.length & 0xFF:
                 self.assertTrue(sp.checkSync(sync))
             else:
                 self.assertFalse(sp.checkSync(sync))
@@ -162,6 +187,7 @@ class TestSfpProtocol(TestCase):
         def handler(packet):
             self.assertEqual(packet, payload)
             self.handled = True
+
         sp.setHandler(pids.MEMORY, handler)
 
         self.handled = False
@@ -171,13 +197,14 @@ class TestSfpProtocol(TestCase):
         self.assertEqual(sp.result, GOOD_FRAME)
         self.assertEqual(sp.gotPacket, True)
 
+    def test_spsPacket(self):
         self.setUp()
         self.handled = False
         sp.rxBytes(spsframe)
         sp.distributer()
         self.assertFalse(self.handled)
-        self.assertEqual(sp.result, IGNORE_FRAME)
-        self.assertEqual(sp.gotPacket, False)
+        self.assertEqual(sp.result, NO_HANDLER)
+        self.assertEqual(sp.gotPacket, True)
 
     def test_sendNPS(self):
         sp.sendNPS(pids.MEMORY, packet[1:])
