@@ -3,11 +3,9 @@
 from pyqtapi2 import *
 from imageTransfer import imageTransfer
 from transfer import *
-import pids
+from protocols import pids
 from message import *
 import binascii
-import sys
-import traceback
 
 class eepromTransfer(imageTransfer):
 	endToken = "END;"

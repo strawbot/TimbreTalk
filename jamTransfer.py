@@ -3,7 +3,7 @@
 from pyqtapi2 import *
 from imageTransfer import imageTransfer
 from transfer import *
-import pids
+from protocols import pids
 
 jamType = {'.jam':JAM_PLAYER, '.jbc':JBC_PLAYER}
 

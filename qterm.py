@@ -17,10 +17,9 @@ from compileui import updateUi
 updateUi('mainWindow')
 
 from mainWindow import Ui_MainWindow
-import time
-import sys, traceback	
+import traceback
 
-import listports, pids, serialio
+import listports, serialio
 from message import *
 
 class terminal(QMainWindow):

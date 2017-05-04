@@ -2,7 +2,7 @@
 
 from pyqtapi2 import *
 from message import *
-import sfp, pids
+from protocols import pids
 import sys, traceback	
 
 class serialPane(QWidget):

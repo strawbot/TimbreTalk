@@ -6,7 +6,6 @@ import sys, traceback
 from endian import *
 from message import *
 from imageTransfer import imageTransfer
-import pids
 
 printme = 0
 

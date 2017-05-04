@@ -5,7 +5,7 @@ version='1.5'
 
 from pyqtapi2 import *
 from cpuids import MAIN_HOST
-import sfp
+from protocols import sfp
 
 # update GUI from designer
 from compileui import updateUi
@@ -16,7 +16,6 @@ from message import *
 import qterm, serialPane, transferPane
 import infopane
 import utilitypane, cpuids
-import sys
 
 class sfpQt (QObject, sfp.sfpProtocol):
 	source = Signal(object)

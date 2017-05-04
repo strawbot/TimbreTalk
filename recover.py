@@ -6,7 +6,7 @@ slots: startRecovery, stopRecovery
 '''
 from pyqtapi2 import *
 
-import pids
+from protocols import pids
 from endian import *
 from message import *
 

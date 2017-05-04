@@ -2,7 +2,7 @@
 
 from pyqtapi2 import *
 from message import *
-import pids
+from protocols import pids
 from endian import *
 from srecordTransfer import sRecordTransfer, ubootTransfer
 from recover import recover
