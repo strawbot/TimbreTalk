@@ -2,3 +2,6 @@
 	path = PyInstaller
 	url = https://github.com/pyinstaller/pyinstaller.git
 	branch = master
+[submodule "protocols"]
+	path = protocols
+	url = https://strawbot@github.com/strawbot/sfpPython.git
