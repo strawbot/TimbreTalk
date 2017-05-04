@@ -40,6 +40,7 @@ class sfpProtocol(object):
 		self.receivedPool = Queue.Queue()  # holds received frames
 		self.transmitPool = Queue.Queue()  # holds outgoing frames
 		self.handler = {}  # for associating handlers with PIDs
+		self.setHandler(pids.SPS, self.spsHandler)
 		self.frame = deque() # incoming data
 		self.sfpState = self.hunting  # receive states: hunting, syncing, receiving
 		self.frameTime = time.time()  # to know when data is stale
@@ -185,6 +186,9 @@ class sfpProtocol(object):
 				self.error(NO_HANDLER,"Error: no handler for %s (0x%x)" % (pids.pids[packet[0]], packet[0]))
 			else:
 				self.dump("Error: unknown packet: 0x%x " % (packet[0]), packet)
+
+	def spsHandler(self, packet):
+		pass
 
 	def setHandler(self, pid, handler):  # route packets to handler
 		self.handler[pid] = handler
