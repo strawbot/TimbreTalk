@@ -8,6 +8,7 @@ from message import *
 from checksum import fletcher32
 import image
 from transfer import *
+import protocols.pids as pids
 
 class imageTransfer(image.imageRecord):
 	setProgress = Signal(object)
@@ -16,8 +17,9 @@ class imageTransfer(image.imageRecord):
 	# or bring pids into this module and have it as an SFP transfer but make a super
 	# class which is protocol independant
 	chunk = 240 # default size to transfer; should derive from MAX_FRAME_LENGTH
-	transferPid = 0 # pid for transfer operations
-	transferType = 0 # type of file if needed
+	transferPid = pids.FILES # pid for transfer operations
+	transferType = BINARY_TRANSFER # type of file if needed
+	maxRetries = 5 # maximum number of retries for transferring chunks
 
 	def __init__(self, parent):
 		super(imageTransfer, self).__init__(parent)
@@ -26,7 +28,7 @@ class imageTransfer(image.imageRecord):
 		self.transferTimer = QTimer()
 		self.transferTimer.timeout.connect(self.timedOut)
 		self.transferTimer.setSingleShot(True)
-		self.transferDelay = 0
+		self.transferDelay = 2000
 
 		# shortcuts
 		self.protocol = self.parent.protocol
@@ -36,6 +38,14 @@ class imageTransfer(image.imageRecord):
 		return self.parent.parent.who() # packet routing
 
 	# states
+	# upload
+	def requestFile(self, file):
+		self.startTransferTime = time.time()
+		self.name = file
+		payload = self.who() + [TRANSFER_FILE] + list(map(ord, self.name)) + [0]
+		self.protocol.sendNPS(self.transferPid, payload)
+
+	# download
 	def sendFile(self):
 		if self.transferTimer.isActive():
 			self.abort()
@@ -46,13 +56,22 @@ class imageTransfer(image.imageRecord):
 				self.setProgress.emit(0)
 				self.setupTransfer()
 				self.requestTransfer()
-				self.transferTimer.start(2000)
 				self.setAction.emit('Abort')
 			else:
-				error("No image for downloading")
+				error(" Host: No image for downloading")
 		
 	def setupTransfer(self):
 		pass
+
+	def requestTransfer(self):
+		size = longList(self.size)
+		name = list(map(ord, self.name)) + [0]
+		type = [self.transferType]
+		payload = self.who() + [TRANSFER_REQUEST] + size + type + name
+		self.protocol.sendNPS(self.transferPid, payload)
+		self.transferTimer.timeout.disconnect()
+		self.transferTimer.timeout.connect(self.timedOut)
+		self.transferTimer.start(5000)
 
 	def startTransfer(self):
 		self.i = 0
@@ -60,8 +79,10 @@ class imageTransfer(image.imageRecord):
 		self.left = self.size
 
 		self.transferTimer.timeout.disconnect()
-		self.transferTimer.timeout.connect(self.transferChunk)
+		self.transferTimer.timeout.connect(self.resendChunk)
 		self.transferTimer.start(self.transferDelay)
+		self.retries = self.maxRetries
+		self.transferChunk()
 
 	def transferChunk(self):
 		if self.left:
@@ -82,68 +103,93 @@ class imageTransfer(image.imageRecord):
 			self.transferTimer.timeout.connect(self.timedOut)
 			self.transferTimer.start(20000)
 
-	# states
-	def requestTransfer(self):
-		size = longList(self.size)
-		name = [len(self.name)] + list(self.name)
-		type = [self.transferType]
-		payload = self.who() + [TRANSFER_REQUEST] + size + name + type
-		self.protocol.sendNPS(self.transferPid, payload)
-	
+	def resendChunk(self):
+		if self.retries:
+			note(" Host: timed out - resending last chunk")
+			self.protocol.sendNPS(self.transferPid, self.lastPayload)
+			self.retries -= 1
+		else:
+			error(' Host: timed out - no more retries left; transfer aborted')
+			self.abort()
+
+		'''
+		typedef struct {
+			Byte pid;
+			who_t who;
+			Byte spid;
+			long_t address;
+			Byte data[];
+		} dataPacket_t;
+		'''
 	def transferData(self, data):
-		payload = self.who() + [TRANSFER_DATA] + longList(self.i) + data
-		self.protocol.sendNPS(self.transferPid, payload)
+		self.lastPayload = self.who() + [TRANSFER_DATA] + longList(self.i) + data
+		self.protocol.sendNPS(self.transferPid, self.lastPayload)
 	
 	def transferDone(self):
 		payload = self.who() + [TRANSFER_DONE] + longList(self.checksum)
 		self.protocol.sendNPS(self.transferPid, payload)
 
 	def transferResponse(self, packet):
-		spid, result = cast('BBBB', packet)[2:4]
+		spid = cast('BBB', packet)[2]
 		if spid == TRANSFER_REPLY:
-			if result == REQUEST_OK:
-				note('Request approved. Starting data transfer...')
+			if packet[3] == REQUEST_OK:
+				note(' Host: Request approved. Starting data transfer...')
 				self.startTransfer()
 			else:
-				error('Request denied:'+resultText.get(result,'Unknown'))
+				error(' Host: Request denied:'+resultText.get(packet[3],'Unknown'))
 				self.abort()
 		elif spid == TRANSFER_RESULT:
-			if result == TRANSFER_OK:
-				note('Transfer complete')
+			if packet[3] == TRANSFER_OK:
+				self.transferChunk()
+			elif packet[3] == TRANSFER_COMPLETE:
+				note(' Host: Transfer complete')
 				self.finish()
 			else:
-				error('Transfer failed. '+resultText.get(result,'Unknown'))
+				error(' Host: Transfer failed. '+resultText.get(result,'Unknown'))
 				self.abort()
+		elif spid == TRANSFER_DATA:
+			data = packet[4:]
+			note(" Host: got data ")
+			payload = self.who() + [TRANSFER_RESULT, TRANSFER_OK]
+			self.protocol.sendNPS(self.transferPid, payload)
+		elif spid == TRANSFER_DONE:
+			note(" Host: Transfer done")
+		elif spid == TRANSFER_COMPLETE:
+		    note(" Host: transfer complete")
+		    self.finish()
+		elif spid == FILE_UNAVAILABLE:
+			note(" Host: file unavailable")
+			self.abort()
 		else:
-			error('Unknown spid:'+hex(spid))
+			error(' Host: Unknown spid:'+hex(spid))
 			self.abort()
 
 	# possible end sequences
 	def timedOut(self):
-		error('Timed out')
+		error(' Host: Timed out')
 		self.abort()
 
 	def abort(self):
-		error('Transfer aborted.')
+		error(' Host: Transfer aborted.')
 		self.finish()
 
 	def finish(self):
 		self.transferTimer.stop()
 		self.setAction.emit('Transfer')
 		elapsed = time.time() - self.startTransferTime
-		message(' finished in %.1f seconds'%elapsed,'note')
+		message(' Host:  finished in %.1f seconds'%elapsed,'note')
 
 	# receive file
-	def getFile(self):
-		if self.transferTimer.isActive():
-			self.abort()
-		else:
-			self.emptyImage()
-			self.startTransferTime = time.time()
-			self.setProgress.emit(0)
-			self.requestFile()
-			self.transferTimer.start(2000)
-			self.setAction.emit('Abort')
-	
-	def requestFile(self):
-		pass
+	# def getFile(self):
+	# 	if self.transferTimer.isActive():
+	# 		self.abort()
+	# 	else:
+	# 		self.emptyImage()
+	# 		self.startTransferTime = time.time()
+	# 		self.setProgress.emit(0)
+	# 		self.requestFile()
+	# 		self.transferTimer.start(2000)
+	# 		self.setAction.emit('Abort')
+	#
+	# def requestFile(self):
+	# 	pass

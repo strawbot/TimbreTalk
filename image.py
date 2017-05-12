@@ -31,6 +31,9 @@ class imageRecord(QObject):
 		self.checksum = 0
 		self.ext = ''
 
+	def updateName(self, name):
+		self.name = name
+
 	def createImage(self, file):
 		if file:
 			if printme: print("Creating Image for: "+file)
@@ -69,11 +72,11 @@ class imageRecord(QObject):
 		self.end = self.entry = self.size = 0
 		del self.records[:]
 
-		if self.ext in ['jbc', 'jam', 'txt', 'text']:
+		if self.ext in ['jbc', 'jam', 'txt', 'text',self.name]: # transfer file as binary
 			self.emptyImage()
 			self.image.extend(map(ord, open(self.file,'rb').read()))
 			self.end = self.size = len(self.image)
-		else:
+		else: # massage contents of file
 			if self.ext in ['srec', 'S19']: self.addSrecord()
 			elif self.ext in ['hex']: self.addHexRecord()
 			elif self.ext in ['elf']: self.addElfRecord()
@@ -333,5 +336,5 @@ class imageRecord(QObject):
 				if printme: print("address: %x  start: %x  end: %x"%(address, self.start, self.end))
 				
 		file.close()
-
+	
 # unit test code: convert srec and hex file to images and compare checksums

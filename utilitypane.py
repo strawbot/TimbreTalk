@@ -10,6 +10,7 @@ import listports, serialio
 from stmTransfer import stmSender
 from jamTransfer import jamSender
 from eepromTransfer import eepromTransfer
+from configTransfer import configTransfer
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
@@ -50,6 +51,20 @@ class utilityPane(QWidget):
 		self.startTransferTime = 0
 		self.image = None
 		self.dir = ''
+
+		# config file transfer
+		self.config = configTransfer(self)
+		self.config.setName.connect(self.ui.configFileName.setText)
+		self.ui.configFileName.editingFinished.connect(lambda: self.config.updateName(self.ui.configFileName.text()))
+		self.config.setSize.connect(self.ui.configFileSize.setText)
+		self.ui.configFileSelect.clicked.connect(
+			lambda: self.config.selectFile(QFileDialog().getOpenFileName(directory=self.config.dir)))
+		self.ui.configFileToSL.clicked.connect(self.config.sendFile)
+		self.ui.configFileProgressBar.reset()
+		self.ui.configFileProgressBar.setMaximum(1000)
+		self.config.setProgress.connect(lambda n: self.ui.configFileProgressBar.setValue(n * 1000))
+		self.config.setAction.connect(lambda: self.ui.configFileToSL.setText)
+		self.ui.configFileToHost.clicked.connect(lambda: self.config.requestFile(self.ui.configFileName.text()))
 
 		# STM32F4 Boot Loader
 		self.stm = stmSender(self)
