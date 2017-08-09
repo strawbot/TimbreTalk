@@ -37,7 +37,8 @@ if sys.platform == 'win32':
 elif sys.platform == 'darwin':
 	print "Building app for Mac OSX"
 	import shutil
-	shutil.rmtree('dist/tt.app') # save a step for builder by removing previous build
+	if os.path.isdir("dist/tt.app"):
+		shutil.rmtree('dist/tt.app') # save a step for builder by removing previous build
 	os.system('pyinstaller --clean --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.icns  --noupx -p . --osx-bundle-identifier="TimbreTalk" tt.py')
 elif sys.platform[:5] == 'linux':
 	"Building app for Linux"
