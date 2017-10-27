@@ -117,13 +117,16 @@ class utilityPane(QWidget):
 		self.portname2 = None
 		self.monitorPort1 = serialio.serialPort(int(self.ui.MonitorBaud1.currentText()))
 		self.monitorPort2 = serialio.serialPort(int(self.ui.MonitorBaud2.currentText()))
-
+		self.selectFormat1()
+		self.selectFormat2()
 		self.listPorts()
 
 		self.ui.MonitorPort1.activated.connect(self.selectPort1)
 		self.ui.MonitorPort2.activated.connect(self.selectPort2)
 		self.ui.MonitorBaud1.activated.connect(self.selectRate1)
 		self.ui.MonitorBaud2.activated.connect(self.selectRate2)
+		self.ui.monitorFormat1.activated.connect(self.selectFormat1)
+		self.ui.monitorFormat2.activated.connect(self.selectFormat2)
 
 	# monitor ports
 	def listPorts(self):
@@ -206,6 +209,12 @@ class utilityPane(QWidget):
 		else:
 			self.portname1 = None
 
+	def selectFormat1(self):
+		self.format1 = self.ui.monitorFormat1.currentText()
+
+	def selectFormat2(self):
+		self.format2 = self.ui.monitorFormat2.currentText()
+
 	def serialDone(self):
 		note('Serial thread finished')
 
@@ -214,19 +223,27 @@ class utilityPane(QWidget):
 
 	def connectPort1(self): # override in children
 		self.monitorPort1.source.connect(self.sink1)
-		self.setParam(self.monitorPort1, 'E', 8, 1)
+		# self.setParam(self.monitorPort1, 'E', 8, 1)
 
 	def connectPort2(self): # override in children
 		self.monitorPort2.source.connect(self.sink2)
-		self.setParam(self.monitorPort2, 'E', 8, 1)
+		# self.setParam(self.monitorPort2, 'E', 8, 1)
 
 	def sink1(self, s):
 		ts = self.timestamp()
-		message(ts+''.join(map(lambda x: ' '+hex(ord(x))[2:],  s)), self.ui.Color1.currentText())	
+		if self.format1 == 'ASCII':
+			text = ''.join([c if c >= ' ' and c <= '~' else '<'+hex(ord(c))[2:]+'>' for c in s])
+		else:
+			text = ''.join(map(lambda x: ' '+hex(ord(x))[2:],  s))
+		message('\n1 '+ts+text, self.ui.Color1.currentText())
 
 	def sink2(self, s):
 		ts = self.timestamp()
-		message(ts+''.join(map(lambda x: ' '+hex(ord(x))[2:],  s)), self.ui.Color2.currentText())	
+		if self.format2 == 'ASCII':
+			text = ''.join([c if c >= ' ' and c <= '~' else '<'+hex(ord(c))[2:]+'>' for c in s])
+		else:
+			text = ''.join(map(lambda x: ' '+hex(ord(x))[2:],  s))
+		message('\n2 '+ts+text, self.ui.Color2.currentText())
 
 	def setParam(self, sp, parity, bytesize, stopbits):
 		if sp.port:

@@ -341,11 +341,18 @@
                        <item>
                         <widget class="QRadioButton" name="AT">
                          <property name="text">
-                          <string>AT</string>
+                          <string>AT Wifi</string>
                          </property>
                          <attribute name="buttonGroup">
                           <string notr="true">serialProtocol</string>
                          </attribute>
+                        </widget>
+                       </item>
+                       <item>
+                        <widget class="QRadioButton" name="radioButton">
+                         <property name="text">
+                          <string>AT Cell</string>
+                         </property>
                         </widget>
                        </item>
                       </layout>
@@ -1489,15 +1496,15 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
             <item>
              <widget class="QToolBox" name="toolBox">
               <property name="currentIndex">
-               <number>4</number>
+               <number>3</number>
               </property>
               <widget class="QWidget" name="page">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>360</width>
-                 <height>277</height>
+                 <width>343</width>
+                 <height>276</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -1937,8 +1944,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>360</width>
-                 <height>247</height>
+                 <width>308</width>
+                 <height>221</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2163,7 +2170,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                  <x>0</x>
                  <y>0</y>
                  <width>360</width>
-                 <height>247</height>
+                 <height>277</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2314,6 +2321,20 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                      </item>
                     </widget>
                    </item>
+                   <item row="1" column="1">
+                    <widget class="QComboBox" name="monitorFormat1">
+                     <item>
+                      <property name="text">
+                       <string>ASCII</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Hex</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
                   </layout>
                  </widget>
                 </item>
@@ -2414,7 +2435,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                       <bool>false</bool>
                      </property>
                      <property name="currentIndex">
-                      <number>6</number>
+                      <number>5</number>
                      </property>
                      <property name="frame">
                       <bool>true</bool>
@@ -2461,6 +2482,20 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                      </item>
                     </widget>
                    </item>
+                   <item row="1" column="1">
+                    <widget class="QComboBox" name="monitorFormat2">
+                     <item>
+                      <property name="text">
+                       <string>ASCII</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>Hex</string>
+                      </property>
+                     </item>
+                    </widget>
+                   </item>
                   </layout>
                  </widget>
                 </item>
@@ -2480,6 +2515,14 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                </layout>
               </widget>
               <widget class="QWidget" name="ConfigFiles">
+               <property name="geometry">
+                <rect>
+                 <x>0</x>
+                 <y>0</y>
+                 <width>360</width>
+                 <height>277</height>
+                </rect>
+               </property>
                <attribute name="label">
                 <string>Config Files</string>
                </attribute>
@@ -3189,8 +3232,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
   </connection>
  </connections>
  <buttongroups>
+  <buttongroup name="CrOut"/>
   <buttongroup name="serialProtocol"/>
   <buttongroup name="LfOut"/>
-  <buttongroup name="CrOut"/>
  </buttongroups>
 </ui>
