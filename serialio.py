@@ -66,14 +66,14 @@ class serialPort(QThread):
 			portname = prefix+port
 			try:
 				self.port = serial.Serial(portname,
-										  rate,
+										  self.rate,
 										  timeout=.01, # time to accumulate characters: 10 ms @ 115200, thats up to 115.2 chars
-										  parity=self.parity, 
+										  parity=self.parity,
 										  stopbits=self.stopbits,
 										  xonxoff=0,
 										  rtscts=0, # hw flow control
 										  bytesize=self.bytesize)
-				note('opened %s at %d'%(port, rate))
+				note('opened %s at %d' % (port, self.rate))
 				self.start() # run serial in thread
 				self.opened.emit()
 			except Exception, e:
