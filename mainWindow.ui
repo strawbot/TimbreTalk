@@ -58,7 +58,7 @@
            <enum>Qt::NoContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>4</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="Interface">
            <attribute name="title">
@@ -474,19 +474,6 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="3">
-                    <widget class="QPushButton" name="ResetRcvr">
-                     <property name="sizePolicy">
-                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                       <horstretch>0</horstretch>
-                       <verstretch>0</verstretch>
-                      </sizepolicy>
-                     </property>
-                     <property name="text">
-                      <string>Reset Receiver</string>
-                     </property>
-                    </widget>
-                   </item>
                    <item row="0" column="0">
                     <widget class="QCheckBox" name="ProtocolDump">
                      <property name="text">
@@ -504,6 +491,26 @@
                      </property>
                      <property name="text">
                       <string>Ping</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="3">
+                    <widget class="QPushButton" name="ResetRcvr">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>Reset Receiver</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="2" column="0">
+                    <widget class="QCheckBox" name="ignoreUnknowns">
+                     <property name="text">
+                      <string>Ignore Unknowns</string>
                      </property>
                     </widget>
                    </item>
@@ -2519,8 +2526,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>360</width>
-                 <height>277</height>
+                 <width>226</width>
+                 <height>151</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -3232,8 +3239,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
   </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="CrOut"/>
   <buttongroup name="serialProtocol"/>
   <buttongroup name="LfOut"/>
+  <buttongroup name="CrOut"/>
  </buttongroups>
 </ui>
