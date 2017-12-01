@@ -58,7 +58,7 @@
            <enum>Qt::NoContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>4</number>
           </property>
           <widget class="QWidget" name="Interface">
            <attribute name="title">
@@ -1503,19 +1503,19 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
             <item>
              <widget class="QToolBox" name="toolBox">
               <property name="currentIndex">
-               <number>3</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="page">
                <property name="geometry">
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>343</width>
-                 <height>276</height>
+                 <width>360</width>
+                 <height>277</height>
                 </rect>
                </property>
                <attribute name="label">
-                <string>STM32F4 Boot Loader</string>
+                <string>Micro Boot Loader</string>
                </attribute>
                <layout class="QVBoxLayout" name="verticalLayout_19">
                 <item>
@@ -1528,101 +1528,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                     <string>Download</string>
                    </attribute>
                    <layout class="QGridLayout" name="gridLayout_10">
-                    <item row="7" column="0">
-                     <widget class="QPushButton" name="sendBoot">
-                      <property name="minimumSize">
-                       <size>
-                        <width>71</width>
-                        <height>32</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>83</width>
-                        <height>32</height>
-                       </size>
-                      </property>
-                      <property name="text">
-                       <string>Transfer</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="6" column="1">
-                     <widget class="QLineEdit" name="bootSize">
-                      <property name="maximumSize">
-                       <size>
-                        <width>120</width>
-                        <height>16777215</height>
-                       </size>
-                      </property>
-                      <property name="readOnly">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="0">
-                     <widget class="QLabel" name="label_32">
-                      <property name="text">
-                       <string>Address:</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="3">
-                     <widget class="QCheckBox" name="run">
-                      <property name="text">
-                       <string>Run</string>
-                      </property>
-                      <property name="checked">
-                       <bool>true</bool>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="1">
-                     <widget class="QLineEdit" name="bootStart"/>
-                    </item>
-                    <item row="0" column="1" colspan="2">
-                     <widget class="QLineEdit" name="bootFile"/>
-                    </item>
-                    <item row="6" column="0">
-                     <widget class="QLabel" name="label_29">
-                      <property name="text">
-                       <string>Size:</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="7" column="1" colspan="3">
-                     <widget class="QProgressBar" name="bootLoaderProgressBar">
-                      <property name="minimumSize">
-                       <size>
-                        <width>200</width>
-                        <height>23</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>200</width>
-                        <height>23</height>
-                       </size>
-                      </property>
-                      <property name="value">
-                       <number>0</number>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="3">
-                     <widget class="QPushButton" name="Go">
-                      <property name="text">
-                       <string>Go</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="0">
+                    <item row="1" column="0">
                      <widget class="QPushButton" name="bootSelect">
                       <property name="enabled">
                        <bool>true</bool>
@@ -1653,59 +1559,135 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                       </property>
                      </widget>
                     </item>
-                   </layout>
-                  </widget>
-                  <widget class="QWidget" name="STMTools">
-                   <attribute name="title">
-                    <string>Tools</string>
-                   </attribute>
-                   <layout class="QGridLayout" name="gridLayout_11">
-                    <item row="0" column="0">
-                     <widget class="QPushButton" name="Boot">
-                      <property name="text">
-                       <string>Boot</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="1">
-                     <widget class="QPushButton" name="Init">
-                      <property name="text">
-                       <string>Init</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="2">
-                     <widget class="QPushButton" name="Reconnect">
-                      <property name="text">
-                       <string>Serial</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="0">
-                     <widget class="QPushButton" name="Rdp">
-                      <property name="text">
-                       <string>-Rdp</string>
-                      </property>
-                     </widget>
-                    </item>
                     <item row="1" column="1">
-                     <widget class="QPushButton" name="Getrpd">
-                      <property name="text">
-                       <string>Get Rpd</string>
-                      </property>
-                     </widget>
+                     <widget class="QLineEdit" name="bootFile"/>
                     </item>
                     <item row="1" column="2">
-                     <widget class="QPushButton" name="Erase">
+                     <widget class="QCheckBox" name="run">
                       <property name="text">
-                       <string>Erase</string>
+                       <string>Run</string>
+                      </property>
+                      <property name="checked">
+                       <bool>true</bool>
                       </property>
                      </widget>
                     </item>
                     <item row="2" column="0">
-                     <widget class="QPushButton" name="Get">
+                     <widget class="QLabel" name="label_32">
                       <property name="text">
-                       <string>Get</string>
+                       <string>Address:</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="1">
+                     <widget class="QLineEdit" name="bootStart"/>
+                    </item>
+                    <item row="2" column="2">
+                     <widget class="QPushButton" name="Go">
+                      <property name="text">
+                       <string>Go</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="0">
+                     <widget class="QLabel" name="label_29">
+                      <property name="text">
+                       <string>Size:</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="1">
+                     <widget class="QLineEdit" name="bootSize">
+                      <property name="maximumSize">
+                       <size>
+                        <width>120</width>
+                        <height>16777215</height>
+                       </size>
+                      </property>
+                      <property name="readOnly">
+                       <bool>true</bool>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="4" column="0">
+                     <widget class="QPushButton" name="sendBoot">
+                      <property name="minimumSize">
+                       <size>
+                        <width>71</width>
+                        <height>32</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>83</width>
+                        <height>32</height>
+                       </size>
+                      </property>
+                      <property name="text">
+                       <string>Transfer</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="4" column="1" colspan="2">
+                     <widget class="QProgressBar" name="bootLoaderProgressBar">
+                      <property name="minimumSize">
+                       <size>
+                        <width>200</width>
+                        <height>23</height>
+                       </size>
+                      </property>
+                      <property name="maximumSize">
+                       <size>
+                        <width>200</width>
+                        <height>23</height>
+                       </size>
+                      </property>
+                      <property name="value">
+                       <number>0</number>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="2">
+                     <widget class="QCheckBox" name="verbose">
+                      <property name="text">
+                       <string>Verbose</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QComboBox" name="microSelect">
+                      <property name="currentIndex">
+                       <number>1</number>
+                      </property>
+                      <item>
+                       <property name="text">
+                        <string>STM32F4</string>
+                       </property>
+                      </item>
+                      <item>
+                       <property name="text">
+                        <string>EFM32</string>
+                       </property>
+                      </item>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                  <widget class="QWidget" name="STMTools">
+                   <attribute name="title">
+                    <string>STM32F4 Tools</string>
+                   </attribute>
+                   <layout class="QGridLayout" name="gridLayout_11">
+                    <item row="1" column="2">
+                     <widget class="QPushButton" name="Erase">
+                      <property name="text">
+                       <string>Erase</string>
                       </property>
                      </widget>
                     </item>
@@ -1716,17 +1698,10 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                       </property>
                      </widget>
                     </item>
-                    <item row="2" column="2">
-                     <widget class="QPushButton" name="Pages">
+                    <item row="0" column="2">
+                     <widget class="QPushButton" name="Reconnect">
                       <property name="text">
-                       <string>Pages</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="0">
-                     <widget class="QPushButton" name="Write">
-                      <property name="text">
-                       <string>Write</string>
+                       <string>Serial</string>
                       </property>
                      </widget>
                     </item>
@@ -1737,6 +1712,34 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                       </property>
                      </widget>
                     </item>
+                    <item row="3" column="0">
+                     <widget class="QPushButton" name="Write">
+                      <property name="text">
+                       <string>Write</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QPushButton" name="Get">
+                      <property name="text">
+                       <string>Get</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="1">
+                     <widget class="QPushButton" name="Getrpd">
+                      <property name="text">
+                       <string>Get Rpd</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="2">
+                     <widget class="QPushButton" name="Pages">
+                      <property name="text">
+                       <string>Pages</string>
+                      </property>
+                     </widget>
+                    </item>
                     <item row="3" column="2">
                      <widget class="QPushButton" name="Data">
                       <property name="text">
@@ -1744,33 +1747,85 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                       </property>
                      </widget>
                     </item>
+                    <item row="0" column="0">
+                     <widget class="QPushButton" name="Boot">
+                      <property name="text">
+                       <string>Boot</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QPushButton" name="Rdp">
+                      <property name="text">
+                       <string>-Rdp</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QPushButton" name="Init">
+                      <property name="text">
+                       <string>Init</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="4" column="1">
+                     <widget class="QPushButton" name="setDateTime">
+                      <property name="sizePolicy">
+                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                       </sizepolicy>
+                      </property>
+                      <property name="text">
+                       <string>Set Date/Time</string>
+                      </property>
+                     </widget>
+                    </item>
+                   </layout>
+                  </widget>
+                  <widget class="QWidget" name="tab">
+                   <attribute name="title">
+                    <string>EFM32 Tools</string>
+                   </attribute>
+                   <layout class="QGridLayout" name="gridLayout_9">
+                    <item row="0" column="0">
+                     <widget class="QPushButton" name="resetEfm32">
+                      <property name="text">
+                       <string>Reset</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="1">
+                     <widget class="QCheckBox" name="bootOverwrite">
+                      <property name="text">
+                       <string>Overwrite Bootloader</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="0">
+                     <widget class="QPushButton" name="bootEfm32">
+                      <property name="text">
+                       <string>Boot Appl</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="2" column="0">
+                     <widget class="QPushButton" name="getFlashCRC">
+                      <property name="text">
+                       <string>Flash Checksum</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="3" column="0">
+                     <widget class="QPushButton" name="getApplCRC">
+                      <property name="text">
+                       <string>Appl Checksum</string>
+                      </property>
+                     </widget>
+                    </item>
                    </layout>
                   </widget>
                  </widget>
-                </item>
-                <item>
-                 <layout class="QVBoxLayout" name="verticalLayout_17">
-                  <item>
-                   <widget class="QCheckBox" name="verbose">
-                    <property name="text">
-                     <string>Verbose</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
-                   <widget class="QPushButton" name="setDateTime">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>Set Date/Time</string>
-                    </property>
-                   </widget>
-                  </item>
-                 </layout>
                 </item>
                </layout>
               </widget>
@@ -2176,8 +2231,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>360</width>
-                 <height>277</height>
+                 <width>296</width>
+                 <height>225</height>
                 </rect>
                </property>
                <attribute name="label">

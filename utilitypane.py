@@ -7,7 +7,7 @@ from protocols import pids
 from endian import *
 from image import *
 import listports, serialio
-from stmTransfer import stmSender
+from microTransfer import stmTransfer, efmTransfer
 from jamTransfer import jamSender
 from eepromTransfer import eepromTransfer
 from configTransfer import configTransfer
@@ -51,6 +51,7 @@ class utilityPane(QWidget):
 		self.startTransferTime = 0
 		self.image = None
 		self.dir = ''
+		self.micro = None
 
 		# config file transfer
 		self.config = configTransfer(self)
@@ -66,23 +67,25 @@ class utilityPane(QWidget):
 		self.config.setAction.connect(lambda: self.ui.configFileToSL.setText)
 		self.ui.configFileToHost.clicked.connect(lambda: self.config.requestFile(self.ui.configFileName.text()))
 
-		# STM32F4 Boot Loader
-		self.stm = stmSender(self)
-		self.stm.setName.connect(self.ui.bootFile.setText)
-		self.stm.setSize.connect(self.ui.bootSize.setText)
-		self.ui.bootSelect.clicked.connect(lambda: self.stm.selectFile(QFileDialog().getOpenFileName(directory=self.stm.dir)))
-		self.ui.sendBoot.clicked.connect(self.stm.sendFile)
+		# micro Boot Loader: STM32F4 & EFM32GG
+		self.selectMicro() 
+		self.ui.microSelect.activated.connect(self.selectMicro)
+		self.ui.microSelect.currentIndexChanged.connect(self.selectMicro)
+		self.micro.setName.connect(self.ui.bootFile.setText)
+		self.micro.setSize.connect(self.ui.bootSize.setText)
+		self.ui.bootSelect.clicked.connect(lambda: self.micro.selectFile(QFileDialog().getOpenFileName(directory=self.micro.dir)))
+		self.ui.sendBoot.clicked.connect(self.micro.sendFile)
 		self.ui.bootLoaderProgressBar.reset()
 		self.ui.bootLoaderProgressBar.setMaximum(1000)
-		self.stm.setProgress.connect(lambda n: self.ui.bootLoaderProgressBar.setValue(n*1000))
-		self.stm.setAction.connect(lambda: self.ui.sendBoot.setText)
-		self.stm.verbose = self.ui.verbose.isChecked()
-		self.ui.verbose.stateChanged.connect(self.stm.setVerbose)
-		self.stm.run = self.ui.run.isChecked()
-		self.ui.run.stateChanged.connect(self.stm.setRun)
-		self.stm.setStart.connect(lambda a: self.ui.bootStart.setText(a))
-		self.ui.bootStart.textChanged.connect(lambda t: self.stm.address)
- 		self.ui.Go.clicked.connect(self.stm.goButton)
+		self.micro.setProgress.connect(lambda n: self.ui.bootLoaderProgressBar.setValue(n*1000))
+		self.micro.setAction.connect(lambda text: self.ui.sendBoot.setText(text))
+		self.micro.verbose = self.ui.verbose.isChecked()
+		self.ui.verbose.stateChanged.connect(self.micro.setVerbose)
+		self.micro.run = self.ui.run.isChecked()
+		self.ui.run.stateChanged.connect(self.micro.setRun)
+		self.micro.setStart.connect(lambda a: self.ui.bootStart.setText(a))
+		self.ui.bootStart.textChanged.connect(lambda t: self.micro.address)
+		self.ui.Go.clicked.connect(self.micro.goButton)
 		
 		self.ui.setDateTime.clicked.connect(self.setDateTimeNow)
 
@@ -90,7 +93,7 @@ class utilityPane(QWidget):
  		self.jam = jamSender(self)
 		self.jam.setName.connect(self.ui.jamFile.setText)
 		self.jam.setSize.connect(self.ui.jamSize.setText)
- 		self.ui.jamSelect.clicked.connect(lambda: self.jam.selectFile(QFileDialog().getOpenFileName(directory=self.jam.dir)))
+		self.ui.jamSelect.clicked.connect(lambda: self.jam.selectFile(QFileDialog().getOpenFileName(directory=self.jam.dir)))
 		self.ui.sendJam.clicked.connect(self.jam.sendJam)
 		self.ui.sendFile.clicked.connect(self.jam.sendFile)
 		self.ui.jamLoaderProgressBar.reset()
@@ -102,7 +105,7 @@ class utilityPane(QWidget):
  		self.eeprom = eepromTransfer(self)
 		self.eeprom.setName.connect(self.ui.eepromFile.setText)
 		self.eeprom.setSize.connect(self.ui.eepromSize.setText)
- 		self.ui.eepromSelect.clicked.connect(lambda: self.eeprom.selectFile(QFileDialog().getOpenFileName(directory=self.eeprom.dir)))
+		self.ui.eepromSelect.clicked.connect(lambda: self.eeprom.selectFile(QFileDialog().getOpenFileName(directory=self.eeprom.dir)))
 		self.ui.sendEeprom.clicked.connect(self.eeprom.sendFile)
 		self.ui.eepromLoaderProgressBar.reset()
 		self.ui.eepromLoaderProgressBar.setMaximum(1000)
@@ -127,6 +130,14 @@ class utilityPane(QWidget):
 		self.ui.MonitorBaud2.activated.connect(self.selectRate2)
 		self.ui.monitorFormat1.activated.connect(self.selectFormat1)
 		self.ui.monitorFormat2.activated.connect(self.selectFormat2)
+
+	def selectMicro(self):
+		if self.ui.microSelect.currentText() == "STM32F4":
+			self.micro = stmTransfer(self)
+		elif self.ui.microSelect.currentText() == "EFM32":
+			self.micro = efmTransfer(self)
+		else:
+			print("No micro available. Don't know: %s"%self.ui.microSelect.currentText())
 
 	# monitor ports
 	def listPorts(self):

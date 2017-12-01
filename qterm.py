@@ -375,7 +375,7 @@ class terminal(QMainWindow):
 		self.sink(s)
 
 	def sink(self, s):
-		message(s)	
+		message(s)
 
 	def isCursorVisible(self):
 		vbar = self.ui.textEdit.verticalScrollBar()

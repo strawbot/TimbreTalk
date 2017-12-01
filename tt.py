@@ -4,7 +4,7 @@
 version='1.5'
 
 from pyqtapi2 import *
-from cpuids import MAIN_HOST
+from protocols.pids import DIRECT
 from protocols import sfp
 
 # update GUI from designer
@@ -60,7 +60,7 @@ class timbreTalk(qterm.terminal):
 		self.listRoutes()
 
 		# default
-		self.whofrom = MAIN_HOST
+		self.whofrom = DIRECT
 		self.ui.whoFrom.setCurrentIndex(self.whofrom)
 		QErrorMessage.qtHandler()
 
