@@ -38,7 +38,7 @@ class imageTransfer(image.imageRecord):
         return self.parent.parent.who() # packet routing
 
     def abortButton(self):
-        self.setAction.emit('Abort')
+        self.setAction.emit(' Abort  ')
 
     def transferButton(self):
         self.setAction.emit('Transfer')

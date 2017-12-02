@@ -7,6 +7,9 @@ from endian import *
 from message import *
 from imageTransfer import imageTransfer
 import xmodem
+from threading import Timer
+from multiprocessing import Process, Value
+import os
 
 printme = 0
 
@@ -203,13 +206,14 @@ class stmTransfer(microTransfer):
         self.send(tx)
 
 # for silicon labs from the factory
+pkts = 0
 class efmTransfer(microTransfer):
     def __init__(self, parent):
         super(efmTransfer, self).__init__(parent)
+        self.sent = Value('d', 0)
 
     def xmodemStatus(self, total_packets, success_count, error_count):
-        self.setProgress.emit(success_count/total_packets)
-        # total sent so far. Need total to be sent to be useful!
+        self.sent.value = total_packets
 
     def requestTransfer(self):
         import logging
@@ -219,25 +223,57 @@ class efmTransfer(microTransfer):
             error("No serial port open")
             return
 
+        # note settings from current serial port
+        prefix = self.serialPort.prefix
+        port = self.serialPort.name
         rate = self.serialPort.port.baudrate
 
         self.serialPort.close()
-        self.transferTimer.start(20000)
         message('\nAcquiring serial port for binary transfer...')
-        self.serialPort.openBlocking(self.parent.parent.prefix,
-                                     self.parent.parent.portname,
-                                     rate=rate)
+        self.serialPort.openBlocking(prefix, port, rate=rate)
 
-        message("\nSwitching to EFM32 bootloader protocol")
-        # def xmoden (thread)...
-        xm = xmodem.XMODEM(self.serialPort.getc, self.serialPort.putc)
+        message("\nStarting EFM32 download")
         self.send('u')
-        self.serialPort.getc(9, 1) # pull out <d><a>Ready<d><a> reply
+        self.serialPort.getc(9, .1) # pull out <d><a>Ready<d><a> reply
+
         filename = self.file.rsplit(".", 1)[0] + ".bin" # xmodem works with binary image
+        self.sent.value = 0
+        self.size = os.path.getsize(filename)
+        self.transferTimer.start(6000 + (self.size / 7)) # in ms
+        self.size /= 128
         stream = file(filename, 'rb')
-        if not xm.send(stream): #, callback=self.xmodemStatus):
-            error("file transfer failed")
+
+        def xmsend():
+            xm = xmodem.XMODEM(self.serialPort.getc, self.serialPort.putc)
+            if not xm.send(stream, callback=self.xmodemStatus):
+                print("file transfer failed")
+
+        # use process instead of thread so it can be terminated
+        self.xm = Process(target=xmsend)
+        self.xm.start()
+
+        self.doneTimer = Timer(1, self.checkFinish)
+        self.doneTimer.start()
+        self.updateProgressBar()
+
+
+    def updateProgressBar(self):
+        progress = self.sent.value/self.size
+        self.setProgress.emit(progress)
+        if self.xm.is_alive():
+            self.updateProgress = Timer(.5, self.updateProgressBar)
+            self.updateProgress.start()
+
+    def checkFinish(self):  # monitor process to see when done
+        self.xm.join()
         self.finish()
+
+    def abort(self):
+        self.xm.terminate()
+        time.sleep(1)
+        CAN = chr(0x18)
+        self.send(CAN+CAN+CAN+CAN+CAN)
+        super(efmTransfer, self).abort()
 
     def finish(self):
         self.serialPort.close()
