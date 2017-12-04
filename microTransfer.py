@@ -211,19 +211,24 @@ class efmTransfer(microTransfer):
     def __init__(self, parent):
         super(efmTransfer, self).__init__(parent)
         self.sent = Value('d', 0)
+        self.success = Value('i', 0)
+        self.errors = Value('i', 0)
+        self.aborted = False
 
     def xmodemStatus(self, total_packets, success_count, error_count):
         self.sent.value = total_packets
+        self.success.value = success_count
+        self.errors.value = error_count
 
     def requestTransfer(self):
         import logging
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.CRITICAL)
 
         if not self.serialPort.isOpen():
             error("No serial port open")
             return
 
-        # note settings from current serial port
+        # use settings from current serial port
         prefix = self.serialPort.prefix
         port = self.serialPort.name
         rate = self.serialPort.port.baudrate
@@ -233,7 +238,10 @@ class efmTransfer(microTransfer):
         self.serialPort.openBlocking(prefix, port, rate=rate)
 
         message("\nStarting EFM32 download")
-        self.send('u')
+        if self.parent.parent.ui.bootOverwrite.isChecked():
+            self.send('d')
+        else:
+            self.send('u')
         self.serialPort.getc(9, .1) # pull out <d><a>Ready<d><a> reply
 
         filename = self.file.rsplit(".", 1)[0] + ".bin" # xmodem works with binary image
@@ -252,10 +260,10 @@ class efmTransfer(microTransfer):
         self.xm = Process(target=xmsend)
         self.xm.start()
 
+        self.aborted = False # reset flag for alternate finish
         self.doneTimer = Timer(1, self.checkFinish)
         self.doneTimer.start()
         self.updateProgressBar()
-
 
     def updateProgressBar(self):
         progress = self.sent.value/self.size
@@ -263,22 +271,29 @@ class efmTransfer(microTransfer):
         if self.xm.is_alive():
             self.updateProgress = Timer(.5, self.updateProgressBar)
             self.updateProgress.start()
+            if self.verbose:
+                note('total: %d  success: %d  error: %d'%(self.sent.value, self.success.value, self.errors.value))
 
     def checkFinish(self):  # monitor process to see when done
         self.xm.join()
-        self.finish()
+        if self.aborted == False:
+            self.finish()
 
     def abort(self):
+        self.aborted = True
         self.xm.terminate()
-        time.sleep(1)
+        self.xm.join()
         CAN = chr(0x18)
         self.send(CAN+CAN+CAN+CAN+CAN)
         super(efmTransfer, self).abort()
 
     def finish(self):
+        if self.run:
+            self.goButton()
         self.serialPort.close()
         super(efmTransfer, self).finish()
         self.parent.parent.selectPort()
 
     def goButton(self):
-        pass
+        self.send('b')
+

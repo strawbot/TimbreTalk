@@ -1568,7 +1568,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                        <string>Run</string>
                       </property>
                       <property name="checked">
-                       <bool>true</bool>
+                       <bool>false</bool>
                       </property>
                      </widget>
                     </item>
@@ -1788,24 +1788,17 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                     <string>EFM32 Tools</string>
                    </attribute>
                    <layout class="QGridLayout" name="gridLayout_9">
-                    <item row="0" column="0">
+                    <item row="1" column="0">
                      <widget class="QPushButton" name="resetEfm32">
                       <property name="text">
                        <string>Reset</string>
                       </property>
                      </widget>
                     </item>
-                    <item row="0" column="1">
+                    <item row="1" column="1">
                      <widget class="QCheckBox" name="bootOverwrite">
                       <property name="text">
                        <string>Overwrite Bootloader</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item row="1" column="0">
-                     <widget class="QPushButton" name="bootEfm32">
-                      <property name="text">
-                       <string>Boot Appl</string>
                       </property>
                      </widget>
                     </item>
@@ -1820,6 +1813,13 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                      <widget class="QPushButton" name="getApplCRC">
                       <property name="text">
                        <string>Appl Checksum</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="0">
+                     <widget class="QPushButton" name="autobaud">
+                      <property name="text">
+                       <string>Autobaud</string>
                       </property>
                      </widget>
                     </item>
