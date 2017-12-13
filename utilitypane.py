@@ -90,6 +90,7 @@ class utilityPane(QWidget):
         self.ui.resetEfm32.clicked.connect(lambda: self.micro.send('r'))
         self.ui.getFlashCRC.clicked.connect(lambda: self.micro.send('v'))
         self.ui.getApplCRC.clicked.connect(lambda: self.micro.send('c'))
+        self.ui.exitDownload.clicked.connect(self.micro.exitDownload)
 
         self.ui.setDateTime.clicked.connect(self.setDateTimeNow)
 

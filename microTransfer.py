@@ -279,12 +279,15 @@ class efmTransfer(microTransfer):
         if self.aborted == False:
             self.finish()
 
+    def exitDownload(self):
+        CAN = chr(0x18)
+        self.send(CAN+CAN+CAN+CAN+CAN)
+
     def abort(self):
         self.aborted = True
         self.xm.terminate()
         self.xm.join()
-        CAN = chr(0x18)
-        self.send(CAN+CAN+CAN+CAN+CAN)
+        self.exitDownload()
         super(efmTransfer, self).abort()
 
     def finish(self):
