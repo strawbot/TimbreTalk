@@ -82,6 +82,8 @@ Issues:
  46. Allow platform specific saving of parameters which includes things like phrases. Check
      out: https://pypi.python.org/pypi/appdirs/1.4.3
  47. Copy and paste all phrases at the same time as 8 lines of text.
+ 48. Factor files to match GUI. There should be: interfacePane.py, textPane.py,
+     transferPane.py, infoPane.py, toolsPane.py, phrasePane.py
  
 Updates:
  1. removed unneccessary files from folder

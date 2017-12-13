@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # GUI for serial transactions using Qt	Robert Chapman III	Sep 28, 2012
-version='1.5'
+version='1.7'
 
 from pyqtapi2 import *
 from protocols.pids import DIRECT
