@@ -1797,41 +1797,78 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                    <attribute name="title">
                     <string>EFM32 Tools</string>
                    </attribute>
-                   <layout class="QGridLayout" name="gridLayout_9">
-                    <item row="1" column="0">
-                     <widget class="QPushButton" name="resetEfm32">
-                      <property name="text">
-                       <string>Reset</string>
+                   <layout class="QHBoxLayout" name="horizontalLayout_4">
+                    <item>
+                     <spacer name="horizontalSpacer_13">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
                       </property>
-                     </widget>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
                     </item>
-                    <item row="1" column="1">
-                     <widget class="QCheckBox" name="bootOverwrite">
-                      <property name="text">
-                       <string>Overwrite Bootloader</string>
-                      </property>
-                     </widget>
+                    <item>
+                     <layout class="QVBoxLayout" name="verticalLayout_17">
+                      <item>
+                       <widget class="QPushButton" name="autobaud">
+                        <property name="text">
+                         <string>Autobaud</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="resetEfm32">
+                        <property name="text">
+                         <string>Reset</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="getFlashCRC">
+                        <property name="text">
+                         <string>Flash Checksum</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="getApplCRC">
+                        <property name="text">
+                         <string>Appl Checksum</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QPushButton" name="exitDownload">
+                        <property name="text">
+                         <string>Exit Download</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item>
+                       <widget class="QCheckBox" name="bootOverwrite">
+                        <property name="text">
+                         <string>Overwrite Bootloader</string>
+                        </property>
+                       </widget>
+                      </item>
+                     </layout>
                     </item>
-                    <item row="2" column="0">
-                     <widget class="QPushButton" name="getFlashCRC">
-                      <property name="text">
-                       <string>Flash Checksum</string>
+                    <item>
+                     <spacer name="horizontalSpacer_11">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
                       </property>
-                     </widget>
-                    </item>
-                    <item row="3" column="0">
-                     <widget class="QPushButton" name="getApplCRC">
-                      <property name="text">
-                       <string>Appl Checksum</string>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>53</width>
+                        <height>20</height>
+                       </size>
                       </property>
-                     </widget>
-                    </item>
-                    <item row="0" column="0">
-                     <widget class="QPushButton" name="autobaud">
-                      <property name="text">
-                       <string>Autobaud</string>
-                      </property>
-                     </widget>
+                     </spacer>
                     </item>
                    </layout>
                   </widget>
@@ -2732,46 +2769,14 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              <rect>
               <x>7</x>
               <y>10</y>
-              <width>372</width>
+              <width>371</width>
               <height>286</height>
              </rect>
             </property>
-            <layout class="QGridLayout" name="gridLayout_2" columnstretch="290,0" columnminimumwidth="290,0">
+            <layout class="QGridLayout" name="gridLayout_2" columnstretch="290,0">
              <property name="sizeConstraint">
               <enum>QLayout::SetDefaultConstraint</enum>
              </property>
-             <item row="1" column="0">
-              <widget class="QLineEdit" name="phrase1">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>290</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLineEdit" name="phrase2">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                 <horstretch>127</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>290</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </widget>
-             </item>
              <item row="3" column="0">
               <widget class="QLineEdit" name="phrase4">
                <property name="sizePolicy">
@@ -2785,13 +2790,6 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                  <width>290</width>
                  <height>0</height>
                 </size>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="send2">
-               <property name="text">
-                <string>Send</string>
                </property>
               </widget>
              </item>
@@ -2841,20 +2839,6 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                </property>
               </widget>
              </item>
-             <item row="6" column="1">
-              <widget class="QPushButton" name="send7">
-               <property name="text">
-                <string>Send</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="1">
-              <widget class="QPushButton" name="send3">
-               <property name="text">
-                <string>Send</string>
-               </property>
-              </widget>
-             </item>
              <item row="4" column="0">
               <widget class="QLineEdit" name="phrase5">
                <property name="sizePolicy">
@@ -2871,8 +2855,15 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QPushButton" name="send1">
+             <item row="6" column="1">
+              <widget class="QPushButton" name="send7">
+               <property name="text">
+                <string>Send</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <widget class="QPushButton" name="send3">
                <property name="text">
                 <string>Send</string>
                </property>
@@ -2924,7 +2915,79 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                </property>
               </widget>
              </item>
+             <item row="0" column="0">
+              <widget class="QLineEdit" name="phrase1">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>290</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLineEdit" name="phrase2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                 <horstretch>127</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>290</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QPushButton" name="send1">
+               <property name="text">
+                <string>Send</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QPushButton" name="send2">
+               <property name="text">
+                <string>Send</string>
+               </property>
+              </widget>
+             </item>
             </layout>
+           </widget>
+           <widget class="QPushButton" name="copyAll">
+            <property name="geometry">
+             <rect>
+              <x>40</x>
+              <y>310</y>
+              <width>113</width>
+              <height>32</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Load</string>
+            </property>
+           </widget>
+           <widget class="QPushButton" name="pasteAll">
+            <property name="geometry">
+             <rect>
+              <x>180</x>
+              <y>310</y>
+              <width>113</width>
+              <height>32</height>
+             </rect>
+            </property>
+            <property name="text">
+             <string>Save</string>
+            </property>
            </widget>
           </widget>
          </widget>
@@ -3220,6 +3283,141 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
   </widget>
  </widget>
  <layoutdefault spacing="6" margin="12"/>
+ <tabstops>
+  <tabstop>phrase1</tabstop>
+  <tabstop>phrase2</tabstop>
+  <tabstop>phrase3</tabstop>
+  <tabstop>phrase4</tabstop>
+  <tabstop>phrase5</tabstop>
+  <tabstop>phrase6</tabstop>
+  <tabstop>phrase7</tabstop>
+  <tabstop>phrase8</tabstop>
+  <tabstop>ethernetIf</tabstop>
+  <tabstop>PortSelect</tabstop>
+  <tabstop>BaudRate</tabstop>
+  <tabstop>toolButton</tabstop>
+  <tabstop>serialIf</tabstop>
+  <tabstop>destIp</tabstop>
+  <tabstop>ipPort</tabstop>
+  <tabstop>Serial1</tabstop>
+  <tabstop>SFP</tabstop>
+  <tabstop>AT</tabstop>
+  <tabstop>radioButton</tabstop>
+  <tabstop>whoFrom</tabstop>
+  <tabstop>whoTo</tabstop>
+  <tabstop>LoopBack</tabstop>
+  <tabstop>ProtocolDump</tabstop>
+  <tabstop>Ping</tabstop>
+  <tabstop>ResetRcvr</tabstop>
+  <tabstop>ignoreUnknowns</tabstop>
+  <tabstop>inputIgnore</tabstop>
+  <tabstop>sendHex</tabstop>
+  <tabstop>hexNum</tabstop>
+  <tabstop>InBuffered</tabstop>
+  <tabstop>InRaw</tabstop>
+  <tabstop>InRawEcho</tabstop>
+  <tabstop>InHex</tabstop>
+  <tabstop>LFnada</tabstop>
+  <tabstop>CRCR</tabstop>
+  <tabstop>CRnada</tabstop>
+  <tabstop>LFLF</tabstop>
+  <tabstop>LFCR</tabstop>
+  <tabstop>CRLF</tabstop>
+  <tabstop>linewrap</tabstop>
+  <tabstop>targetSelect</tabstop>
+  <tabstop>srecordFile</tabstop>
+  <tabstop>fileSelect</tabstop>
+  <tabstop>size</tabstop>
+  <tabstop>entryPoint</tabstop>
+  <tabstop>checkSum</tabstop>
+  <tabstop>addressStart</tabstop>
+  <tabstop>targetAddress</tabstop>
+  <tabstop>header</tabstop>
+  <tabstop>Run</tabstop>
+  <tabstop>endian</tabstop>
+  <tabstop>sendSrecord</tabstop>
+  <tabstop>verifyLed</tabstop>
+  <tabstop>Recover</tabstop>
+  <tabstop>Version</tabstop>
+  <tabstop>reboot</tabstop>
+  <tabstop>recoverOption</tabstop>
+  <tabstop>Refresh</tabstop>
+  <tabstop>bootVersion</tabstop>
+  <tabstop>leftAppVersion</tabstop>
+  <tabstop>rightAppVersion</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>bootSelect</tabstop>
+  <tabstop>bootFile</tabstop>
+  <tabstop>run</tabstop>
+  <tabstop>bootStart</tabstop>
+  <tabstop>Go</tabstop>
+  <tabstop>bootSize</tabstop>
+  <tabstop>sendBoot</tabstop>
+  <tabstop>verbose</tabstop>
+  <tabstop>microSelect</tabstop>
+  <tabstop>Erase</tabstop>
+  <tabstop>Getid</tabstop>
+  <tabstop>Reconnect</tabstop>
+  <tabstop>Address</tabstop>
+  <tabstop>Write</tabstop>
+  <tabstop>Get</tabstop>
+  <tabstop>Getrpd</tabstop>
+  <tabstop>Pages</tabstop>
+  <tabstop>Data</tabstop>
+  <tabstop>Boot</tabstop>
+  <tabstop>Rdp</tabstop>
+  <tabstop>Init</tabstop>
+  <tabstop>setDateTime</tabstop>
+  <tabstop>resetEfm32</tabstop>
+  <tabstop>bootOverwrite</tabstop>
+  <tabstop>getFlashCRC</tabstop>
+  <tabstop>getApplCRC</tabstop>
+  <tabstop>jamFile</tabstop>
+  <tabstop>sendJam</tabstop>
+  <tabstop>sendFile</tabstop>
+  <tabstop>jamSelect</tabstop>
+  <tabstop>jamSize</tabstop>
+  <tabstop>eepromSize</tabstop>
+  <tabstop>eepromFile</tabstop>
+  <tabstop>eepromTarget</tabstop>
+  <tabstop>crcValue</tabstop>
+  <tabstop>eepromSelect</tabstop>
+  <tabstop>sendEeprom</tabstop>
+  <tabstop>readEeprom</tabstop>
+  <tabstop>MonitorPort1</tabstop>
+  <tabstop>MonitorBaud1</tabstop>
+  <tabstop>Color1</tabstop>
+  <tabstop>monitorFormat1</tabstop>
+  <tabstop>MonitorPort2</tabstop>
+  <tabstop>MonitorBaud2</tabstop>
+  <tabstop>Color2</tabstop>
+  <tabstop>monitorFormat2</tabstop>
+  <tabstop>configFileSelect</tabstop>
+  <tabstop>configFileName</tabstop>
+  <tabstop>configFileSize</tabstop>
+  <tabstop>configFileToSL</tabstop>
+  <tabstop>configFileToHost</tabstop>
+  <tabstop>Controls</tabstop>
+  <tabstop>send2</tabstop>
+  <tabstop>send6</tabstop>
+  <tabstop>send8</tabstop>
+  <tabstop>send7</tabstop>
+  <tabstop>send3</tabstop>
+  <tabstop>send1</tabstop>
+  <tabstop>send4</tabstop>
+  <tabstop>send5</tabstop>
+  <tabstop>textEdit</tabstop>
+  <tabstop>Find</tabstop>
+  <tabstop>FindText</tabstop>
+  <tabstop>FindBackwards</tabstop>
+  <tabstop>fontSize</tabstop>
+  <tabstop>saveText</tabstop>
+  <tabstop>ClearText</tabstop>
+  <tabstop>autobaud</tabstop>
+  <tabstop>exitDownload</tabstop>
+  <tabstop>copyAll</tabstop>
+  <tabstop>pasteAll</tabstop>
+ </tabstops>
  <resources/>
  <connections>
   <connection>

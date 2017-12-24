@@ -5,6 +5,8 @@ from message import *
 from protocols import pids
 import sys, traceback	
 
+CRETURN = 0xD
+
 class serialPane(QWidget):
 	def __init__(self, parent):
 		QWidget.__init__(self, parent)
@@ -158,7 +160,7 @@ class serialPane(QWidget):
 		if self.ui.InBuffered.isChecked():
 			talkout = pids.EVAL
 			s = s.strip()
-			payload = map(ord,s)+[0]
+			payload = map(ord,s)+[CRETURN]
 		else:
 			talkout = pids.TALK_IN
 			payload = map(ord,s)
@@ -168,7 +170,7 @@ class serialPane(QWidget):
 		s = str(s)
 		if self.ui.InBuffered.isChecked():
 			s = s.strip()
-			payload = map(ord,s)+[0xD]
+			payload = map(ord,s)+[CRETURN]
 		else:
 			payload = map(ord,s)
 		self.protocol.sendNPS(pids.AT_CMD, self.parent.who()+payload)
