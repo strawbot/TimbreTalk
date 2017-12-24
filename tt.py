@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 # GUI for serial transactions using Qt	Robert Chapman III	Sep 28, 2012
-version='1.6'
+version='1.7'
 
 from pyqtapi2 import *
-from cpuids import MAIN_HOST
+from protocols.pids import DIRECT
 from protocols import sfp
 
 # update GUI from designer
@@ -60,7 +60,7 @@ class timbreTalk(qterm.terminal):
 		self.listRoutes()
 
 		# default
-		self.whofrom = MAIN_HOST
+		self.whofrom = DIRECT
 		self.ui.whoFrom.setCurrentIndex(self.whofrom)
 		QErrorMessage.qtHandler()
 

@@ -22,6 +22,7 @@ class serialPane(QWidget):
 		self.ui.ResetRcvr.clicked.connect(self.resetRcvr)
 		self.ui.ProtocolDump.stateChanged.connect(self.protocolDump)
 		self.ui.sendHex.clicked.connect(self.sendHex)
+		self.ui.ignoreUnknowns.stateChanged.connect(self.blockUnknownPackets)
 		
 		self.parent.serialPort.opened.connect(self.setParamButtonText)
 		
@@ -172,7 +173,7 @@ class serialPane(QWidget):
 			payload = map(ord,s)
 		self.protocol.sendNPS(pids.AT_CMD, self.parent.who()+payload)
 
-	def sendPing(self, flag):
+	def sendPing(self):
 		self.protocol.sendNPS(pids.PING, [self.parent.whoto, self.parent.whofrom])
 
 	def resetRcvr(self):
@@ -186,3 +187,5 @@ class serialPane(QWidget):
 	def setId(self):
 		self.protocol.sendNPS(pids.SET_ID, [self.parent.whoto])
 
+	def blockUnknownPackets(self, flag):
+		self.protocol.displayUnknowns = not flag

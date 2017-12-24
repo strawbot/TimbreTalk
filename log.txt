@@ -77,6 +77,14 @@ Issues:
      Maybe a link to the most recent binary release should be there. There should be a readme.txt.
  43. Either add all standard baud rates or allow user to enter a baudrate.
  44. Add regular expression to text search in main window.
+ 45. Add detection for linux ports not opening due to user not belonging to dialout group and
+     inform then how to fix or fix it for them.
+ 46. Allow platform specific saving of parameters which includes things like phrases. Check
+     out: https://pypi.python.org/pypi/appdirs/1.4.3
+ 47. Copy and paste all phrases at the same time as 8 lines of text.
+ 48. Make line length independent of window width. Lines don't get too long but
+     choose some length like 255. This way when window width changes, lines will lengthen
+     to fit window. By clipping, it avoids superlong lines.
  
 Updates:
  1. removed unneccessary files from folder
