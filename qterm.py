@@ -123,7 +123,7 @@ class terminal(QMainWindow):
 		font.setPointSize(size)
 		self.ui.textEdit.setFont(font)
 		
-	def sendPhrase(self, s):
+	def sendPhrase(self, s): # TODO: use line send and echo text to window
 		s = s+'\r'
 		for c in s:
 			self.keyin(c)
@@ -254,8 +254,8 @@ class terminal(QMainWindow):
 
 		uiPort = self.ui.PortSelect
 		items = [uiPort.itemText(i) for i in range(1, uiPort.count())]
-		self.prefix, ports = listports.listports()
-		
+		ports = listports.listports()
+
 		for r in list(set(items)-set(ports)): # items to be removed
 			uiPort.removeItem(uiPort.findText(r))
 		for a in list(set(ports)-set(items)): # items to be added
@@ -283,7 +283,7 @@ class terminal(QMainWindow):
 			self.serialPort.close()
 		if self.ui.PortSelect.currentIndex():
 			self.portname = self.ui.PortSelect.currentText()
-			self.serialPort.open(self.prefix, self.portname, self.serialPort.rate)
+			self.serialPort.open(self.portname, self.serialPort.rate)
 			if self.serialPort.isOpen():
 				self.serialPort.closed.connect(self.serialDone)
 				self.serialPort.ioError.connect(self.ioError)

@@ -151,7 +151,8 @@ class utilityPane(QWidget):
         uiPort1 = self.ui.MonitorPort1
         uiPort2 = self.ui.MonitorPort2
         items = [uiPort1.itemText(i) for i in range(1, uiPort1.count())]
-        self.prefix, ports = listports.listports()
+        ports = listports.listports()
+        ports = [p for p in ports if listports.jlink not in p]
 
         for r in list(set(items)-set(ports)): # items to be removed
             uiPort1.removeItem(uiPort1.findText(r))
@@ -196,7 +197,7 @@ class utilityPane(QWidget):
             self.monitorPort1.close()
         if self.ui.MonitorPort1.currentIndex():
             self.portname1 = self.ui.MonitorPort1.currentText()
-            self.monitorPort1.open(self.prefix, self.portname1, self.monitorPort1.rate)
+            self.monitorPort1.open(self.portname1, self.monitorPort1.rate)
             if self.monitorPort1.isOpen():
                 self.monitorPort1.closed.connect(self.serialDone)
                 self.monitorPort1.ioError.connect(self.ioError)
@@ -213,7 +214,7 @@ class utilityPane(QWidget):
             self.monitorPort2.close()
         if self.ui.MonitorPort2.currentIndex():
             self.portname2 = self.ui.MonitorPort2.currentText()
-            self.monitorPort2.open(self.prefix, self.portname2, self.monitorPort2.rate)
+            self.monitorPort2.open(self.portname2, self.monitorPort2.rate)
             if self.monitorPort2.isOpen():
                 self.monitorPort2.closed.connect(self.serialDone)
                 self.monitorPort2.ioError.connect(self.ioError)

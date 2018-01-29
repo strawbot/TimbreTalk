@@ -2,6 +2,23 @@
 
 import sys
 
+jlink = 'jlink-'
+
+def module_exists(module_name):
+    try:
+        __import__(module_name)
+    except ImportError:
+        return False
+    else:
+        return True
+
+def jlinkPorts():
+    if not module_exists('pylink'):
+        return []
+
+    import pylink
+    return [jlink+str(p.SerialNumber) for p in pylink.JLink().connected_emulators()]
+
 def listports():
 	ports = []
 	if sys.platform == 'win32':
@@ -12,8 +29,6 @@ def listports():
 		import _winreg as winreg
 		import itertools
 		
-		prefix = ''
-		
 		""" Uses the Win32 registry to return an
 			iterator of serial (COM) ports
 			existing on this computer.
@@ -22,7 +37,7 @@ def listports():
 		try:
 			key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, path)
 		except WindowsError:
-			return (prefix, ports)
+			return ports
 	
 		for i in itertools.count():
 			try:
@@ -36,7 +51,7 @@ def listports():
 
 		prefix = '/dev/'
 		usb = re.compile('cu.*(serial*|USA*)', re.IGNORECASE)
-		ports = [p for p in os.listdir(prefix) if usb.search(p)]
+		ports = [prefix+p for p in os.listdir(prefix) if usb.search(p)]
 
 	elif sys.platform[:5] == 'linux':
 		import os, re
@@ -45,13 +60,13 @@ def listports():
 		usb = re.compile('ttyusb', re.IGNORECASE)
 		acm = re.compile('ttyacm', re.IGNORECASE)
 		ports = [p for p in os.listdir(prefix) if usb.search(p)]
-		portsextra = [p for p in os.listdir(prefix) if acm.search(p)]
+		portsextra = [prefix+p for p in os.listdir(prefix) if acm.search(p)]
 		ports.extend(portsextra)
 
 	else:
 		print >>sys.stderr, 'unknown system platform: %s'%sys.platform
 
-	return (prefix, ports)
+	return ports + jlinkPorts()
 
 if __name__ == '__main__':
 	print >>sys.stderr, listports()  #enumerate_serial_ports()

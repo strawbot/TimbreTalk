@@ -117,6 +117,9 @@
                      <height>16777215</height>
                     </size>
                    </property>
+                   <property name="insertPolicy">
+                    <enum>QComboBox::InsertAlphabetically</enum>
+                   </property>
                    <item>
                     <property name="text">
                      <string>(Select host Port)</string>
@@ -1520,8 +1523,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>360</width>
-                 <height>277</height>
+                 <width>345</width>
+                 <height>272</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2769,7 +2772,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              <rect>
               <x>7</x>
               <y>10</y>
-              <width>371</width>
+              <width>372</width>
               <height>286</height>
              </rect>
             </property>

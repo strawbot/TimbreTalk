@@ -8,7 +8,8 @@
 from pyqtapi2 import *
 import sys, traceback, serial
 from message import warning, error, note, message
-
+import listports
+import etmLink
 
 class serialPort(QThread):
     # define signals
@@ -50,20 +51,33 @@ class serialPort(QThread):
                 # note('Alert: device removed while open ')
             except Exception, e:
                 self.closePort()
-            # error("run - serial port exception: %s" % e)
+                traceback.print_exc(file=sys.stderr)
+                error("run - serial port exception: %s" % e)
         self.closed.emit()
 
-    def open(self, prefix, port, rate=None, thread=True, timeout=.01):
+    def open(self, port, rate=None, thread=True, timeout=.01):
         if self.isOpen():
             error("Already opened!")
+
+        elif listports.jlink in port:
+            self.name = port
+            self.port = etmLink.etmLink(port.replace(listports.jlink,''))
+            if self.port.findEtm():
+                note('opened %s ' % (port))
+                if thread:
+                    self.start()  # run serial in thread
+                    self.opened.emit()
+            else:
+                error("Could't find etm link in memory")
+                self.closePort()
+
         else:
             if rate == None:
                 self.rate = self.default
             else:
                 self.rate = rate
-            self.prefix = prefix
             self.name = port
-            portname = prefix + port
+            portname = port
             try:
                 self.port = serial.Serial(portname,
                                           self.rate,
@@ -85,9 +99,16 @@ class serialPort(QThread):
                 print >> sys.stderr, e
                 traceback.print_exc(file=sys.stderr)
                 #				error('open port failed for '+prefix+port)
-                raise Exception('open port failed for ' + prefix + port)
+                raise Exception('open port failed for ' + port)
 
     def closePort(self):
+        try:
+            self.source.disconnect()
+            self.closed.disconnect()
+            self.ioError.disconnect()
+            self.ioException.disconnect()
+        except:
+            pass
         if self.isOpen():
             port = self.port
             self.port = None
@@ -101,13 +122,6 @@ class serialPort(QThread):
             self.port = None
 
     def close(self):
-        try:
-            self.ioError.disconnect()
-            self.ioException.disconnect()
-            self.closed.disconnect()
-            self.source.disconnect()
-        except:
-            pass
         self.closePort()
         self.wait(1000)
 
@@ -135,8 +149,8 @@ class serialPort(QThread):
         return False
 
     # support for blocking usage
-    def openBlocking(self, prefix, port, rate=None):
-        self.open(prefix, port, rate, thread=False, timeout=0)
+    def openBlocking(self, port, rate=None):
+        self.open(port, rate, thread=False, timeout=0)
 
     def getc(self, n, timeout=1):
         self.port.timeout = timeout
