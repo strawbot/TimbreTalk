@@ -7,7 +7,6 @@ from endian import *
 from srecordTransfer import sRecordTransfer, ubootTransfer
 from recover import recover
 import led
-from cpuids import *
 from targets import *
 import sys
 
@@ -33,9 +32,9 @@ class srecordPane(QWidget):
 		# default target addresses and menu setup
 			# name, transferObject(parent, filename, target address, header choice, who for)
 		self.targets = [
-			['Main Boot',	sRecordTransfer(parent, '', MAIN_BOOT,		0, MAIN_CPU, 'little')],
-			['Main App L',	sRecordTransfer(parent, '', MAIN_APP_LEFT,	1, MAIN_CPU, 'little')],
-			['Main App R',	sRecordTransfer(parent, '', MAIN_APP_RIGHT,	1, MAIN_CPU, 'little')]
+			['Main Boot',	sRecordTransfer(parent, '', MAIN_BOOT,		0, pids.MAIN_CPU, 'little')],
+			['Main App L',	sRecordTransfer(parent, '', MAIN_APP_LEFT,	1, pids.MAIN_CPU, 'little')],
+			['Main App R',	sRecordTransfer(parent, '', MAIN_APP_RIGHT,	1, pids.MAIN_CPU, 'little')]
 			]
 		for entry in self.targets:
 			self.ui.targetSelect.addItem(entry[0])

@@ -4,7 +4,7 @@
 version='1.7'
 
 from pyqtapi2 import *
-from protocols.pids import DIRECT
+from protocols.pids import DIRECT, whoDict
 from protocols import sfp
 
 # update GUI from designer
@@ -15,7 +15,7 @@ updateUi('tabs')
 from message import *
 import qterm, serialPane, transferPane
 import infopane
-import utilitypane, cpuids
+import utilitypane
 
 class sfpQt (QObject, sfp.sfpProtocol):
 	source = Signal(object)
@@ -94,7 +94,7 @@ class timbreTalk(qterm.terminal):
 	# Routing
 	def listRoutes(self):
 		routes = [['Direct',0]]
-		for name,value in cpuids.whoDict.iteritems():
+		for name,value in whoDict.iteritems():
 			if value:
 				routes.append([name,value])
 		points = [point[0] for point in sorted(routes, key = lambda x: x[1])]
