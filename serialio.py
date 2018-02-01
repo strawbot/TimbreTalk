@@ -51,8 +51,8 @@ class serialPort(QThread):
                 # note('Alert: device removed while open ')
             except Exception, e:
                 self.closePort()
-                traceback.print_exc(file=sys.stderr)
-                error("run - serial port exception: %s" % e)
+                # traceback.print_exc(file=sys.stderr)
+                # error("run - serial port exception: %s" % e)
         self.closed.emit()
 
     def open(self, port, rate=None, thread=True, timeout=.01):

@@ -158,7 +158,7 @@ class serialPane(QWidget):
 	def talkSink(self, s): # have a text port
 		s = str(s)
 		if self.ui.InBuffered.isChecked():
-			talkout = pids.EVAL
+			talkout = pids.EVAL_PID
 			s = s.strip()
 			payload = map(ord,s)+[CRETURN]
 		else:

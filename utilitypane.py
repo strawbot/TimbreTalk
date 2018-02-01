@@ -277,7 +277,7 @@ class utilityPane(QWidget):
         cmd = "%d %d %d setdate %d %d %d settime date"% \
                (n.year%100, n.month, n.day, n.hour, n.minute, n.second)
         payload = map(ord, cmd) + [0]
-        self.protocol.sendNPS(pids.EVAL, self.parent.who() + payload)
+        self.protocol.sendNPS(pids.EVAL_PID, self.parent.who() + payload)
 
     def crcStatus(self, flag):
         self.ui.crcValue.setText('%08X' % self.eeprom.scriptCrc)

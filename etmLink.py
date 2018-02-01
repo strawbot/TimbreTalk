@@ -6,8 +6,13 @@
 #  ->txq: points to micros byte transmit queue; must read from here
 #  ->rxq: points to mciros byte receive queue; must write to here
 
+FLASH_START, FLASH_END = 0x0, 0x80000
+RAM_START, RAM_END = 0x20000000, 0x20020000
+
 class byteq(): #IRE
     def __init__(self, etm, a):
+        if a not in range(RAM_START,RAM_END):
+            raise Exception('address 0x%x is outside of RAM'%a)
         self.q = a
         self.etm = etm
         self.e = self.etm.memory_read32(a+8,1)[0]
@@ -47,7 +52,7 @@ class byteq(): #IRE
 
 class etmLink():
     micro = 'EFM32GG980F1024'
-    etmid = 0xFACEDEAF
+    etmid = 0xFACEF00D
 
     link = 0
     baudrate = 0
@@ -58,12 +63,14 @@ class etmLink():
         self.link = pylink.JLink()
         self.link.open(sn)
         self.link.connect(etmLink.micro)
+        self.link.restart()
 
     def findEtm(self):
         n = 256
-        for a in range(0x20000000, 0x20020000, n):
+        for a in range(FLASH_START, FLASH_END, n):
             for b in self.link.memory_read32(a,n):
                 if b == etmLink.etmid:
+                    print(self.link.memory_read32(a,3))
                     self.inq, self.outq = [byteq(self.link, q) for q in self.link.memory_read32(a+4, 2)]
                     return True
                 a += 4
@@ -93,3 +100,6 @@ class etmLink():
         if self.link:
             self.link.close()
             self.link = None
+
+    def flush(self):
+        pass
