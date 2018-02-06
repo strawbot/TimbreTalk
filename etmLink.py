@@ -6,8 +6,20 @@
 #  ->txq: points to micros byte transmit queue; must read from here
 #  ->rxq: points to mciros byte receive queue; must write to here
 
+def module_exists(module_name):
+    try:
+        __import__(module_name)
+    except ImportError:
+        return False
+    else:
+        return True
+
 FLASH_START, FLASH_END = 0x0, 0x80000
 RAM_START, RAM_END = 0x20000000, 0x20020000
+
+jlink = 'jlink-' # use for prefixing serial numbers for user visuals
+
+# check for ETM ports
 
 class byteq(): #IRE
     def __init__(self, etm, a):
@@ -58,23 +70,56 @@ class etmLink():
     baudrate = 0
     timeout = 0
 
-    def __init__(self, sn):
-        import pylink
-        self.link = pylink.JLink()
-        self.link.open(sn)
-        self.link.connect(etmLink.micro)
-        self.link.restart()
+    def __init__(self):
+        if module_exists('pylink'):
+            import pylink
+            self.link = pylink.JLink()
+
+            def ports():
+                devices = self.link.connected_emulators()
+                return [jlink + str(d.SerialNumber) for d in devices]
+
+        else:
+            self.link = None
+
+            def ports():
+                return []
+
+        self.ports = ports
+        self.etmlink = 0
+        self.outq = None
+
+    def isPort(self,port):
+        return jlink in port
+
+    def isOpen(self):
+        return self.outq != None
+
+    def addQueues(self):
+        self.inq, self.outq = [byteq(self.link, q) for q in self.link.memory_read32(self.etmlink + 4, 2)]
 
     def findEtm(self):
+        if self.link.memory_read32(self.etmlink, 1)[0] == etmLink.etmid:
+            self.addQueues()
+            return True
+
         n = 256
         for a in range(FLASH_START, FLASH_END, n):
             for b in self.link.memory_read32(a,n):
                 if b == etmLink.etmid:
                     print(self.link.memory_read32(a,3))
-                    self.inq, self.outq = [byteq(self.link, q) for q in self.link.memory_read32(a+4, 2)]
+                    self.etmlink = a
+                    self.addQueues()
                     return True
                 a += 4
         return False
+
+    def open(self, sn):
+        self.link.open(sn.replace(jlink, ''))
+        self.link.connect(self.micro)
+        self.link.restart()
+        if self.link.connected():
+            self.findEtm()
 
     def read(self, n):
         s = []
@@ -93,13 +138,10 @@ class etmLink():
         for c in s:
             self.outq.push(ord(c))
 
-    def isOpen(self):
-        return self.link != None
-
     def close(self):
-        if self.link:
+        if self.outq:
             self.link.close()
-            self.link = None
+            self.outq = None
 
     def flush(self):
         pass

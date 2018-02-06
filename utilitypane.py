@@ -152,7 +152,6 @@ class utilityPane(QWidget):
         uiPort2 = self.ui.MonitorPort2
         items = [uiPort1.itemText(i) for i in range(1, uiPort1.count())]
         ports = listports.listports()
-        ports = [p for p in ports if listports.jlink not in p]
 
         for r in list(set(items)-set(ports)): # items to be removed
             uiPort1.removeItem(uiPort1.findText(r))

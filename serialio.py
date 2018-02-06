@@ -8,7 +8,6 @@
 from pyqtapi2 import *
 import sys, traceback, serial
 from message import warning, error, note, message
-import listports
 import etmLink
 
 class serialPort(QThread):
@@ -23,12 +22,13 @@ class serialPort(QThread):
     parity = noparity
     bytesize = serial.EIGHTBITS
 
-    def __init__(self, rate=9600):
+    def __init__(self, rate=9600, link=None):
         QThread.__init__(self)  # needed for signals to work!!
         self.port = None
         self.rate = self.default = rate
         self.inputs = 0
         self.outputs = 0
+        self.link = link
 
     #		initSignalCatcher()
 
@@ -59,10 +59,11 @@ class serialPort(QThread):
         if self.isOpen():
             error("Already opened!")
 
-        elif listports.jlink in port:
-            self.name = port
-            self.port = etmLink.etmLink(port.replace(listports.jlink,''))
-            if self.port.findEtm():
+        elif self.link.isPort(port):
+            self.link.open(port)
+            if self.link.isOpen():
+                self.name = port
+                self.port = self.link
                 note('opened %s ' % (port))
                 if thread:
                     self.start()  # run serial in thread

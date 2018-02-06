@@ -4,14 +4,9 @@
 
 from pyqtapi2 import *
 
+import etmLink
 import sys
-'''
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4.QtSvg import *
-from PyQt4.QtCore import pyqtSignal as Signal
-from PyQt4.QtCore import pyqtSlot as Slot
-'''
+
 # update GUI from designer
 from compileui import updateUi
 updateUi('mainWindow')
@@ -31,11 +26,13 @@ class terminal(QMainWindow):
 		self.banner()
 		# connect(fontSizeSpin, SIGNAL(valueChanged(int), textEdit, SLOT(setFontPointSize(int));
 		self.ui.fontSize.valueChanged.connect(self.setFontSize)
-		
+
+		self.etm = etmLink.etmLink()
+
 		# serial port
 		self.sptimer = QTimer()
 		self.portname = None
-		self.serialPort = serialio.serialPort(int(self.ui.BaudRate.currentText()))
+		self.serialPort = serialio.serialPort(int(self.ui.BaudRate.currentText()),self.etm)
 
 		# adjust ui widgets
 		self.UiAdjust()
@@ -254,7 +251,7 @@ class terminal(QMainWindow):
 
 		uiPort = self.ui.PortSelect
 		items = [uiPort.itemText(i) for i in range(1, uiPort.count())]
-		ports = listports.listports()
+		ports = listports.listports() + self.etm.ports()
 
 		for r in list(set(items)-set(ports)): # items to be removed
 			uiPort.removeItem(uiPort.findText(r))
