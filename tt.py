@@ -103,8 +103,8 @@ class timbreTalk(qterm.terminal):
 		self.ui.whoTo.insertItems(0, points)
 		self.ui.whoFrom.clear()
 		self.ui.whoFrom.insertItems(0, points)
-		self.ui.whoTo.activated.connect(self.selectWhoTo)
-		self.ui.whoFrom.activated.connect(self.selectWhoFrom)
+		self.ui.whoTo.currentIndexChanged.connect(self.selectWhoTo)
+		self.ui.whoFrom.currentIndexChanged.connect(self.selectWhoFrom)
 
 	def selectWhoTo(self, index):
 		self.whoto = index

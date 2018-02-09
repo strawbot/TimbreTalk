@@ -8,7 +8,6 @@
 from pyqtapi2 import *
 import sys, traceback, serial
 from message import warning, error, note, message
-import etmLink
 
 class serialPort(QThread):
     # define signals
@@ -59,20 +58,20 @@ class serialPort(QThread):
         if self.isOpen():
             error("Already opened!")
 
-        elif self.link.isPort(port):
+        elif self.link and self.link.isPort(port): # check to see if it is ETM linked
             self.link.open(port)
             if self.link.isOpen():
                 self.name = port
                 self.port = self.link
                 note('opened %s ' % (port))
                 if thread:
-                    self.start()  # run serial in thread
+                    self.start()  # run serial-in thread
                     self.opened.emit()
             else:
                 error("Could't find etm link in memory")
                 self.closePort()
 
-        else:
+        else: # open as normal serial port
             if rate == None:
                 self.rate = self.default
             else:

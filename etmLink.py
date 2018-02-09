@@ -89,7 +89,8 @@ class etmLink():
         self.etmlink = 0
         self.outq = None
 
-    def isPort(self,port):
+    @staticmethod
+    def isPort(port):
         return jlink in port
 
     def isOpen(self):
@@ -107,7 +108,6 @@ class etmLink():
         for a in range(FLASH_START, FLASH_END, n):
             for b in self.link.memory_read32(a,n):
                 if b == etmLink.etmid:
-                    print(self.link.memory_read32(a,3))
                     self.etmlink = a
                     self.addQueues()
                     return True
