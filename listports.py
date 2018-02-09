@@ -42,7 +42,7 @@ def listports():
         prefix = '/dev/'
         usb = re.compile('ttyusb', re.IGNORECASE)
         acm = re.compile('ttyacm', re.IGNORECASE)
-        ports = [p for p in os.listdir(prefix) if usb.search(p)]
+        ports = [prefix+p for p in os.listdir(prefix) if usb.search(p)]
         portsextra = [prefix+p for p in os.listdir(prefix) if acm.search(p)]
         ports.extend(portsextra)
 
