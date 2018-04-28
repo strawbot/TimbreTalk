@@ -7,6 +7,11 @@ from pyqtapi2 import *
 import etmLink
 import sys
 
+try:
+	_fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+	_fromUtf8 = lambda s: s
+
 # update GUI from designer
 from compileui import updateUi
 updateUi('mainWindow')
@@ -45,6 +50,8 @@ class terminal(QMainWindow):
 			self.raise_()
 		else:
 			font = self.ui.textEdit.font()
+			if sys.platform[:5] == 'linux':
+				font.setFamily(_fromUtf8("Andale Mono"))
 			font.setPointSize(font.pointSize() - 3)
 			self.ui.textEdit.setFont(font)
 			self.ui.fontSize.setValue(font.pointSize())

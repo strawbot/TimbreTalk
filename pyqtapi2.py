@@ -20,5 +20,6 @@ if useQt():
 	from PyQt4.QtSvg import *
 	from PyQt4.QtCore import pyqtSignal as Signal
 	from PyQt4.QtCore import pyqtSlot as Slot
+	from PyQt4 import QtCore
 else:
 	from machines import *

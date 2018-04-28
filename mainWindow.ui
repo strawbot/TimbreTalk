@@ -10,6 +10,12 @@
     <height>644</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -58,7 +64,7 @@
            <enum>Qt::NoContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>5</number>
           </property>
           <widget class="QWidget" name="Interface">
            <attribute name="title">
@@ -308,82 +314,159 @@
             <item>
              <widget class="QGroupBox" name="groupBox_2">
               <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+               <sizepolicy hsizetype="Maximum" vsizetype="Minimum">
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>0</height>
+               </size>
+              </property>
               <property name="title">
                <string>Protocol</string>
               </property>
-              <layout class="QVBoxLayout" name="verticalLayout_12">
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_3">
                  <item>
-                  <layout class="QHBoxLayout" name="horizontalLayout_6">
+                  <layout class="QHBoxLayout" name="horizontalLayout_5">
                    <item>
-                    <layout class="QHBoxLayout" name="horizontalLayout_15">
+                    <layout class="QVBoxLayout" name="verticalLayout">
                      <item>
-                      <layout class="QVBoxLayout" name="verticalLayout_4">
-                       <item>
-                        <widget class="QRadioButton" name="Serial1">
-                         <property name="text">
-                          <string>Serial</string>
-                         </property>
-                         <property name="checked">
-                          <bool>false</bool>
-                         </property>
-                         <attribute name="buttonGroup">
-                          <string notr="true">serialProtocol</string>
-                         </attribute>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QRadioButton" name="SFP">
-                         <property name="text">
-                          <string>SFP</string>
-                         </property>
-                         <property name="checked">
-                          <bool>true</bool>
-                         </property>
-                         <attribute name="buttonGroup">
-                          <string notr="true">serialProtocol</string>
-                         </attribute>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QRadioButton" name="AT">
-                         <property name="text">
-                          <string>AT Wifi</string>
-                         </property>
-                         <attribute name="buttonGroup">
-                          <string notr="true">serialProtocol</string>
-                         </attribute>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QRadioButton" name="radioButton">
-                         <property name="text">
-                          <string>AT Cell</string>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
+                      <widget class="QRadioButton" name="Serial1">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>25</height>
+                        </size>
+                       </property>
+                       <property name="baseSize">
+                        <size>
+                         <width>0</width>
+                         <height>0</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>Serial</string>
+                       </property>
+                       <property name="iconSize">
+                        <size>
+                         <width>16</width>
+                         <height>24</height>
+                        </size>
+                       </property>
+                       <property name="checked">
+                        <bool>false</bool>
+                       </property>
+                       <attribute name="buttonGroup">
+                        <string notr="true">serialProtocol</string>
+                       </attribute>
+                      </widget>
                      </item>
                      <item>
-                      <spacer name="horizontalSpacer_3">
-                       <property name="orientation">
-                        <enum>Qt::Horizontal</enum>
+                      <widget class="QRadioButton" name="SFP">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
                        </property>
-                       <property name="sizeHint" stdset="0">
+                       <property name="minimumSize">
                         <size>
-                         <width>40</width>
+                         <width>0</width>
+                         <height>25</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>SFP</string>
+                       </property>
+                       <property name="iconSize">
+                        <size>
+                         <width>16</width>
+                         <height>16</height>
+                        </size>
+                       </property>
+                       <property name="checked">
+                        <bool>true</bool>
+                       </property>
+                       <attribute name="buttonGroup">
+                        <string notr="true">serialProtocol</string>
+                       </attribute>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QRadioButton" name="ATwifi">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>25</height>
+                        </size>
+                       </property>
+                       <property name="text">
+                        <string>AT Wifi</string>
+                       </property>
+                       <attribute name="buttonGroup">
+                        <string notr="true">serialProtocol</string>
+                       </attribute>
+                      </widget>
+                     </item>
+                     <item>
+                      <widget class="QRadioButton" name="ATcell">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>0</width>
+                         <height>25</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>16777215</width>
                          <height>20</height>
                         </size>
                        </property>
-                      </spacer>
+                       <property name="text">
+                        <string>AT Cell</string>
+                       </property>
+                       <attribute name="buttonGroup">
+                        <string notr="true">serialProtocol</string>
+                       </attribute>
+                      </widget>
                      </item>
                     </layout>
+                   </item>
+                   <item>
+                    <spacer name="horizontalSpacer_3">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>40</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
                    </item>
                    <item>
                     <widget class="Line" name="line_2">
@@ -393,66 +476,58 @@
                     </widget>
                    </item>
                    <item>
-                    <layout class="QVBoxLayout" name="verticalLayout">
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_26">
-                       <item>
-                        <widget class="QLabel" name="label_5">
-                         <property name="text">
-                          <string>Host:</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QComboBox" name="whoFrom">
-                         <property name="sizePolicy">
-                          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                           <horstretch>0</horstretch>
-                           <verstretch>0</verstretch>
-                          </sizepolicy>
-                         </property>
-                         <property name="minimumSize">
-                          <size>
-                           <width>130</width>
-                           <height>26</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>130</width>
-                           <height>26</height>
-                          </size>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
+                    <layout class="QFormLayout" name="formLayout_6">
+                     <item row="0" column="0">
+                      <widget class="QLabel" name="label_5">
+                       <property name="text">
+                        <string>Host:</string>
+                       </property>
+                      </widget>
                      </item>
-                     <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_28">
-                       <item>
-                        <widget class="QLabel" name="label_4">
-                         <property name="text">
-                          <string>Target:</string>
-                         </property>
-                        </widget>
-                       </item>
-                       <item>
-                        <widget class="QComboBox" name="whoTo">
-                         <property name="minimumSize">
-                          <size>
-                           <width>130</width>
-                           <height>26</height>
-                          </size>
-                         </property>
-                         <property name="maximumSize">
-                          <size>
-                           <width>130</width>
-                           <height>26</height>
-                          </size>
-                         </property>
-                        </widget>
-                       </item>
-                      </layout>
+                     <item row="0" column="1">
+                      <widget class="QComboBox" name="whoFrom">
+                       <property name="sizePolicy">
+                        <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                         <horstretch>0</horstretch>
+                         <verstretch>0</verstretch>
+                        </sizepolicy>
+                       </property>
+                       <property name="minimumSize">
+                        <size>
+                         <width>130</width>
+                         <height>26</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>130</width>
+                         <height>26</height>
+                        </size>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="0">
+                      <widget class="QLabel" name="label_4">
+                       <property name="text">
+                        <string>Target:</string>
+                       </property>
+                      </widget>
+                     </item>
+                     <item row="1" column="1">
+                      <widget class="QComboBox" name="whoTo">
+                       <property name="minimumSize">
+                        <size>
+                         <width>130</width>
+                         <height>26</height>
+                        </size>
+                       </property>
+                       <property name="maximumSize">
+                        <size>
+                         <width>130</width>
+                         <height>26</height>
+                        </size>
+                       </property>
+                      </widget>
                      </item>
                     </layout>
                    </item>
@@ -467,7 +542,14 @@
                  </item>
                  <item>
                   <layout class="QGridLayout" name="gridLayout_6">
-                   <item row="0" column="2">
+                   <item row="0" column="0">
+                    <widget class="QCheckBox" name="ProtocolDump">
+                     <property name="text">
+                      <string>Protocol Dump</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="1">
                     <spacer name="horizontalSpacer_4">
                      <property name="orientation">
                       <enum>Qt::Horizontal</enum>
@@ -480,21 +562,7 @@
                      </property>
                     </spacer>
                    </item>
-                   <item row="1" column="0">
-                    <widget class="QCheckBox" name="LoopBack">
-                     <property name="text">
-                      <string>Loop back</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="0">
-                    <widget class="QCheckBox" name="ProtocolDump">
-                     <property name="text">
-                      <string>Protocol Dump</string>
-                     </property>
-                    </widget>
-                   </item>
-                   <item row="0" column="3">
+                   <item row="0" column="2">
                     <widget class="QPushButton" name="Ping">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -507,7 +575,14 @@
                      </property>
                     </widget>
                    </item>
-                   <item row="1" column="3">
+                   <item row="1" column="0">
+                    <widget class="QCheckBox" name="LoopBack">
+                     <property name="text">
+                      <string>Loop back</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="2">
                     <widget class="QPushButton" name="ResetRcvr">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -529,23 +604,23 @@
                    </item>
                   </layout>
                  </item>
+                 <item>
+                  <spacer name="verticalSpacer_6">
+                   <property name="orientation">
+                    <enum>Qt::Vertical</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>20</width>
+                     <height>106</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
                 </layout>
                </item>
               </layout>
              </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_6">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </widget>
@@ -1523,8 +1598,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>345</width>
-                 <height>272</height>
+                 <width>360</width>
+                 <height>277</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -2773,7 +2848,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
               <x>7</x>
               <y>10</y>
               <width>372</width>
-              <height>286</height>
+              <height>305</height>
              </rect>
             </property>
             <layout class="QGridLayout" name="gridLayout_2" columnstretch="290,0">
@@ -2783,14 +2858,14 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              <item row="3" column="0">
               <widget class="QLineEdit" name="phrase4">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>290</width>
+                 <width>0</width>
                  <height>0</height>
                 </size>
                </property>
@@ -2799,14 +2874,14 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              <item row="2" column="0">
               <widget class="QLineEdit" name="phrase3">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>290</width>
+                 <width>0</width>
                  <height>0</height>
                 </size>
                </property>
@@ -2822,14 +2897,14 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              <item row="5" column="0">
               <widget class="QLineEdit" name="phrase6">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>290</width>
+                 <width>0</width>
                  <height>0</height>
                 </size>
                </property>
@@ -2845,14 +2920,30 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              <item row="4" column="0">
               <widget class="QLineEdit" name="phrase5">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>290</width>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLineEdit" name="phrase8">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
                  <height>0</height>
                 </size>
                </property>
@@ -2865,6 +2956,22 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                </property>
               </widget>
              </item>
+             <item row="6" column="0">
+              <widget class="QLineEdit" name="phrase7">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+              </widget>
+             </item>
              <item row="2" column="1">
               <widget class="QPushButton" name="send3">
                <property name="text">
@@ -2872,33 +2979,17 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                </property>
               </widget>
              </item>
-             <item row="7" column="0">
-              <widget class="QLineEdit" name="phrase8">
+             <item row="0" column="0">
+              <widget class="QLineEdit" name="phrase1">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>290</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0">
-              <widget class="QLineEdit" name="phrase7">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>290</width>
+                 <width>0</width>
                  <height>0</height>
                 </size>
                </property>
@@ -2911,42 +3002,26 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                </property>
               </widget>
              </item>
-             <item row="4" column="1">
-              <widget class="QPushButton" name="send5">
-               <property name="text">
-                <string>Send</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="0">
-              <widget class="QLineEdit" name="phrase1">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>290</width>
-                 <height>0</height>
-                </size>
-               </property>
-              </widget>
-             </item>
              <item row="1" column="0">
               <widget class="QLineEdit" name="phrase2">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>127</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
                <property name="minimumSize">
                 <size>
-                 <width>290</width>
+                 <width>0</width>
                  <height>0</height>
                 </size>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QPushButton" name="send5">
+               <property name="text">
+                <string>Send</string>
                </property>
               </widget>
              </item>
@@ -2970,7 +3045,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
             <property name="geometry">
              <rect>
               <x>40</x>
-              <y>310</y>
+              <y>410</y>
               <width>113</width>
               <height>32</height>
              </rect>
@@ -2983,7 +3058,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
             <property name="geometry">
              <rect>
               <x>180</x>
-              <y>310</y>
+              <y>410</y>
               <width>113</width>
               <height>32</height>
              </rect>
@@ -3304,10 +3379,9 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
   <tabstop>ipPort</tabstop>
   <tabstop>Serial1</tabstop>
   <tabstop>SFP</tabstop>
-  <tabstop>AT</tabstop>
-  <tabstop>radioButton</tabstop>
+  <tabstop>ATwifi</tabstop>
+  <tabstop>ATcell</tabstop>
   <tabstop>whoFrom</tabstop>
-  <tabstop>whoTo</tabstop>
   <tabstop>LoopBack</tabstop>
   <tabstop>ProtocolDump</tabstop>
   <tabstop>Ping</tabstop>
@@ -3430,8 +3504,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>966</x>
-     <y>548</y>
+     <x>1016</x>
+     <y>620</y>
     </hint>
     <hint type="destinationlabel">
      <x>829</x>

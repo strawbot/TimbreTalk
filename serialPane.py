@@ -20,7 +20,7 @@ class serialPane(QWidget):
         # signals
         self.ui.SFP.clicked.connect(self.selectSfp)
         self.ui.Serial1.clicked.connect(self.selectSerial)
-        self.ui.AT.clicked.connect(self.selectAt)
+        self.ui.ATwifi.clicked.connect(self.selectAt)
         self.ui.Ping.clicked.connect(self.sendPing)
         self.ui.ResetRcvr.clicked.connect(self.resetRcvr)
         self.ui.ProtocolDump.stateChanged.connect(self.protocolDump)
@@ -149,7 +149,7 @@ class serialPane(QWidget):
             self.parent.source.connect(self.talkSink)
 
     def selectAt(self):
-        if not self.ui.AT.isChecked():
+        if not self.ui.ATwifi.isChecked():
             note('changed to AT')
         self.disconnectFlows()
         if self.ui.LoopBack.isChecked():
