@@ -6,6 +6,8 @@
 #  ->txq: points to micros byte transmit queue; must read from here
 #  ->rxq: points to mciros byte receive queue; must write to here
 
+import sys
+
 def module_exists(module_name):
     try:
         __import__(module_name)
@@ -63,7 +65,7 @@ class byteq(): #IRE
         return n
 
 class etmLink():
-    micro = 'EFM32GG980F1024'
+    micro = 'EFM32GG380F1024' # make this selectable from GUI
     etmid = 0xFACEF00D
 
     link = 0
@@ -116,10 +118,14 @@ class etmLink():
 
     def open(self, sn):
         self.link.open(sn.replace(jlink, ''))
-        self.link.connect(self.micro)
-        self.link.restart()
-        if self.link.connected():
-            self.findEtm()
+        try:
+            self.link.connect(self.micro)
+            self.link.restart()
+            if self.link.connected():
+                self.findEtm()
+        except Exception, e:
+            self.link.close()
+            print >> sys.stderr, e
 
     def read(self, n):
         s = []

@@ -39,7 +39,7 @@ elif sys.platform == 'darwin':
 	import shutil
 	if os.path.isdir("dist/tt.app"):
 		shutil.rmtree('dist/tt.app') # save a step for builder by removing previous build
-	os.system('pyinstaller --clean --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.icns  --noupx -p . --osx-bundle-identifier="TimbreTalk" tt.py')
+	os.system('pyinstaller --clean --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.icns  --noupx -p . --osx-bundle-identifier="TimbreTalk" ttmac.spec')
 elif sys.platform[:5] == 'linux':
 	"Building app for Linux"
 	os.system('PyInstaller/pyinstaller.py --runtime-hook rthook_pyqt4.py -w -F -i timbretalk.ico -p . tt.py')
