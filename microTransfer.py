@@ -77,6 +77,7 @@ class microTransfer(imageTransfer):
 class stmTransfer(microTransfer):
     def __init__(self, parent):
         super(stmTransfer, self).__init__(parent)
+        self.parent.parent.ui.bootOverwrite.hide()
 
     def setSerialPort(self):
         self.setParam(self.serialPort, 'E', 8, 1)
@@ -214,6 +215,7 @@ class efmTransfer(microTransfer):
         self.success = Value('i', 0)
         self.errors = Value('i', 0)
         self.aborted = False
+        self.parent.parent.ui.bootOverwrite.show()
 
     def xmodemStatus(self, total_packets, success_count, error_count):
         self.sent.value = total_packets
