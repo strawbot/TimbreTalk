@@ -231,13 +231,12 @@ class efmTransfer(microTransfer):
             return
 
         # use settings from current serial port
-        prefix = self.serialPort.prefix
         port = self.serialPort.name
         rate = self.serialPort.port.baudrate
 
         self.serialPort.close()
         message('\nAcquiring serial port for binary transfer...')
-        self.serialPort.openBlocking(prefix, port, rate=rate)
+        self.serialPort.openBlocking(port, rate=rate)
 
         message("\nStarting EFM32 download")
         if self.parent.parent.ui.bootOverwrite.isChecked():
