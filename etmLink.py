@@ -76,6 +76,7 @@ class etmLink():
         if module_exists('pylink'):
             import pylink
             self.link = pylink.JLink()
+            self.pylink = pylink
 
             def ports():
                 devices = self.link.connected_emulators()
@@ -107,7 +108,7 @@ class etmLink():
             return True
 
         n = 256
-        for a in range(FLASH_START, FLASH_END, n):
+        for a in range(RAM_START, RAM_END, n):
             for b in self.link.memory_read32(a,n):
                 if b == etmLink.etmid:
                     self.etmlink = a
@@ -117,8 +118,10 @@ class etmLink():
         return False
 
     def open(self, sn):
-        self.link.open(sn.replace(jlink, ''))
+        serialNumber = sn.replace(jlink, '').encode('ascii','ignore')
+        self.link.open(serialNumber)
         try:
+            self.link.set_tif(self.pylink.JLinkInterfaces.SWD)
             self.link.connect(self.micro)
             self.link.restart()
             if self.link.connected():
@@ -151,3 +154,15 @@ class etmLink():
 
     def flush(self):
         pass
+
+if __name__ == '__main__':
+    e = etmLink()
+    sn = str(e.link.connected_emulators()[0].SerialNumber)
+    e.open(sn)
+    e.findEtm()
+    if e.link:
+        print("link found at 0x{:0X}".format(e.etmlink))
+    else:
+        print("link not found")
+
+    e.close()
