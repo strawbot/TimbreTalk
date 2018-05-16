@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 # GUI for serial transactions using Qt	Robert Chapman III	Sep 28, 2012
-version='1.5'
+version='1.7.2'
 
 from pyqtapi2 import *
-from cpuids import MAIN_HOST
+from protocols.pids import DIRECT, whoDict
 from protocols import sfp
 
 # update GUI from designer
@@ -15,7 +15,7 @@ updateUi('tabs')
 from message import *
 import qterm, serialPane, transferPane
 import infopane
-import utilitypane, cpuids
+import utilitypane
 
 class sfpQt (QObject, sfp.sfpProtocol):
 	source = Signal(object)
@@ -60,7 +60,7 @@ class timbreTalk(qterm.terminal):
 		self.listRoutes()
 
 		# default
-		self.whofrom = MAIN_HOST
+		self.whofrom = DIRECT
 		self.ui.whoFrom.setCurrentIndex(self.whofrom)
 		QErrorMessage.qtHandler()
 
@@ -94,7 +94,7 @@ class timbreTalk(qterm.terminal):
 	# Routing
 	def listRoutes(self):
 		routes = [['Direct',0]]
-		for name,value in cpuids.whoDict.iteritems():
+		for name,value in whoDict.iteritems():
 			if value:
 				routes.append([name,value])
 		points = [point[0] for point in sorted(routes, key = lambda x: x[1])]
@@ -103,8 +103,8 @@ class timbreTalk(qterm.terminal):
 		self.ui.whoTo.insertItems(0, points)
 		self.ui.whoFrom.clear()
 		self.ui.whoFrom.insertItems(0, points)
-		self.ui.whoTo.activated.connect(self.selectWhoTo)
-		self.ui.whoFrom.activated.connect(self.selectWhoFrom)
+		self.ui.whoTo.currentIndexChanged.connect(self.selectWhoTo)
+		self.ui.whoFrom.currentIndexChanged.connect(self.selectWhoFrom)
 
 	def selectWhoTo(self, index):
 		self.whoto = index

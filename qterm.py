@@ -4,14 +4,14 @@
 
 from pyqtapi2 import *
 
+import etmLink
 import sys
-'''
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
-from PyQt4.QtSvg import *
-from PyQt4.QtCore import pyqtSignal as Signal
-from PyQt4.QtCore import pyqtSlot as Slot
-'''
+
+try:
+	_fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+	_fromUtf8 = lambda s: s
+
 # update GUI from designer
 from compileui import updateUi
 updateUi('mainWindow')
@@ -31,11 +31,13 @@ class terminal(QMainWindow):
 		self.banner()
 		# connect(fontSizeSpin, SIGNAL(valueChanged(int), textEdit, SLOT(setFontPointSize(int));
 		self.ui.fontSize.valueChanged.connect(self.setFontSize)
-		
+
+		self.etm = etmLink.etmLink()
+
 		# serial port
 		self.sptimer = QTimer()
 		self.portname = None
-		self.serialPort = serialio.serialPort(int(self.ui.BaudRate.currentText()))
+		self.serialPort = serialio.serialPort(int(self.ui.BaudRate.currentText()),self.etm)
 
 		# adjust ui widgets
 		self.UiAdjust()
@@ -48,6 +50,8 @@ class terminal(QMainWindow):
 			self.raise_()
 		else:
 			font = self.ui.textEdit.font()
+			if sys.platform[:5] == 'linux':
+				font.setFamily(_fromUtf8("Andale Mono"))
 			font.setPointSize(font.pointSize() - 3)
 			self.ui.textEdit.setFont(font)
 			self.ui.fontSize.setValue(font.pointSize())
@@ -123,7 +127,7 @@ class terminal(QMainWindow):
 		font.setPointSize(size)
 		self.ui.textEdit.setFont(font)
 		
-	def sendPhrase(self, s):
+	def sendPhrase(self, s): # TODO: use line send and echo text to window
 		s = s+'\r'
 		for c in s:
 			self.keyin(c)
@@ -254,8 +258,8 @@ class terminal(QMainWindow):
 
 		uiPort = self.ui.PortSelect
 		items = [uiPort.itemText(i) for i in range(1, uiPort.count())]
-		self.prefix, ports = listports.listports()
-		
+		ports = listports.listports() + self.etm.ports()
+
 		for r in list(set(items)-set(ports)): # items to be removed
 			uiPort.removeItem(uiPort.findText(r))
 		for a in list(set(ports)-set(items)): # items to be added
@@ -283,7 +287,7 @@ class terminal(QMainWindow):
 			self.serialPort.close()
 		if self.ui.PortSelect.currentIndex():
 			self.portname = self.ui.PortSelect.currentText()
-			self.serialPort.open(self.prefix, self.portname, self.serialPort.rate)
+			self.serialPort.open(self.portname, self.serialPort.rate)
 			if self.serialPort.isOpen():
 				self.serialPort.closed.connect(self.serialDone)
 				self.serialPort.ioError.connect(self.ioError)
@@ -375,7 +379,7 @@ class terminal(QMainWindow):
 		self.sink(s)
 
 	def sink(self, s):
-		message(s)	
+		message(s)
 
 	def isCursorVisible(self):
 		vbar = self.ui.textEdit.verticalScrollBar()

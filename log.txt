@@ -82,6 +82,11 @@ Issues:
  46. Allow platform specific saving of parameters which includes things like phrases. Check
      out: https://pypi.python.org/pypi/appdirs/1.4.3
  47. Copy and paste all phrases at the same time as 8 lines of text.
+ 48. Make line length independent of window width. Lines don't get too long but
+     choose some length like 255. This way when window width changes, lines will lengthen
+     to fit window. By clipping, it avoids superlong lines.
+ 49. Factor files to match GUI. There should be: interfacePane.py, textPane.py,
+     transferPane.py, infoPane.py, toolsPane.py, phrasePane.py
  
 Updates:
  1. removed unneccessary files from folder

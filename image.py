@@ -139,7 +139,7 @@ class imageRecord(QObject):
 						elif type == 1:
 							pass # end of file
 						elif type == 2:
-							base = int(data, 16) * 16
+							base = int(data, 16) << 4
 						elif type == 4:
 							base = int(data, 16) << 16
 						elif type == 3 or type == 5:

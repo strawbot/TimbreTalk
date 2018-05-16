@@ -14,7 +14,6 @@ from message import *
 from checksum import fletcher32
 from targets import *
 from buildversion import *
-from cpuids import *
 
 printme = 0
 
