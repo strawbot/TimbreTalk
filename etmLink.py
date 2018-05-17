@@ -77,10 +77,11 @@ class etmLink():
             import pylink
             self.link = pylink.JLink()
             self.pylink = pylink
+            devices = self.link.connected_emulators()
+            self.portlist = [jlink + str(d.SerialNumber) for d in devices]
 
             def ports():
-                devices = self.link.connected_emulators()
-                return [jlink + str(d.SerialNumber) for d in devices]
+                return self.portlist
 
         else:
             self.link = None
