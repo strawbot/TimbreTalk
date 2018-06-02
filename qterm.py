@@ -84,7 +84,7 @@ class terminal(QMainWindow):
 		self.ui.InRaw.clicked.connect(self.rawMinusEcho)
 		self.ui.InRawEcho.clicked.connect(self.rawPlusEcho)
 		self.ui.InHex.clicked.connect(self.rawPlusEcho)
-		self.ui.InRaw.click()
+		self.ui.InBuffered.click()
 		self.echo = False
 		self.linebuffer = []
 		self.ui.inputIgnore.activated.connect(self.selectIgnores)

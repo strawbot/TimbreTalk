@@ -64,7 +64,7 @@
            <enum>Qt::NoContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>4</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="Interface">
            <attribute name="title">
@@ -646,6 +646,9 @@
                    <property name="text">
                     <string>Buffered</string>
                    </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                  <item>
@@ -654,7 +657,7 @@
                     <string>Raw</string>
                    </property>
                    <property name="checked">
-                    <bool>true</bool>
+                    <bool>false</bool>
                    </property>
                   </widget>
                  </item>
@@ -1578,7 +1581,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
             <item>
              <widget class="QToolBox" name="toolBox">
               <property name="currentIndex">
-               <number>0</number>
+               <number>3</number>
               </property>
               <widget class="QWidget" name="page">
                <property name="geometry">
@@ -2446,7 +2449,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                     </widget>
                    </item>
                    <item row="1" column="0">
-                    <widget class="QComboBox" name="Color1">
+                    <widget class="QComboBox" name="MonitorColor1">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -2505,7 +2508,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                     </widget>
                    </item>
                    <item row="1" column="1">
-                    <widget class="QComboBox" name="monitorFormat1">
+                    <widget class="QComboBox" name="MonitorFormat1">
                      <item>
                       <property name="text">
                        <string>ASCII</string>
@@ -2514,6 +2517,11 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                      <item>
                       <property name="text">
                        <string>Hex</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>SFP</string>
                       </property>
                      </item>
                     </widget>
@@ -2607,7 +2615,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                     </widget>
                    </item>
                    <item row="1" column="0">
-                    <widget class="QComboBox" name="Color2">
+                    <widget class="QComboBox" name="MonitorColor2">
                      <property name="sizePolicy">
                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                        <horstretch>0</horstretch>
@@ -2666,7 +2674,7 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                     </widget>
                    </item>
                    <item row="1" column="1">
-                    <widget class="QComboBox" name="monitorFormat2">
+                    <widget class="QComboBox" name="MonitorFormat2">
                      <item>
                       <property name="text">
                        <string>ASCII</string>
@@ -2675,6 +2683,11 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                      <item>
                       <property name="text">
                        <string>Hex</string>
+                      </property>
+                     </item>
+                     <item>
+                      <property name="text">
+                       <string>SFP</string>
                       </property>
                      </item>
                     </widget>
@@ -3446,12 +3459,12 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
   <tabstop>readEeprom</tabstop>
   <tabstop>MonitorPort1</tabstop>
   <tabstop>MonitorBaud1</tabstop>
-  <tabstop>Color1</tabstop>
-  <tabstop>monitorFormat1</tabstop>
+  <tabstop>MonitorColor1</tabstop>
+  <tabstop>MonitorFormat1</tabstop>
   <tabstop>MonitorPort2</tabstop>
   <tabstop>MonitorBaud2</tabstop>
-  <tabstop>Color2</tabstop>
-  <tabstop>monitorFormat2</tabstop>
+  <tabstop>MonitorColor2</tabstop>
+  <tabstop>MonitorFormat2</tabstop>
   <tabstop>configFileSelect</tabstop>
   <tabstop>configFileName</tabstop>
   <tabstop>configFileSize</tabstop>

@@ -3,7 +3,7 @@
 from pyqtapi2 import *
 import time, datetime
 from message import *
-from protocols import pids
+from protocols import sfp, pids
 from endian import *
 from image import *
 import listports, serialio
@@ -119,157 +119,22 @@ class utilityPane(QWidget):
         self.eeprom.scriptOk.connect(self.crcStatus)
         self.eeprom.imageLoaded.connect(self.eeprom.checkScriptCrc)
 
-        # monitor ports - should make a common class and instantiate multiple times
+        # monitor ports
+        self.portMonitor1 = portMonitor(1,
+        								self.ui.MonitorPort1,
+                                        self.ui.MonitorBaud1,
+                                        self.ui.MonitorColor1,
+                                        self.ui.MonitorFormat1)
+        self.portMonitor2 = portMonitor(2,
+        								self.ui.MonitorPort2,
+                                        self.ui.MonitorBaud2,
+                                        self.ui.MonitorColor2,
+                                        self.ui.MonitorFormat2)
+
+        self.monitors = [self.portMonitor1, self.portMonitor2]
+
         self.sptimer = QTimer()
-        self.portname1 = None
-        self.portname2 = None
-        self.monitorPort1 = serialio.serialPort(int(self.ui.MonitorBaud1.currentText()))
-        self.monitorPort2 = serialio.serialPort(int(self.ui.MonitorBaud2.currentText()))
-        self.selectFormat1()
-        self.selectFormat2()
         self.listPorts()
-
-        self.ui.MonitorPort1.activated.connect(self.selectPort1)
-        self.ui.MonitorPort2.activated.connect(self.selectPort2)
-        self.ui.MonitorBaud1.activated.connect(self.selectRate1)
-        self.ui.MonitorBaud2.activated.connect(self.selectRate2)
-        self.ui.monitorFormat1.activated.connect(self.selectFormat1)
-        self.ui.monitorFormat2.activated.connect(self.selectFormat2)
-
-    def selectMicro(self):
-        if self.ui.microSelect.currentText() == "STM32F4":
-            self.micro = stmTransfer(self)
-        elif self.ui.microSelect.currentText() == "EFM32":
-            self.micro = efmTransfer(self)
-        else:
-            print("No micro available. Don't know: %s"%self.ui.microSelect.currentText())
-
-    # monitor ports
-    def listPorts(self):
-        select, disc = '(Select a Port)', '(Disconnect)'
-
-        uiPort1 = self.ui.MonitorPort1
-        uiPort2 = self.ui.MonitorPort2
-        items = [uiPort1.itemText(i) for i in range(1, uiPort1.count())]
-        ports = listports.listports()
-
-        for r in list(set(items)-set(ports)): # items to be removed
-            uiPort1.removeItem(uiPort1.findText(r))
-            uiPort2.removeItem(uiPort2.findText(r))
-        for a in list(set(ports)-set(items)): # items to be added
-            uiPort1.addItem(a)
-            uiPort2.addItem(a)
-
-        if self.portname1:
-            if self.portname1 != uiPort1.currentText():
-                index = uiPort1.findText(self.portname1)
-                if index == -1:
-                    index = 0
-                    self.portname1 = None
-                uiPort1.setCurrentIndex(index)
-
-        if self.portname2:
-            if self.portname2 != uiPort2.currentText():
-                index = uiPort2.findText(self.portname2)
-                if index == -1:
-                    index = 0
-                    self.portname2 = None
-                uiPort2.setCurrentIndex(index)
-
-        text = disc if uiPort1.currentIndex() else select
-        if uiPort1.itemText(0) != text:
-            uiPort1.setItemText(0, text)
-        text = disc if uiPort2.currentIndex() else select
-        if uiPort2.itemText(0) != text:
-            uiPort2.setItemText(0, text)
-
-        self.sptimer.singleShot(1000, self.listPorts)
-
-    def selectRate1(self):
-        self.monitorPort1.setRate(int(self.ui.MonitorBaud1.currentText()))
-
-    def selectRate2(self):
-        self.monitorPort2.setRate(int(self.ui.MonitorBaud2.currentText()))
-
-    def selectPort1(self):
-        if self.monitorPort1.isOpen():
-            self.monitorPort1.close()
-        if self.ui.MonitorPort1.currentIndex():
-            self.portname1 = self.ui.MonitorPort1.currentText()
-            self.monitorPort1.open(self.portname1, self.monitorPort1.rate)
-            if self.monitorPort1.isOpen():
-                self.monitorPort1.closed.connect(self.serialDone)
-                self.monitorPort1.ioError.connect(self.ioError)
-                self.monitorPort1.ioException.connect(self.ioError)
-                self.connectPort1()
-            else:
-                self.ui.MonitorPort1.setCurrentIndex(0)
-                self.portname1 = None
-        else:
-            self.portname1 = None
-
-    def selectPort2(self):
-        if self.monitorPort2.isOpen():
-            self.monitorPort2.close()
-        if self.ui.MonitorPort2.currentIndex():
-            self.portname2 = self.ui.MonitorPort2.currentText()
-            self.monitorPort2.open(self.portname2, self.monitorPort2.rate)
-            if self.monitorPort2.isOpen():
-                self.monitorPort2.closed.connect(self.serialDone)
-                self.monitorPort2.ioError.connect(self.ioError)
-                self.monitorPort2.ioException.connect(self.ioError)
-                self.connectPort2()
-            else:
-                self.ui.MonitorPort2.setCurrentIndex(0)
-                self.portname2 = None
-        else:
-            self.portname1 = None
-
-    def selectFormat1(self):
-        self.format1 = self.ui.monitorFormat1.currentText()
-
-    def selectFormat2(self):
-        self.format2 = self.ui.monitorFormat2.currentText()
-
-    def serialDone(self):
-        note('Serial thread finished')
-
-    def ioError(self, message):
-        error(message)
-
-    def connectPort1(self): # override in children
-        self.monitorPort1.source.connect(self.sink1)
-        # self.setParam(self.monitorPort1, 'E', 8, 1)
-
-    def connectPort2(self): # override in children
-        self.monitorPort2.source.connect(self.sink2)
-        # self.setParam(self.monitorPort2, 'E', 8, 1)
-
-    def sink1(self, s):
-        ts = self.timestamp()
-        if self.format1 == 'ASCII':
-            text = ''.join([c if c >= ' ' and c <= '~' else '<'+hex(ord(c))[2:]+'>' for c in s])
-        else:
-            text = ''.join(map(lambda x: ' '+hex(ord(x))[2:],  s))
-        message('\n1 '+ts+text, self.ui.Color1.currentText())
-
-    def sink2(self, s):
-        ts = self.timestamp()
-        if self.format2 == 'ASCII':
-            text = ''.join([c if c >= ' ' and c <= '~' else '<'+hex(ord(c))[2:]+'>' for c in s])
-        else:
-            text = ''.join(map(lambda x: ' '+hex(ord(x))[2:],  s))
-        message('\n2 '+ts+text, self.ui.Color2.currentText())
-
-    def setParam(self, sp, parity, bytesize, stopbits):
-        if sp.port:
-            sp.port.setParity(parity)
-            sp.port.setByteSize(bytesize)
-            sp.port.setStopbits(stopbits)
-
-    def timestamp(self):
-        ms = current_milli_time()
-        return "%d.%03d: "%(ms/1000,ms%1000)
 
     def setDateTimeNow(self):
         n = datetime.datetime.now()
@@ -281,3 +146,127 @@ class utilityPane(QWidget):
     def crcStatus(self, flag):
         self.ui.crcValue.setText('%08X' % self.eeprom.scriptCrc)
         self.ui.crcStatus.setText('ok' if flag else 'bad')
+
+    def selectMicro(self):
+        if self.ui.microSelect.currentText() == "STM32F4":
+            self.micro = stmTransfer(self)
+        elif self.ui.microSelect.currentText() == "EFM32":
+            self.micro = efmTransfer(self)
+        else:
+            print("No micro available. Don't know: %s"%self.ui.microSelect.currentText())
+
+    # get list of current ports
+    # go through combobox and add and remove items for each monitor
+    # check each monitor selection and if item no longer applicable, change portname to None
+    def listPorts(self):
+        select, disc = '(Select a Port)', '(Disconnect)'
+
+        ports = listports.listports()
+        port = self.monitors[0].port
+        items = [port.itemText(i) for i in range(1, port.count())]
+
+        for monitor in self.monitors:
+            uiPort = monitor.port
+            for r in list(set(items)-set(ports)): # items to be removed
+                uiPort.removeItem(uiPort.findText(r))
+            for a in list(set(ports)-set(items)): # items to be added
+                uiPort.addItem(a)
+
+            if monitor.portname:
+                if monitor.portname != uiPort.currentText():
+                    index = uiPort.findText(monitor.portname)
+                    if index == -1:
+                        index = 0
+                        monitor.portname = None
+                    uiPort.setCurrentIndex(index)
+
+            text = disc if uiPort.currentIndex() else select
+            if uiPort.itemText(0) != text:
+                uiPort.setItemText(0, text)
+
+        self.sptimer.singleShot(1000, self.listPorts)
+
+# utilities
+def isAscii(c):
+	return c >= ' ' and c <= '~'
+
+def toHex(c):
+	return '<' + hex(ord(c))[2:] + '>'
+
+def asciify(s):
+	return ''.join([c if isAscii(c) else toHex(c) for c in s])
+
+def hexify(s):
+	return ''.join(map(lambda x: ' ' + hex(ord(x))[2:], s))
+
+class portMonitor(QObject):
+    def __init__(self, whoami, port, baud, color, format):
+        QObject.__init__(self)
+        self.sfp = sfp.sfpProtocol()
+
+        self.port = port
+        self.baud = baud
+        self.color = color.currentText
+        self.format = format
+
+        self.port.activated.connect(self.selectPort)
+        self.baud.activated.connect(self.selectRate)
+        
+        self.sfp.newPacket = self.distributer
+        self.serial = serialio.serialPort(int(self.baud.currentText()))
+        self.portname = None
+        self.whoami = whoami
+
+    def distributer(self):  # distribute packets from queue
+        if not self.sfp.receivedPool.empty():
+            packet = self.sfp.receivedPool.get()
+            pid = packet[0]
+            if pids.pids.get(pid):
+                self.text("Packet: {} {}".format(pids.pids[pid], asciify(map(chr, packet[1:]))))
+            else:
+                error("Unknown PID: (0x{:02x})".format(pid))
+
+    def selectRate(self):
+        self.port.setRate(int(self.baud.currentText()))
+
+    def selectPort(self):
+        if self.serial.isOpen():
+            self.serial.close()
+        if self.port.currentIndex():
+            self.portname = self.port.currentText()
+            self.serial.open(self.portname, self.serial.rate)
+            if self.serial.isOpen():
+                self.serial.closed.connect(self.serialDone)
+                self.serial.ioError.connect(self.ioError)
+                self.serial.ioException.connect(self.ioError)
+                self.connectPort()
+            else:
+                self.port.setCurrentIndex(0)
+                self.portname = None
+        else:
+            self.portname = None
+
+    def serialDone(self):
+        note('{}: serial thread finished'.format(self.portname))
+
+    def ioError(self, message):
+        error(message)
+
+    def connectPort(self):  # override in children
+        self.serial.source.connect(self.sink)
+
+    def text(self, text):
+        message('\n{} '.format(self.whoami) + self.timestamp() + text, self.color())
+
+    def sink(self, s):
+        format = self.format.currentText()
+        if format == 'ASCII':
+            self.text(asciify(s))
+        elif format == 'SFP':
+            self.sfp.rxBytes(map(ord, s))
+        else:
+            self.text(hexify(s))
+
+    def timestamp(self):
+        ms = current_milli_time()
+        return "%d.%03d: " % (ms / 1000, ms % 1000)
