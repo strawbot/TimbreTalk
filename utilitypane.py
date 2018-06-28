@@ -200,10 +200,13 @@ def hexify(s):
 	return ''.join(map(lambda x: ' ' + hex(ord(x))[2:], s))
 
 class portMonitor(QObject):
+
     def __init__(self, whoami, port, baud, color, format):
         QObject.__init__(self)
         self.sfp = sfp.sfpProtocol()
 
+        self.useColor = dict(zip(["white","cyan","blue","green","yellow","orange","magenta","red"],
+				   ["white","cyan","deepskyblue","springgreen","yellow","orange","magenta","tomato"]))
         self.port = port
         self.baud = baud
         self.color = color.currentText
@@ -256,7 +259,8 @@ class portMonitor(QObject):
         self.serial.source.connect(self.sink)
 
     def text(self, text):
-        message('\n{} '.format(self.whoami) + self.timestamp() + text, self.color())
+    	color = self.useColor[self.color()]
+        message('\n{} '.format(self.whoami) + self.timestamp() + text, color)
 
     def sink(self, s):
         format = self.format.currentText()
