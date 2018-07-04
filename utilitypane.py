@@ -130,8 +130,18 @@ class utilityPane(QWidget):
                                         self.ui.MonitorBaud2,
                                         self.ui.MonitorColor2,
                                         self.ui.MonitorFormat2)
+        self.portMonitor3 = portMonitor(3,
+        								self.ui.MonitorPort3,
+                                        self.ui.MonitorBaud3,
+                                        self.ui.MonitorColor3,
+                                        self.ui.MonitorFormat3)
+        self.portMonitor4 = portMonitor(4,
+        								self.ui.MonitorPort4,
+                                        self.ui.MonitorBaud4,
+                                        self.ui.MonitorColor4,
+                                        self.ui.MonitorFormat4)
 
-        self.monitors = [self.portMonitor1, self.portMonitor2]
+        self.monitors = [self.portMonitor1, self.portMonitor2, self.portMonitor3, self.portMonitor4]
 
         self.sptimer = QTimer()
         self.listPorts()
@@ -188,16 +198,16 @@ class utilityPane(QWidget):
 
 # utilities
 def isAscii(c):
-	return c >= ' ' and c <= '~'
+    return c >= ' ' and c <= '~'
 
 def toHex(c):
-	return '<' + hex(ord(c))[2:] + '>'
+    return '<' + hex(ord(c))[2:] + '>'
 
 def asciify(s):
-	return ''.join([c if isAscii(c) else toHex(c) for c in s])
+    return ''.join([c if isAscii(c) else toHex(c) for c in s])
 
 def hexify(s):
-	return ''.join(map(lambda x: ' ' + hex(ord(x))[2:], s))
+    return ''.join(map(lambda x: ' ' + hex(ord(x))[2:], s))
 
 class portMonitor(QObject):
 
@@ -259,7 +269,7 @@ class portMonitor(QObject):
         self.serial.source.connect(self.sink)
 
     def text(self, text):
-    	color = self.useColor[self.color()]
+        color = self.useColor[self.color()]
         message('\n{} '.format(self.whoami) + self.timestamp() + text, color)
 
     def sink(self, s):

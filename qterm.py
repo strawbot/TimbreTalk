@@ -69,6 +69,9 @@ class terminal(QMainWindow):
 		self.ui.textEdit.installEventFilter(self)
 		self.messages(messageQueue())
 		self.ui.Find.clicked.connect(self.findText)
+		self.ui.CopyText.clicked.connect(self.copyText)
+		self.ui.SelectText.clicked.connect(self.selectText)
+		self.ui.PasteText.clicked.connect(self.pasteText)
 		self.ui.ClearText.clicked.connect(self.clearText)
 		self.ui.saveText.clicked.connect(self.saveText)
 		self.textcount = 0
@@ -127,7 +130,7 @@ class terminal(QMainWindow):
 		font.setPointSize(size)
 		self.ui.textEdit.setFont(font)
 		
-	def sendPhrase(self, s): # TODO: use line send and echo text to window
+	def sendPhrase(self, s): # TODO: use line send and echo text to window; also allow for long text
 		s = s+'\r'
 		for c in s:
 			self.keyin(c)
@@ -466,6 +469,15 @@ class terminal(QMainWindow):
 			except Exception, e:
 				print >>sys.stderr, e
 				traceback.print_exc(file=sys.stderr)
+
+	def selectText(self):
+		self.ui.textEdit.selectAll()
+
+	def copyText(self):
+		self.ui.textEdit.copy()
+
+	def pasteText(self):
+		self.sendPhrase(QApplication.clipboard().text())
 
 if __name__ == "__main__":
 	import sys	
