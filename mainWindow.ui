@@ -475,19 +475,6 @@
                       </property>
                      </spacer>
                     </item>
-                    <item row="0" column="2">
-                     <widget class="QPushButton" name="Ping">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="text">
-                       <string>Ping</string>
-                      </property>
-                     </widget>
-                    </item>
                     <item row="1" column="0">
                      <widget class="QCheckBox" name="LoopBack">
                       <property name="text">
@@ -495,23 +482,24 @@
                       </property>
                      </widget>
                     </item>
-                    <item row="1" column="2">
-                     <widget class="QPushButton" name="ResetRcvr">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                      <property name="text">
-                       <string>Reset Receiver</string>
-                      </property>
-                     </widget>
-                    </item>
                     <item row="2" column="0">
                      <widget class="QCheckBox" name="ignoreUnknowns">
                       <property name="text">
                        <string>Ignore Unknowns</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="0" column="2">
+                     <widget class="QPushButton" name="Ping">
+                      <property name="text">
+                       <string>Ping</string>
+                      </property>
+                     </widget>
+                    </item>
+                    <item row="1" column="2">
+                     <widget class="QPushButton" name="ResetRcvr">
+                      <property name="text">
+                       <string>Reset Receiver</string>
                       </property>
                      </widget>
                     </item>
@@ -778,14 +766,93 @@
                 </layout>
                </item>
                <item>
-                <widget class="QCheckBox" name="linewrap">
-                 <property name="text">
-                  <string>Line wrap</string>
-                 </property>
-                 <property name="checked">
-                  <bool>true</bool>
-                 </property>
-                </widget>
+                <layout class="QHBoxLayout" name="horizontalLayout_19">
+                 <item>
+                  <widget class="QCheckBox" name="linewrap">
+                   <property name="text">
+                    <string>Line wrap</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_19">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="textColor">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="acceptDrops">
+                    <bool>false</bool>
+                   </property>
+                   <property name="currentIndex">
+                    <number>1</number>
+                   </property>
+                   <property name="frame">
+                    <bool>true</bool>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>white</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>cyan</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>blue</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>green</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>yellow</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>orange</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>magenta</string>
+                    </property>
+                   </item>
+                   <item>
+                    <property name="text">
+                     <string>red</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>
@@ -2130,8 +2197,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>360</width>
-                 <height>277</height>
+                 <width>308</width>
+                 <height>221</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -3182,8 +3249,8 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <rect>
                  <x>0</x>
                  <y>0</y>
-                 <width>360</width>
-                 <height>277</height>
+                 <width>226</width>
+                 <height>151</height>
                 </rect>
                </property>
                <attribute name="label">
@@ -3333,6 +3400,9 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              </property>
              <item row="8" column="0">
               <widget class="QLineEdit" name="phrase9">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -3343,6 +3413,12 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <size>
                  <width>0</width>
                  <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
                 </size>
                </property>
               </widget>
@@ -3395,6 +3471,9 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              </item>
              <item row="9" column="0">
               <widget class="QLineEdit" name="phrase10">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -3405,6 +3484,12 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <size>
                  <width>0</width>
                  <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
                 </size>
                </property>
               </widget>
@@ -3425,6 +3510,9 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              </item>
              <item row="10" column="0">
               <widget class="QLineEdit" name="phrase11">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -3435,6 +3523,12 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                 <size>
                  <width>0</width>
                  <height>0</height>
+                </size>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
                 </size>
                </property>
               </widget>
@@ -3571,6 +3665,9 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              </item>
              <item row="11" column="0">
               <widget class="QLineEdit" name="phrase12">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -3583,10 +3680,25 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
                  <height>0</height>
                 </size>
                </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
               </widget>
              </item>
              <item row="8" column="1">
               <widget class="QPushButton" name="send9">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
                 <string>Send</string>
                </property>
@@ -3594,6 +3706,15 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              </item>
              <item row="9" column="1">
               <widget class="QPushButton" name="send10">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
                 <string>Send</string>
                </property>
@@ -3601,6 +3722,15 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              </item>
              <item row="10" column="1">
               <widget class="QPushButton" name="send11">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
                 <string>Send</string>
                </property>
@@ -3608,6 +3738,15 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
              </item>
              <item row="11" column="1">
               <widget class="QPushButton" name="send12">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="maximumSize">
+                <size>
+                 <width>16777215</width>
+                 <height>16777215</height>
+                </size>
+               </property>
                <property name="text">
                 <string>Send</string>
                </property>
@@ -4001,8 +4140,6 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
   <tabstop>whoFrom</tabstop>
   <tabstop>LoopBack</tabstop>
   <tabstop>ProtocolDump</tabstop>
-  <tabstop>Ping</tabstop>
-  <tabstop>ResetRcvr</tabstop>
   <tabstop>ignoreUnknowns</tabstop>
   <tabstop>inputIgnore</tabstop>
   <tabstop>sendHex</tabstop>
