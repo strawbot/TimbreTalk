@@ -1,24 +1,30 @@
-# generic device and portal classes for TT to connect to  Robert Chapman  Jul 24, 2018
+# generic port and portal classes for TT to connect to  Robert Chapman  Jul 24, 2018
 
-import threading
-import time
+from interface import *
 
-class device(object):
+class Port(Bottom):
     nodata = ''
 
-    def __init__(self, address, name, port):
+    def __init__(self, address, name, portal):
+        Bottom.__init__(self)
         self.address = address
         self.data = self.nodata
         self.name = name
-        self.port = port
-        self.timestamp = time.time()
+        self.portal = portal
+        self.__opened = False
+        self.start()
 
-    def last_timestamp(self):
-        return self.timestamp
+    def is_open(self):
+        return self.__opened
 
-    def hold_data(self, data):
+    def open(self):
+        self.__opened = True
+
+    def close(self):
+        self.__opened = False
+
+    def add_data(self, data):
         self.data += data
-        self.timestamp = time.time()
 
     def get_data(self):
         data = self.data
@@ -26,23 +32,33 @@ class device(object):
         return data
 
     def send_data(self, data):
-        self.port.send_data(self.address, data)
+        self.portal.send_data(self.address, data)
 
 
-class portal(threading.Thread):
+class Portal(QThread):
+    __ports = {}
+    update = pyqtSignal(object)
+
     def __init__(self):
-        threading.Thread.__init__(self)
-        self.__devices = {}
+        QThread.__init__(self)
+        self.__ports = {}
         self.start()
 
-    def devices(self):
-        return self.__devices.values()
+    def ports(self): # instance
+        return self.__ports.values()
 
-    def add_device(self, device):
-        self.__devices[device.name] = device
+    def all_ports(self): # class
+        return Portal.__ports.values()
 
-    def remove_device(self, device):
-        self.__devices.pop(device.name)
+    def add_port(self, port):
+        Portal.__ports[port.name] = port
+        self.__ports[port.name] = port
+        self.update.emit(port)
 
-    def get_device(self, name):
-        return self.__devices.get(name)
+    def remove_port(self, port):
+        Portal.__ports.pop(port.name)
+        self.__ports.pop(port.name)
+        self.update.emit(port)
+
+    def get_port(self, name):
+        return self.__ports.get(name)

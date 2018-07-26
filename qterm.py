@@ -33,7 +33,7 @@ class terminal(QMainWindow):
         self.ui.fontSize.valueChanged.connect(self.setFontSize)
 
         self.etm = etmLink.etmLink()
-        self.ip = ip.udpPortal()
+        self.ip = ip.UdpPortal()
 
         # serial port
         self.sptimer = QTimer()
@@ -263,7 +263,7 @@ class terminal(QMainWindow):
         uiPort = self.ui.PortSelect
         items = [uiPort.itemText(i) for i in range(1, uiPort.count())]
 
-        ipports = [device.name for device in self.ip.devices()]
+        ipports = [device.name for device in self.ip.ports()]
         ports = listports.listports() + self.etm.ports() + ipports
 
         for r in list(set(items)-set(ports)): # items to be removed
@@ -445,6 +445,7 @@ class terminal(QMainWindow):
     def close(self):
         if self.serialPort.port:
             self.serialPort.port.close()
+        self.ip.close()
         self.mthread.quit()
         self.mthread.wait()
 

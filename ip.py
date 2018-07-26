@@ -7,10 +7,23 @@ import sys, traceback
 import time
 
 sfp_udp_port = 1337
-udp_poll = 5
+udp_poll = 2
 udp_stale = 10
 
-class udpPortal(portal.portal):
+class UdpPort(portal.Port):
+    def __init__(self, address, name, port):
+        portal.Port.__init__(self, address, name, port)
+        self.timestamp = time.time()
+
+    def last_timestamp(self):
+        return self.timestamp
+
+    def add_data(self, data):
+        super(UdpPort, self).add_data(data)
+        self.timestamp = time.time()
+
+
+class UdpPortal(portal.Portal):
     def run(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('', sfp_udp_port))
@@ -31,16 +44,16 @@ class udpPortal(portal.portal):
 
     def receive_data(self, data, address):
         name = 'UDP port: {}'.format(address[1])
-        device = self.get_device(name)
-        if not device:
-            device = portal.device(address, name, self)
-            self.add_device(device)
-        device.hold_data(data)
+        port = self.get_port(name)
+        if not port:
+            port = UdpPort(address, name, self)
+            self.add_port(port)
+        port.add_data(data)
 
     def update_port_list(self):
-        for device in self.devices():
-            if time.time() - device.last_timestamp() > udp_stale:
-                self.remove_device(device)
+        for port in self.ports():
+            if time.time() - port.last_timestamp() > udp_stale:
+                self.remove_port(port)
 
     def send_data(self, address, data):
         self.sock.sendto(data, address)
