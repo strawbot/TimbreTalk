@@ -16,10 +16,9 @@ from message import *
 import qterm, serialPane, transferPane
 import infopane
 import utilitypane
+from interface import Layer
 
-class sfpQt (QObject, sfp.sfpProtocol):
-	source = Signal(object)
-
+class sfpQt (Layer, sfp.sfpProtocol):
 	def __init__(self):
 		QObject.__init__(self)
 		sfp.sfpProtocol.__init__(self)
@@ -112,7 +111,7 @@ class timbreTalk(qterm.terminal):
 
 	def selectWhoFrom(self, index):
 		self.whofrom = index
-		note('changed source to ' + self.ui.whoFrom.currentText())
+		note('changed output to ' + self.ui.whoFrom.currentText())
 
 	def who(self): # return latest who list
 		return [self.whoto, self.whofrom]

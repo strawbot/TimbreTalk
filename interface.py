@@ -31,12 +31,6 @@ class Interface(QThread):
         except:
             pass
 
-    def disconnect_output(self):
-        try:
-            self.output.disconnect()
-        except:
-            pass
-
     def loopback(self):
         self.disconnect_input()
         self.input.connect(self.output)
@@ -45,12 +39,18 @@ class Interface(QThread):
         self.disconnect_input()
         self.input.connect(self.send_data)
 
-    def connect(self, interface):
-        self.disconnect_output()
-        interface.disconnect_output()
+    def plugin(self, interface):
+        self.unplug()
+        interface.unplug()
         interface.output.connect(self.input)
         self.output.connect(interface.input)
 
+    def unplug(self):
+        try:
+            self.output.disconnect()
+        except:
+            pass
+        self.normal()
 
 class Bottom(Interface):
     pass
@@ -78,12 +78,19 @@ class Layer(QObject):
 
 if __name__ == "__main__":
     i = Interface()
-    l = Layer()
-    t = Top()
-    b = Bottom()
     def hi():
         print('hi')
     i.output.connect(hi)
     i.loopback()
     i.input.emit('')
     i.input.disconnect()
+
+    l = Layer()
+    t = Top()
+    b = Bottom()
+    t.plugin(l.upper)
+    b.plugin(l.lower)
+    l.passThrough()
+    b.loopback()
+    t.input.connect(hi)
+    t.output.emit('')

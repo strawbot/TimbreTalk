@@ -9,7 +9,7 @@ class Port(Bottom):
     closed = pyqtSignal()
     opened = pyqtSignal()
 
-    def __init__(self, address, name, portal):
+    def __init__(self, address=0, name=None, portal=None):
         Bottom.__init__(self)
         self.address = address
         self.data = self.nodata
@@ -26,9 +26,10 @@ class Port(Bottom):
         self.opened.emit()
 
     def close(self):
-        self.__opened = False
-        self.quit()
-        self.closed.emit()
+        if self.is_open():
+            self.__opened = False
+            self.quit()
+            self.closed.emit()
 
     def send_data(self, data):
         self.data += data
@@ -67,11 +68,12 @@ class Portal(QThread):
             self.update.emit(port)
 
     def get_port(self, name):
-        return self.__ports.get(name)
+        return Portal.__ports.get(name)
 
     def close(self):
         for port in self.ports():
             port.close()
+            self.remove_port(port.name)
         self.quit()
 
 

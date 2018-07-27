@@ -52,7 +52,7 @@ def dumpUimage(file):
 	print >>sys.stderr, 'comp: %X'%image[31]
 	print >>sys.stderr, 'name: %s'%''.join(map(chr, image[32:])).strip()
 
-def listfind(source, match): # find string match in source list
+def listfind(source, match): # find string match in output list
 	m = map(ord, match)
 	offset = [i for i in range(len(source)) if source[i:i+len(m)] == m]
 	if offset:

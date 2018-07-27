@@ -27,7 +27,7 @@ class serialPane(QWidget):
         self.ui.sendHex.clicked.connect(self.sendHex)
         self.ui.ignoreUnknowns.stateChanged.connect(self.blockUnknownPackets)
 
-        self.parent.serialPort.opened.connect(self.setParamButtonText)
+        self.parent.talkPort.opened.connect(self.setParamButtonText)
 
         # setup
         self.ui.SFP.click()
@@ -73,7 +73,7 @@ class serialPane(QWidget):
             return
 
         self.setWhoFrom(pids.MAIN_HOST)
-        sp = self.parent.serialPort
+        sp = self.parent.talkPort
         if sp.stopbits == 1.5:
             self.ui.toolButton.setText("%s %i %0.1f"%(sp.parity,sp.bytesize,sp.stopbits))
         else:
@@ -81,7 +81,7 @@ class serialPane(QWidget):
 
     def setParam(self, parity, bytesize, stopbits):
         try:
-            sp = self.parent.serialPort
+            sp = self.parent.talkPort
             if parity: sp.parity = parity
             if bytesize: sp.bytesize = bytesize
             if stopbits: sp.stopbits = stopbits
@@ -99,22 +99,16 @@ class serialPane(QWidget):
 
     def sendHex(self):
         try:
-            self.parent.serialPort.sink(bytearray.fromhex(self.ui.hexNum.text()))
+            self.parent.talkPort.input.emit(bytearray.fromhex(self.ui.hexNum.text()))
         except Exception, e:
             print >>sys.stderr, e
             traceback.print_exc(file=sys.stderr)
             error("can't set Params")
 
     def disconnectFlows(self):
-        def disconnectSignals(signal):
-#			while self.protocol.receivers(SIGNAL('source')) > 0:
-            try:
-                signal.disconnect()
-            except:
-                pass
-        disconnectSignals(self.protocol.source)
-        disconnectSignals(self.parent.serialPort.source)
-        disconnectSignals(self.parent.source)
+        self.parent.unplug()
+        self.protocol.unplug()
+        self.parent.talkPort.unplug()
 
     def connectPort(self):
         if self.ui.SFP.isChecked():
@@ -128,38 +122,31 @@ class serialPane(QWidget):
         if not self.ui.Serial1.isChecked():
             note('changed to no-protocol serial')
         self.disconnectFlows()
+        self.parent.plugin(self.parent.talkPort)
         if self.ui.LoopBack.isChecked():
-            self.parent.source.connect(self.parent.sink)
+            self.parent.talkPort.loopback()
         else:
-            self.parent.serialPort.source.connect(self.parent.sink)
-            self.parent.source.connect(self.parent.serialPort.sink)
+            self.parent.talkPort.normal()
 
     def selectSfp(self):
         if not self.ui.SFP.isChecked():
             note('changed to SFP')
             self.resetRcvr()
         self.disconnectFlows()
+        self.parent.plugin(self.parent.protocol.upper)
+        self.parent.talkPort.plugin(self.parent.protocol.lower)
         if self.ui.LoopBack.isChecked():
-            self.parent.serialPort.source.connect(self.parent.serialPort.sink)
-            self.protocol.source.connect(self.protocol.sink)
-            self.parent.source.connect(self.talkSink)
-        else:
-            self.protocol.source.connect(self.parent.serialPort.sink)
-            self.parent.serialPort.source.connect(self.protocol.sink)
-            self.parent.source.connect(self.talkSink)
+            self.parent.talkPort.loopback()
 
     def selectAt(self):
         if not self.ui.ATwifi.isChecked():
             note('changed to AT')
         self.disconnectFlows()
+        self.parent.plugin(self.parent.protocol.upper)
+        self.parent.talkPort.plugin(self.parent.protocol.lower)
         if self.ui.LoopBack.isChecked():
-            self.parent.serialPort.source.connect(self.parent.serialPort.sink)
-            self.protocol.source.connect(self.protocol.sink)
-            self.parent.source.connect(self.ATSink)
-        else:
-            self.protocol.source.connect(self.parent.serialPort.sink)
-            self.parent.serialPort.source.connect(self.protocol.sink)
-            self.parent.source.connect(self.ATSink)
+            self.parent.talkPort.loopback()
+        self.parent.output.connect(self.ATSink)
 
     def protocolDump(self, flag):
         self.protocol.VERBOSE = flag
@@ -167,7 +154,7 @@ class serialPane(QWidget):
 
     # talk connections
     def talkPacket(self, packet): # handle text packets
-        self.parent.sink(''.join(map(chr, packet[2:])))
+        self.parent.input.emit(''.join(map(chr, packet[2:])))
 
     def talkSink(self, s): # have a text port
         s = str(s)

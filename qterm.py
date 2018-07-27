@@ -5,7 +5,7 @@
 from pyqtapi2 import *
 import sys
 import etmLink
-import ip
+import interface, portal, ipPort, serialPort, jlinkPort
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -22,28 +22,22 @@ import traceback
 import listports, serialio
 from message import *
 
-class terminal(QMainWindow):
-    source = Signal(object) # source of output
+class terminal(QMainWindow, interface.Top):
     def __init__(self, parent=None, source=None):
         QMainWindow.__init__(self, parent)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.banner()
-        # connect(fontSizeSpin, SIGNAL(valueChanged(int), textEdit, SLOT(setFontPointSize(int));
         self.ui.fontSize.valueChanged.connect(self.setFontSize)
-
-        self.etm = etmLink.etmLink()
-        self.ip = ip.UdpPortal()
-
-        # serial port
-        self.sptimer = QTimer()
-        self.portname = None
-        self.serialPort = serialio.serialPort(int(self.ui.BaudRate.currentText()),self.etm)
-
-        # adjust ui widgets
         self.UiAdjust()
-        self.listPorts()
         self.show()
+
+        # talk ports
+        self.noTalkPort()
+        self.ipPortal = ipPort.UdpPortal()
+        self.jlinkPortal = jlinkPort.JlinkPortal()
+        self.serialPortal = serialPort.SerialPortal()
+        self.serialPortal.update.connect(self.showPorts)
 
         # font size adjustment
         if sys.platform == 'darwin':
@@ -76,6 +70,7 @@ class terminal(QMainWindow):
         self.ui.ClearText.clicked.connect(self.clearText)
         self.ui.saveText.clicked.connect(self.saveText)
         self.textcount = 0
+        self.normal()
 
         # capture all qt errors to terminal window
         def log_uncaught_exceptions(ex_cls, ex, tb):
@@ -160,30 +155,22 @@ class terminal(QMainWindow):
     def sendPhrase8(self):
         self.sendPhrase(self.ui.phrase8.text())
 
-        # connections
-#		self.source.connect(self.serialPort.sink)
-#		self.serialPort.source.connect(self.sink)
-#		self.source = self.serialPort.sink			
-#		self.serialPort.source = self.sink
-
     def banner(self):
         self.setWindowTitle('Qterm 1.1')
 
     def messages(self, q): # handle messages piped in from other threads
         class messageThread(QThread):
-            output = Signal(object)
             def __init__(self, parent, q):
                 QThread.__init__(self)
                 self.q = q
                 self.parent = parent
-                self.output.connect(self.parent.writeStyled)
 
             def run(self):
                 while 1:
                     try:
                         s = self.q.get()
                         if s:
-                            self.output.emit(s)
+                            self.parent.input.emit(s)
                     except Empty:
                         print 'Empty exception'
                         pass
@@ -193,9 +180,6 @@ class terminal(QMainWindow):
 
         self.mthread = messageThread(self, q)
         self.mthread.start()
-
-    def atextual(self): # keyboard to display direct
-        self.source = self.sink
 
     def newCrLf(self, t):
         s = ''
@@ -257,53 +241,55 @@ class terminal(QMainWindow):
         self.ignore = [[],[13],[10],[10,13]][ignore]
 
     # serial port
-    def listPorts(self):
-        select, disc = '(Select a Port)', '(Disconnect)'
+    def noTalkPort(self):
+        self.talkPort = portal.Port()
 
+    def showPorts(self):
+        # update port list in combobox
         uiPort = self.ui.PortSelect
         items = [uiPort.itemText(i) for i in range(1, uiPort.count())]
-
-        ipports = [device.name for device in self.ip.ports()]
-        ports = listports.listports() + self.etm.ports() + ipports
+        ports = self.serialPortal.all_ports()
 
         for r in list(set(items)-set(ports)): # items to be removed
             uiPort.removeItem(uiPort.findText(r))
         for a in list(set(ports)-set(items)): # items to be added
             uiPort.addItem(a)
 
-        if self.portname:
-            if self.portname != uiPort.currentText():
-                index = uiPort.findText(self.portname)
+        # check current port against list and select proper item
+        if self.talkPort.name:
+            if self.talkPort.name != uiPort.currentText():
+                index = uiPort.findText(self.talkPort.name)
                 if index == -1:
                     index = 0
-                    self.portname = None
+                    self.noTalkPort()
                 uiPort.setCurrentIndex(index)
 
-        text = disc if uiPort.currentIndex() else select
+        # set item zero
+        text = '(Disconnect)' if uiPort.currentIndex() else '(Select a Port)'
         if uiPort.itemText(0) != text:
             uiPort.setItemText(0, text)
 
-        self.sptimer.singleShot(1000, self.listPorts)
-
-    def selectRate(self):
-        self.serialPort.setRate(int(self.ui.BaudRate.currentText()))
-
     def selectPort(self):
-        if self.serialPort.isOpen():
+        if self.talkPort.is_open():
             self.serialPort.close()
+
         if self.ui.PortSelect.currentIndex():
-            self.portname = self.ui.PortSelect.currentText()
-            self.serialPort.open(self.portname, self.serialPort.rate)
-            if self.serialPort.isOpen():
-                self.serialPort.closed.connect(self.serialDone)
-                self.serialPort.ioError.connect(self.ioError)
-                self.serialPort.ioException.connect(self.ioError)
+            self.talkPort = self.serialPortal.get_port(self.ui.PortSelect.currentText())
+            self.talkPort.open()
+            if self.talkPort.is_open():
+                self.talkPort.closed.connect(self.serialDone)
+                self.talkPort.ioError.connect(self.ioError)
+                self.talkPort.ioException.connect(self.ioError)
                 self.connectPort()
             else:
                 self.ui.PortSelect.setCurrentIndex(0)
-                self.portname = None
+                self.noTalkPort()
         else:
-            self.portname = None
+            self.noTalkPort()
+        self.showPorts()
+
+    def selectRate(self):
+        self.serialPort.setRate(int(self.ui.BaudRate.currentText()))
 
     def ioError(self, message):
         error(message)
@@ -312,20 +298,12 @@ class terminal(QMainWindow):
     def serialDone(self):
         note('Serial thread finished')
 
-    # Loopback
-    def loopback(self, flag):
-        if flag:
-            note('looping back connection\n')
-        else:
-            note('removing loopback\n')
-        self.connectPort()
-
-    def connectPort(self): # override in children
+    def connectPort(self):
+        self.plugin(self.talkPort)
         if self.ui.LoopBack.isChecked():
-            self.source.connect(self.sink)
+            self.talkPort.loopback()
         else:
-            self.serialPort.source.connect(self.sink)
-            self.source.connect(self.serialPort.sink)
+            self.talkPort.normal()
 
     # terminal only
     def UiAdjust(self):
@@ -361,7 +339,7 @@ class terminal(QMainWindow):
             character = chr(0x8)
 
         if self.single:
-            self.source.emit(character)
+            self.output.emit(character)
             if self.linebuffer:
                 del self.linebuffer[:]
             if self.echo:
@@ -369,7 +347,7 @@ class terminal(QMainWindow):
         else:
             if character == '\x0d' or character == '\x0a':
                 self.write('\x0a')
-                self.source.emit(''.join(self.linebuffer[:]))
+                self.output.emit(''.join(self.linebuffer[:]))
                 del self.linebuffer[:]
             elif character == chr(8):
                 if self.linebuffer:
@@ -390,7 +368,10 @@ class terminal(QMainWindow):
     def isCursorVisible(self):
         vbar = self.ui.textEdit.verticalScrollBar()
         return ((vbar.maximum() - vbar.value()) < vbar.singleStep())
-        
+
+    def send_data(self, data):
+        self.writeStyled(data)
+
     def writeStyled(self, t):
         s, style = t[0], t[1]
         if s:
@@ -402,7 +383,6 @@ class terminal(QMainWindow):
             visible = self.isCursorVisible()
             f = self.ui.textEdit.currentCharFormat()
             if style: # Note: QColor.colorNames() for a list of named colors
-#				s = s.strip()
                 if style == 'note':
                     f.setForeground(QColor("springgreen"))
                 elif style == 'warning':
