@@ -4,6 +4,10 @@ from interface import *
 
 class Port(Bottom):
     nodata = ''
+    ioError = pyqtSignal(object)
+    ioException = pyqtSignal(object)
+    closed = pyqtSignal()
+    opened = pyqtSignal()
 
     def __init__(self, address, name, portal):
         Bottom.__init__(self)
@@ -19,20 +23,20 @@ class Port(Bottom):
 
     def open(self):
         self.__opened = True
+        self.opened.emit()
 
     def close(self):
         self.__opened = False
+        self.quit()
+        self.closed.emit()
 
-    def add_data(self, data):
+    def send_data(self, data):
         self.data += data
 
     def get_data(self):
         data = self.data
         self.data = self.nodata
         return data
-
-    def send_data(self, data):
-        self.portal.send_data(self.address, data)
 
 
 class Portal(QThread):
@@ -51,14 +55,57 @@ class Portal(QThread):
         return Portal.__ports.values()
 
     def add_port(self, port):
-        Portal.__ports[port.name] = port
-        self.__ports[port.name] = port
-        self.update.emit(port)
+        if not self.get_port(port.name):
+            Portal.__ports[port.name] = port
+            self.__ports[port.name] = port
+            self.update.emit(port)
 
     def remove_port(self, port):
-        Portal.__ports.pop(port.name)
-        self.__ports.pop(port.name)
-        self.update.emit(port)
+        if Portal.get_port(port.name):
+            Portal.__ports.pop(port.name)
+            self.__ports.pop(port.name)
+            self.update.emit(port)
 
     def get_port(self, name):
         return self.__ports.get(name)
+
+    def close(self):
+        for port in self.ports():
+            port.close()
+        self.quit()
+
+
+if __name__ == '__main__':
+    import sys
+    class app(QApplication):
+        def __init__(self):
+            QApplication.__init__(self, [])
+            self.timer = QTimer()
+            self.timer.timeout.connect(self.test)
+            self.timer.start(0)
+
+        def didopen(self):
+            print("port '{}' at address '{}' is open".format(self.port.name, self.port.address))
+
+        def didclose(self):
+            print("port '{}' closed".format(self.port.name))
+
+        def test(self):
+            try:
+                jp = Portal()
+                self.port = j = Port(12345, 'test port', jp)
+                jp.add_port(j)
+                j = jp.get_port(jp.ports()[0].name)
+                j.opened.connect(self.didopen)
+                j.closed.connect(self.didclose)
+                j.open()
+                if j.is_open():
+                    print("yes its open")
+                else:
+                    print("port not found")
+
+                jp.close()
+            finally:
+                self.quit()
+
+    sys.exit(app().exec_())

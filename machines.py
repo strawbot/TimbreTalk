@@ -10,8 +10,8 @@ block.
 
 Code has been added to simulate the Qt application, threading and object classes
 along with signals. If a signal has an argument it is executed immediately (could
-queue the argument I suppose...). If the signal has no argument, it is queued as
-a machine.
+queue the argument I suppose...) (Could also add the argument to the machine as an
+attribute). If the signal has no argument, it is queued as a machine.
 
 Could detect if qt api is available and then call it instead.
 '''
@@ -31,7 +31,7 @@ def doneMachines():
 		print >>sys.stderr, 'threads running:'
 		threading.enumerate()
 
-def runMachines():
+def runMachines(): # could turn this into a thread which waits on the queue
 	if printme: print >>sys.stderr, 'running machines'
 	while not done:
 		machineq.get()() # run the gotten machine

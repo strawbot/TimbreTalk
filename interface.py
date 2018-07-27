@@ -1,4 +1,16 @@
 # interfaces for data  Robert Chapman  Jul 26, 2018
+#  input_data is defined by children
+#  output is emitted by children
+#  routing and coupling is provided by interface
+# Define 2 layers:
+#  layer1, layer2 = Layer(), Layer()
+# To connect layer 1 to layer 2:
+#   layer1.upper.connect(layer2.lower)
+#  or
+#   layer2.lower.connect(layer1.upper)
+# For bottom of a stack:
+#  endpoint = Bottom()
+#  layer1.lower.connect(endpoint)
 
 from pyqtapi2 import *
 
@@ -10,22 +22,34 @@ class Interface(QThread):
         QThread.__init__(self)  # needed for signals to work!!
         self.normal()
 
-    def loopback(self):
+    def send_data(self, data):
+        pass
+
+    def disconnect_input(self):
         try:
             self.input.disconnect()
         except:
             pass
+
+    def disconnect_output(self):
+        try:
+            self.output.disconnect()
+        except:
+            pass
+
+    def loopback(self):
+        self.disconnect_input()
         self.input.connect(self.output)
 
     def normal(self):
-        try:
-            self.input.disconnect()
-        except:
-            pass
-        self.input.connect(self.input_data)
+        self.disconnect_input()
+        self.input.connect(self.send_data)
 
-    def input_data(self, data):
-        pass
+    def connect(self, interface):
+        self.disconnect_output()
+        interface.disconnect_output()
+        interface.output.connect(self.input)
+        self.output.connect(interface.input)
 
 
 class Bottom(Interface):

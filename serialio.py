@@ -29,11 +29,8 @@ class serialPort(QThread):
         self.outputs = 0
         self.link = link
 
-    #		initSignalCatcher()
-
     # shutdown signal
     def shutdown(self):
-        #		note('shutting down serial port\n\r')
         self.closePort()
         self.quit()
 
@@ -51,7 +48,7 @@ class serialPort(QThread):
             except Exception, e:
                 self.closePort()
                 # traceback.print_exc(file=sys.stderr)
-                # error("run - serial port exception: %s" % e)
+                # error("run - serial port exception: %s" % j)
         self.closed.emit()
 
     def open(self, port, rate=None, thread=True, timeout=.01):
