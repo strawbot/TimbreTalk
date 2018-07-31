@@ -28,6 +28,7 @@ class serialPort(QThread):
         self.inputs = 0
         self.outputs = 0
         self.link = link
+        self.setObjectName("SerialPort")
 
     # shutdown signal
     def shutdown(self):

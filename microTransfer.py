@@ -24,7 +24,7 @@ class microTransfer(imageTransfer):
         self.version = 0
         self.verbose = 0
         self.run = 0
-        self.serialPort = self.parent.parent.serialPort
+        self.serialPort = self.parent.parent.talkPort
 
     def setParam(self, sp, parity, bytesize, stopbits):
         if sp.port:

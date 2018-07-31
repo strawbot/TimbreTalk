@@ -384,7 +384,7 @@ class Ui_MainWindow(object):
         spacerItem8 = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout_19.addItem(spacerItem8)
         self.textColor = QtGui.QComboBox(self.groupBox)
-        self.textColor.setEnabled(False)
+        self.textColor.setEnabled(True)
         sizePolicy = QtGui.QSizePolicy(QtGui.QSizePolicy.Fixed, QtGui.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)

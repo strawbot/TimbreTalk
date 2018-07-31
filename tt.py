@@ -92,11 +92,11 @@ if __name__ == "__main__":
 # 	name = kwargs.get('name', '')
 # 	port = kwargs.get('port', '/dev/ttyACM0')
 #	sys.excepthook = lambda *args: None
-	app = QApplication([])
-	try:
-		timbreTalk = timbreTalk()
-		sys.exit(app.exec_())
-	except Exception as e:
-		print >>sys.stderr, e
-		traceback.print_exc(file=sys.stderr)
-	timbreTalk.close()
+    app = QApplication([])
+    try:
+        timbreTalk = timbreTalk(app)
+        sys.exit(app.exec_())
+    except Exception as e:
+        print >>sys.stderr, e
+        traceback.print_exc(file=sys.stderr)
+    timbreTalk.close()

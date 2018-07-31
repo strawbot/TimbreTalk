@@ -24,6 +24,10 @@ class UdpPort(Port):
 
 
 class UdpPortal(Portal):
+    def __init__(self):
+        Portal.__init__(self, name="UdpPortal")
+        self.start()
+
     def run(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.sock.bind(('', sfp_udp_port))

@@ -127,7 +127,7 @@ class JlinkPort(Port):
 
 class JlinkPortal(Portal):
     def __init__(self):
-        Portal.__init__(self)
+        Portal.__init__(self, "JlinkPortal")
         if module_exists('pylink'):
             import pylink
             self.link = pylink.JLink()

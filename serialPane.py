@@ -31,7 +31,8 @@ class serialPane(QWidget):
 
         # setup
         self.ui.SFP.click()
-        self.protocol.setHandler(pids.TALK_OUT, self.talkPacket)
+        # self.protocol.setHandler(pids.TALK_OUT, self.talkPacket)
+        self.protocol.upper.send_data = self.talkSink
 
     def portParametersMenu(self):
         # menu for serial port parameters
@@ -73,6 +74,8 @@ class serialPane(QWidget):
             return
 
         self.setWhoFrom(pids.MAIN_HOST)
+        return
+        ### TODO: Fix
         sp = self.parent.talkPort
         if sp.stopbits == 1.5:
             self.ui.toolButton.setText("%s %i %0.1f"%(sp.parity,sp.bytesize,sp.stopbits))
@@ -106,7 +109,7 @@ class serialPane(QWidget):
             error("can't set Params")
 
     def disconnectFlows(self):
-        self.parent.unplug()
+        self.parent.lower.unplug()
         self.protocol.unplug()
         self.parent.talkPort.unplug()
 
@@ -133,8 +136,9 @@ class serialPane(QWidget):
             note('changed to SFP')
             self.resetRcvr()
         self.disconnectFlows()
-        self.parent.plugin(self.parent.protocol.upper)
+        self.parent.lower.plugin(self.parent.protocol.upper)
         self.parent.talkPort.plugin(self.parent.protocol.lower)
+        self.parent.protocol.lower.output.connect(self.parent.talkPort.send_data)
         if self.ui.LoopBack.isChecked():
             self.parent.talkPort.loopback()
 
@@ -146,7 +150,7 @@ class serialPane(QWidget):
         self.parent.talkPort.plugin(self.parent.protocol.lower)
         if self.ui.LoopBack.isChecked():
             self.parent.talkPort.loopback()
-        self.parent.output.connect(self.ATSink)
+        self.parent.lower.output.connect(self.ATSink)
 
     def protocolDump(self, flag):
         self.protocol.VERBOSE = flag
@@ -154,7 +158,8 @@ class serialPane(QWidget):
 
     # talk connections
     def talkPacket(self, packet): # handle text packets
-        self.parent.input.emit(''.join(map(chr, packet[2:])))
+        data = ''.join(map(chr, packet[2:]))
+        self.parent.lower.input.emit(data)
 
     def talkSink(self, s): # have a text port
         s = str(s)

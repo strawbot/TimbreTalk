@@ -809,7 +809,7 @@
                  <item>
                   <widget class="QComboBox" name="textColor">
                    <property name="enabled">
-                    <bool>false</bool>
+                    <bool>true</bool>
                    </property>
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Fixed" vsizetype="Fixed">

@@ -22,22 +22,29 @@ import traceback
 import listports, serialio
 from message import *
 
-class terminal(QMainWindow, interface.Top):
-    def __init__(self, parent=None, source=None):
-        QMainWindow.__init__(self, parent)
+class terminal(QMainWindow):
+    def __init__(self, app, parent=None, source=None):
+        super(terminal, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.banner()
         self.ui.fontSize.valueChanged.connect(self.setFontSize)
         self.UiAdjust()
         self.show()
+        self.app = app
 
         # talk ports
+        self.portlistMutex = QMutex()
+        self.lower = interface.Top('qterm')
+        self.lower.send_data = self.send_data
         self.noTalkPort()
-        self.ipPortal = ipPort.UdpPortal()
-        self.jlinkPortal = jlinkPort.JlinkPortal()
+        # self.ipPortal = ipPort.UdpPortal()
+        # self.jlinkPortal = jlinkPort.JlinkPortal()
         self.serialPortal = serialPort.SerialPortal()
         self.serialPortal.update.connect(self.showPorts)
+        # self.jlinkPortal.update.connect(self.showPorts)
+        # self.ipPortal.update.connect(self.showPorts)
+        self.showPorts()
 
         # font size adjustment
         if sys.platform == 'darwin':
@@ -70,7 +77,7 @@ class terminal(QMainWindow, interface.Top):
         self.ui.ClearText.clicked.connect(self.clearText)
         self.ui.saveText.clicked.connect(self.saveText)
         self.textcount = 0
-        self.normal()
+        self.lower.normal()
 
         # capture all qt errors to terminal window
         def log_uncaught_exceptions(ex_cls, ex, tb):
@@ -164,14 +171,15 @@ class terminal(QMainWindow, interface.Top):
                 QThread.__init__(self)
                 self.q = q
                 self.parent = parent
+                self.setObjectName("MessageThread")
 
             def run(self):
-                while 1:
+                while True:
                     try:
                         s = self.q.get()
                         if s:
-                            self.parent.input.emit(s)
-                    except Empty:
+                            self.parent.send_data(s)
+                    except Queue.Empty:
                         print 'Empty exception'
                         pass
                     except Exception, e:
@@ -242,13 +250,14 @@ class terminal(QMainWindow, interface.Top):
 
     # serial port
     def noTalkPort(self):
-        self.talkPort = portal.Port()
+        self.talkPort = portal.Port(name='notalk')
 
     def showPorts(self):
+        self.portlistMutex.lock()
         # update port list in combobox
         uiPort = self.ui.PortSelect
         items = [uiPort.itemText(i) for i in range(1, uiPort.count())]
-        ports = self.serialPortal.all_ports()
+        ports = [port.name for port in self.serialPortal.all_ports()]
 
         for r in list(set(items)-set(ports)): # items to be removed
             uiPort.removeItem(uiPort.findText(r))
@@ -268,10 +277,11 @@ class terminal(QMainWindow, interface.Top):
         text = '(Disconnect)' if uiPort.currentIndex() else '(Select a Port)'
         if uiPort.itemText(0) != text:
             uiPort.setItemText(0, text)
+        self.portlistMutex.unlock()
 
     def selectPort(self):
         if self.talkPort.is_open():
-            self.serialPort.close()
+            self.talkPort.close()
 
         if self.ui.PortSelect.currentIndex():
             self.talkPort = self.serialPortal.get_port(self.ui.PortSelect.currentText())
@@ -289,17 +299,17 @@ class terminal(QMainWindow, interface.Top):
         self.showPorts()
 
     def selectRate(self):
-        self.serialPort.setRate(int(self.ui.BaudRate.currentText()))
+        self.talkPort.setRate(int(self.ui.BaudRate.currentText()))
 
     def ioError(self, message):
         error(message)
-        self.serialPort.close()
+        self.talkPort.close()
 
     def serialDone(self):
         note('Serial thread finished')
 
     def connectPort(self):
-        self.plugin(self.talkPort)
+        self.lower.plugin(self.talkPort)
         if self.ui.LoopBack.isChecked():
             self.talkPort.loopback()
         else:
@@ -339,7 +349,7 @@ class terminal(QMainWindow, interface.Top):
             character = chr(0x8)
 
         if self.single:
-            self.output.emit(character)
+            self.lower.output.emit(character)
             if self.linebuffer:
                 del self.linebuffer[:]
             if self.echo:
@@ -347,7 +357,7 @@ class terminal(QMainWindow, interface.Top):
         else:
             if character == '\x0d' or character == '\x0a':
                 self.write('\x0a')
-                self.output.emit(''.join(self.linebuffer[:]))
+                self.lower.output.emit(''.join(self.linebuffer[:]))
                 del self.linebuffer[:]
             elif character == chr(8):
                 if self.linebuffer:
@@ -361,16 +371,21 @@ class terminal(QMainWindow, interface.Top):
         if style:
             s = '\n'+s
         self.sink(s)
+        print ("fix this")
 
     def sink(self, s):
         message(s)
+        print ("fix this")
 
     def isCursorVisible(self):
         vbar = self.ui.textEdit.verticalScrollBar()
         return ((vbar.maximum() - vbar.value()) < vbar.singleStep())
 
     def send_data(self, data):
-        self.writeStyled(data)
+        if type(data) == type(('',)):
+            self.writeStyled(data)
+        else:
+            self.writeStyled((data, ''))
 
     def writeStyled(self, t):
         s, style = t[0], t[1]
@@ -396,7 +411,7 @@ class terminal(QMainWindow, interface.Top):
                     self.textcount = 0
                 self.ui.textEdit.insertPlainText(s)
             else:
-                f.setForeground(QColor("cyan"))
+                f.setForeground(QColor(self.ui.textColor.currentText()))
                 self.ui.textEdit.setCurrentCharFormat(f)
                 for c in s:
                     if self.ui.InHex.isChecked():
@@ -421,10 +436,11 @@ class terminal(QMainWindow, interface.Top):
                 sb = self.ui.textEdit.verticalScrollBar()
                 sb.setValue(sb.maximum())
             self.mutex.unlock()
+            self.ui.textEdit.viewport().update()
 
     def close(self):
-        if self.serialPort.port:
-            self.serialPort.port.close()
+        if self.talkPort.port:
+            self.talkPort.port.close()
         self.ip.close()
         self.mthread.quit()
         self.mthread.wait()
@@ -466,6 +482,6 @@ class terminal(QMainWindow, interface.Top):
 if __name__ == "__main__":
     import sys
     app = QApplication([])
-    terminal = terminal()
+    terminal = terminal(app)
     sys.exit(app.exec_())
     terminal.close()

@@ -17,7 +17,7 @@ class SerialPort(Port):
     def __init__(self, name, portal):
         Port.__init__(self, name, name, portal)
         self.port = None
-        self.rate = self.default = 115200
+        self.rate = 115200
 
     def run(self):
         while self.is_open():
@@ -37,9 +37,8 @@ class SerialPort(Port):
         if self.is_open():
             error("Already opened!")
         else:
-            self.rate = rate
-            if not self.rate:
-                self.rate = self.default
+            if rate:
+                self.rate = rate
 
             try:
                 self.port = serial.Serial(self.name,
@@ -66,7 +65,7 @@ class SerialPort(Port):
     def closePort(self):
         Port.close(self)
         self.wait(100) # let thread finish
-        self.disconnect_output()
+        self.unplug()
         for signal in [self.closed, self.ioError, self.ioException]:
             try:
                 signal.disconnect()
@@ -122,19 +121,26 @@ class SerialPort(Port):
 
 
 class SerialPortal(Portal):
-    def __init__(self, interval=5):
+    def __init__(self, interval=2):
         self.update_interval = interval
-        Portal.__init__(self)
+        Portal.__init__(self, "SerialPortal")
+        self.start()
         self.wait(100)
 
     def run(self):
-        while True:
-            ports = listports.listports()
-            for name in ports:
-                if not self.get_port(name):
-                    port = SerialPort(name, self)
+        try:
+            while True:
+                ports = listports.listports()
+                portlist = [port.name for port in self.ports()]
+                for r in list(set(portlist) - set(ports)):  # items to be removed
+                    self.remove_port(self.get_port(r))
+                for a in list(set(ports) - set(portlist)):  # items to be added
+                    port = SerialPort(a, self)
                     self.add_port(port)
-            time.sleep(self.update_interval)
+                time.sleep(self.update_interval)
+        except Exception, e:
+            print >> sys.stderr, e
+            traceback.print_exc(file=sys.stderr)
 
 
 if __name__ == '__main__':
@@ -152,19 +158,30 @@ if __name__ == '__main__':
         def didclose(self):
             print("port '{}' closed".format(self.port.name))
 
+        def seeInput(self, data):
+            print("Rx'd:[{}]".format(data))
+
         def test(self):
             try:
                 jp = SerialPortal()
                 self.port = j = jp.get_port(jp.ports()[0].name)
                 j.opened.connect(self.didopen)
                 j.closed.connect(self.didclose)
+                j.output.connect(self.seeInput, Qt.DirectConnection)
                 j.open()
                 if j.is_open():
                     print("yes its open")
                 else:
                     print("port not found")
 
+                for i in range(20):
+                    j.send_data("test string {}\n".format(i))
+                j.wait(100)
+                j.close()
                 jp.close()
+            except Exception, e:
+                print >> sys.stderr, e
+                traceback.print_exc(file=sys.stderr)
             finally:
                 self.quit()
 
