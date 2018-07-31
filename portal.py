@@ -10,13 +10,13 @@ class Port(Bottom):
     opened = pyqtSignal()
 
     def __init__(self, address=0, name=None, portal=None):
-        Bottom.__init__(self)
+        Bottom.__init__(self, name)
         self.address = address
         self.data = self.nodata
         self.name = name
         self.portal = portal
         self.__opened = False
-        self.start()
+        self.setObjectName(name)
 
     def is_open(self):
         return self.__opened
@@ -44,10 +44,10 @@ class Portal(QThread):
     __ports = {}
     update = pyqtSignal(object)
 
-    def __init__(self):
+    def __init__(self, name='Portal'):
         QThread.__init__(self)
         self.__ports = {}
-        self.start()
+        self.setObjectName(name)
 
     def ports(self): # instance
         return self.__ports.values()
@@ -62,7 +62,7 @@ class Portal(QThread):
             self.update.emit(port)
 
     def remove_port(self, port):
-        if Portal.get_port(port.name):
+        if Portal.__ports.get(port.name):
             Portal.__ports.pop(port.name)
             self.__ports.pop(port.name)
             self.update.emit(port)
@@ -72,8 +72,8 @@ class Portal(QThread):
 
     def close(self):
         for port in self.ports():
+            self.remove_port(port)
             port.close()
-            self.remove_port(port.name)
         self.quit()
 
 
@@ -95,9 +95,8 @@ if __name__ == '__main__':
         def test(self):
             try:
                 jp = Portal()
-                self.port = j = Port(12345, 'test port', jp)
-                jp.add_port(j)
-                j = jp.get_port(jp.ports()[0].name)
+                jp.add_port(Port(12345, 'test port', jp))
+                self.port = j = jp.get_port(jp.ports()[0].name)
                 j.opened.connect(self.didopen)
                 j.closed.connect(self.didclose)
                 j.open()
@@ -105,6 +104,11 @@ if __name__ == '__main__':
                     print("yes its open")
                 else:
                     print("port not found")
+                if set(jp.all_ports()) - set(jp.ports()):
+                    print("ERROR: all ports not the same as ports")
+                jp.remove_port(jp.get_port(j.name))
+                if set(jp.all_ports()).union(set(jp.ports())) == set():
+                    print("ERROR: all ports not removed")
 
                 jp.close()
             finally:
