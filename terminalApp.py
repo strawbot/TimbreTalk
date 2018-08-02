@@ -71,7 +71,10 @@ class terminal(QtGui.QMainWindow):
     def showText(self, text):
         self.textMutex.lock()
         self.ui.textEdit.moveCursor(QtGui.QTextCursor.End)  # get cursor to end of text
-        self.ui.textEdit.insertPlainText(text)
+        if text == chr(8):
+            self.ui.textEdit.textCursor().deletePreviousChar()
+        else:
+            self.ui.textEdit.insertPlainText(text)
         sb = self.ui.textEdit.verticalScrollBar()
         sb.setValue(sb.maximum())
         self.textMutex.unlock()

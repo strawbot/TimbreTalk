@@ -64,7 +64,7 @@
            <enum>Qt::NoContextMenu</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>1</number>
           </property>
           <widget class="QWidget" name="Interface">
            <attribute name="title">
@@ -4259,12 +4259,60 @@ background-color: qradialgradient(spread:pad, cx:0.5, cy:0.5, radius:0.5, fx:0.5
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1016</x>
-     <y>620</y>
+     <x>957</x>
+     <y>589</y>
     </hint>
     <hint type="destinationlabel">
      <x>829</x>
      <y>438</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>PasteText</sender>
+   <signal>released()</signal>
+   <receiver>textEdit</receiver>
+   <slot>paste()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>645</x>
+     <y>567</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>732</x>
+     <y>483</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>CopyText</sender>
+   <signal>released()</signal>
+   <receiver>textEdit</receiver>
+   <slot>copy()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>565</x>
+     <y>575</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>699</x>
+     <y>475</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SelectText</sender>
+   <signal>released()</signal>
+   <receiver>textEdit</receiver>
+   <slot>selectAll()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>498</x>
+     <y>574</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>773</x>
+     <y>536</y>
     </hint>
    </hints>
   </connection>

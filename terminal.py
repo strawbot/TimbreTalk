@@ -49,6 +49,9 @@ class Ui_Frame(object):
         self.horizontalLayout.addWidget(self.PortSelect)
         spacerItem = QtGui.QSpacerItem(40, 20, QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
+        self.pushButton = QtGui.QPushButton(Frame)
+        self.pushButton.setObjectName(_fromUtf8("pushButton"))
+        self.horizontalLayout.addWidget(self.pushButton)
         self.verticalLayout.addLayout(self.horizontalLayout)
         self.textEdit = QtGui.QPlainTextEdit(Frame)
         self.textEdit.setMinimumSize(QtCore.QSize(601, 471))
@@ -105,12 +108,14 @@ class Ui_Frame(object):
         self.verticalLayout.addWidget(self.textEdit)
 
         self.retranslateUi(Frame)
+        QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL(_fromUtf8("released()")), self.textEdit.clear)
         QtCore.QMetaObject.connectSlotsByName(Frame)
 
     def retranslateUi(self, Frame):
         Frame.setWindowTitle(_translate("Frame", "Frame", None))
         self.label.setText(_translate("Frame", "Port:", None))
         self.PortSelect.setItemText(0, _translate("Frame", "(Select host Port)", None))
+        self.pushButton.setText(_translate("Frame", "Clear", None))
 
 
 if __name__ == "__main__":
