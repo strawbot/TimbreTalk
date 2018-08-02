@@ -4,9 +4,9 @@ from protocols import sfp, pids
 from message import *
 from interface import Layer
 
-class sfpQt (Layer, sfp.sfpProtocol):
+class SfpLayer (Layer, sfp.sfpProtocol):
     def __init__(self):
-        Layer.__init__(self, 'sfpQt')
+        Layer.__init__(self, 'sfpLayer')
         sfp.sfpProtocol.__init__(self)
         self.lower.input.connect(self.send_data)
         self.upper.input.connect(self.talkOut)
@@ -16,8 +16,9 @@ class sfpQt (Layer, sfp.sfpProtocol):
         self.rxBytes(map(ord, bytes))
 
     def newFrame(self):
-        data = ''.join(map(chr, self.txBytes()))
-        self.lower.output.emit(data)
+        data = self.txBytes()
+        string = ''.join(map(chr, data))
+        self.lower.output.emit(string)
 
     def newBytes(self, data):
         self.rxBytes(map(ord, data))
@@ -73,7 +74,7 @@ if __name__ == '__main__':
             try:
                 self.portal = SerialPortal()
                 self.port = self.portal.get_port('/dev/cu.usbserial-FT9S9VC1')
-                self.layer = sfpQt()
+                self.layer = SfpLayer()
                 self.app = Interface('test')
                 # build comm stack
                 self.app.plugin(self.layer.upper)

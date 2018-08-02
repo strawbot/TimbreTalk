@@ -20,16 +20,16 @@ class UdpPort(Port):
         return self.timestamp
 
     def send_data(self, data):
-        super(UdpPort, self).send_data(data)
+        self.portal.send_data(self.address, data)
         self.timestamp = time.time()
 
 
-class UdpPortal(Thread, Portal):
+class UdpPortal(Portal):
     def __init__(self):
-        Thread.__init__(self)
         Portal.__init__(self, name="UdpPortal")
-        self.setDaemon(True)
-        self.start()
+        t = Thread(name=self.name, target=self.run)
+        t.setDaemon(True)
+        t.start()  # run serial port in thread
 
     def run(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -46,21 +46,24 @@ class UdpPortal(Thread, Portal):
                 print >> sys.stderr, e
                 traceback.print_exc(file=sys.stderr)
                 print('Unknown exception, quitting udpPort')
-                self.sock.close()
                 break
+        self.sock.close()
 
     def receive_data(self, data, address):
         name = 'UDP port: {}'.format(address[1])
         port = self.get_port(name)
-        if not port:
+        if port:
+            if port.is_open() and len(data):
+                port.output.emit(data)
+        else:
             port = UdpPort(address, name, self)
             self.add_port(port)
-        port.send_data(data)
 
     def update_port_list(self):
         for port in self.ports():
-            if time.time() - port.last_timestamp() > udp_stale:
-                self.remove_port(port)
+            if not port.is_open():
+                if time.time() - port.last_timestamp() > udp_stale:
+                    self.remove_port(port)
 
     def send_data(self, address, data):
         self.sock.sendto(data, address)

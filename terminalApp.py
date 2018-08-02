@@ -5,7 +5,7 @@ updateUi('terminal')
 from PyQt4 import QtGui, QtCore
 from terminal import Ui_Frame
 import interface, portal, ipPort, serialPort, jlinkPort
-from sfpqt import sfpQt, pids
+from sfpLayer import SfpLayer, pids
 
 version = "V1"
 
@@ -33,7 +33,7 @@ class terminal(QtGui.QMainWindow):
         self.textMutex = QtCore.QMutex()
 
         self.top = interface.Interface('terminal')
-        self.protocol = sfpQt()
+        self.protocol = SfpLayer()
 
         self.top.input.connect(self.textInput)
         self.textSignal.connect(self.showText)
@@ -112,9 +112,6 @@ class terminal(QtGui.QMainWindow):
         error(message)
         self.talkPort.close()
 
-    def serialDone(self):
-        note('Serial thread finished')
-
     def showPorts(self):
         self.portlistMutex.lock()
         # update port list in combobox
@@ -152,7 +149,6 @@ class terminal(QtGui.QMainWindow):
             self.talkPort = self.serialPortal.get_port(name)
             self.talkPort.open()
             if self.talkPort.is_open():
-                self.talkPort.closed.connect(self.serialDone)
                 self.talkPort.ioError.connect(self.ioError)
                 self.talkPort.ioException.connect(self.ioError)
                 self.connectPort()
@@ -169,8 +165,13 @@ class terminal(QtGui.QMainWindow):
 
 
 if __name__ == "__main__":
-    import sys
+    import sys, traceback
+
     app = QtGui.QApplication(sys.argv)
     terminal = terminal()
-    sys.exit(app.exec_())
+    try:
+        sys.exit(app.exec_())
+    except Exception, e:
+        error("Handler {} exception: {}".format(pids.pids[pid], e))
+        traceback.print_exc(file=sys.stderr)
 

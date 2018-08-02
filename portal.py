@@ -17,6 +17,7 @@ class Port(Interface):
         self.name = name
         self.portal = portal
         self.__opened = False
+        self.input.connect(self.send_data)
 
     def is_open(self):
         return self.__opened

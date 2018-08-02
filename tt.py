@@ -15,12 +15,12 @@ from message import *
 import qterm, serialPane, transferPane
 import infopane
 import utilitypane
-from sfpqt import sfpQt
+from sfpLayer import SfpLayer
 
 class timbreTalk(qterm.terminal):
     def __init__(self, app):
         qterm.terminal.__init__(self, app)
-        self.protocol = sfpQt()
+        self.protocol = SfpLayer()
         self.whoto = self.whofrom = 0
         self.serialPane = serialPane.serialPane(self)
         transferPane.srecordPane(self)

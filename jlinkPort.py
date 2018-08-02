@@ -74,7 +74,6 @@ class JlinkPort(Port):
         Port.__init__(self, address, name, portal)
         self.link = portal.link
         self.etmlink = 0
-        self.input.connect(self.send_data)
 
     def run(self):
         while self.is_open():
@@ -123,6 +122,7 @@ class JlinkPort(Port):
                     t = Thread(name=self.name, target=self.run)
                     t.setDaemon(True)
                     t.start()  # run serial port in thread
+                    note('opened %s' % (self.name))
         except Exception, e:
             self.link.close()
             print >> sys.stderr, e
@@ -133,8 +133,10 @@ class JlinkPort(Port):
 
     def close(self):
         if self.is_open():
+            Port.close(self)
+            self.wait(100)
             self.link.close()
-        Port.close(self)
+            note('closed %s' % self.name)
 
 
 class JlinkPortal(Portal):

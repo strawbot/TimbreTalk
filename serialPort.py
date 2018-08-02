@@ -21,7 +21,6 @@ class SerialPort(Port):
         Port.__init__(self, name, name, portal)
         self.port = None
         self.rate = 115200
-        self.input.connect(self.send_data)
 
     def run(self):
         while self.is_open():
@@ -123,14 +122,14 @@ class SerialPort(Port):
         self.port.write(data)
 
 
-class SerialPortal(Thread, Portal):
+class SerialPortal(Portal):
     def __init__(self, interval=2):
         self.update_interval = interval
-        Thread.__init__(self)
         Portal.__init__(self, "SerialPortal")
-        self.setDaemon(True)
         self.running = True
-        self.start()
+        t = Thread(name=self.name, target=self.run)
+        t.setDaemon(True)
+        t.start()  # run serial port in thread
         sleep(.1)
 
     def run(self):
