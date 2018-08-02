@@ -6,6 +6,7 @@ from PyQt4 import QtGui, QtCore
 from terminal import Ui_Frame
 import interface, portal, ipPort, serialPort, jlinkPort
 from sfpLayer import SfpLayer, pids
+from threading import Thread
 
 version = "V1"
 
@@ -18,6 +19,7 @@ def error(text):
 
 class terminal(QtGui.QMainWindow):
     textSignal = QtCore.pyqtSignal(object)
+    showPortSignal = QtCore.pyqtSignal()
 
     def __init__(self):
         super(terminal, self).__init__()
@@ -30,16 +32,19 @@ class terminal(QtGui.QMainWindow):
         self.ui.textEdit.setCursorWidth(8)
         self.ui.textEdit.installEventFilter(self)
         self.linebuffer = []
-        self.textMutex = QtCore.QMutex()
 
         self.top = interface.Interface('terminal')
         self.protocol = SfpLayer()
 
         self.top.input.connect(self.textInput)
-        self.textSignal.connect(self.showText)
         self.top.plugin(self.protocol.upper)
 
+        # isolate worker threads from GUI thread
+        self.textSignal.connect(self.showText)
+        self.showPortSignal.connect(self.showPorts)
+
         self.portlistMutex = QtCore.QMutex()
+        self.textMutex = QtCore.QMutex()
 
         self.ui.PortSelect.activated.connect(self.selectPort)
         self.noTalkPort()
@@ -49,9 +54,10 @@ class terminal(QtGui.QMainWindow):
         self.jlinkPortal.whofrom = pids.ETM_HOST
         self.serialPortal = serialPort.SerialPortal()
         self.serialPortal.whofrom = pids.MAIN_HOST
-        self.serialPortal.update.connect(self.showPorts)
-        self.jlinkPortal.update.connect(self.showPorts)
-        self.ipPortal.update.connect(self.showPorts)
+
+        self.serialPortal.update.connect(self.showPortUpdate)
+        self.jlinkPortal.update.connect(self.showPortUpdate)
+        self.ipPortal.update.connect(self.showPortUpdate)
 
         self.showPorts()
 
@@ -112,6 +118,9 @@ class terminal(QtGui.QMainWindow):
         error(message)
         self.talkPort.close()
 
+    def showPortUpdate(self):
+        self.showPortSignal.emit()
+
     def showPorts(self):
         self.portlistMutex.lock()
         # update port list in combobox
@@ -147,14 +156,19 @@ class terminal(QtGui.QMainWindow):
         if self.ui.PortSelect.currentIndex():
             name = str(self.ui.PortSelect.currentText())
             self.talkPort = self.serialPortal.get_port(name)
-            self.talkPort.open()
-            if self.talkPort.is_open():
-                self.talkPort.ioError.connect(self.ioError)
-                self.talkPort.ioException.connect(self.ioError)
-                self.connectPort()
-            else:
-                self.ui.PortSelect.setCurrentIndex(0)
-                self.noTalkPort()
+            def portSelect():
+                self.talkPort.open()
+                if self.talkPort.is_open():
+                    self.talkPort.ioError.connect(self.ioError)
+                    self.talkPort.ioException.connect(self.ioError)
+                    self.connectPort()
+                else:
+                    self.ui.PortSelect.setCurrentIndex(0)
+                    self.noTalkPort()
+                self.showPortUpdate()
+            t = Thread(target=portSelect)
+            t.setDaemon(True)
+            t.start()  # run opening in thread
         else:
             self.noTalkPort()
         self.showPorts()

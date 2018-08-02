@@ -129,7 +129,7 @@ class SerialPortal(Portal):
         self.running = True
         t = Thread(name=self.name, target=self.run)
         t.setDaemon(True)
-        t.start()  # run serial port in thread
+        t.start()  # run serial portal in thread
         sleep(.1)
 
     def run(self):

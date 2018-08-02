@@ -121,7 +121,7 @@ class JlinkPort(Port):
                     Port.open(self)
                     t = Thread(name=self.name, target=self.run)
                     t.setDaemon(True)
-                    t.start()  # run serial port in thread
+                    t.start()  # run port in thread
                     note('opened %s' % (self.name))
         except Exception, e:
             self.link.close()

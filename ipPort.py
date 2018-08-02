@@ -29,7 +29,7 @@ class UdpPortal(Portal):
         Portal.__init__(self, name="UdpPortal")
         t = Thread(name=self.name, target=self.run)
         t.setDaemon(True)
-        t.start()  # run serial port in thread
+        t.start()  # run portal in thread
 
     def run(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

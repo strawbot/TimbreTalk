@@ -19,7 +19,7 @@ class IpPort(Port):
         try:
             t = Thread(name=self.name, target=self.receiver)
             t.setDaemon(True)
-            t.start()  # run serial port in thread
+            t.start()  # run port in thread
             self.wait(100)
         except Exception, e:
             print >> sys.stderr, e
@@ -67,7 +67,7 @@ class DeviceSimulator(object):
         self.bottom.open()
         t = Thread(name='DeviceSimulator', target=self.keepalive)
         # t.setDaemon(True)
-        t.start()  # run serial port in thread
+        t.start()  # run keep aliver in thread
 
     def talkInHandler(self, packet):
         self.sfp.upper.output.emit(packet[2:])
