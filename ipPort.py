@@ -33,7 +33,7 @@ class UdpPortal(Portal):
 
     def run(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind(('', sfp_udp_port))
+        self.sock.bind(('192.168.0.9', sfp_udp_port))
         self.sock.settimeout(udp_poll)
         while True:
             try:

@@ -7,7 +7,7 @@ from threading import Thread
 import time
 
 sfp_udp_port = 1337
-ip = '192.168.0.9'
+ip = '216.123.208.82'
 udp_check = 2
 
 class IpPort(Port):
@@ -65,9 +65,9 @@ class DeviceSimulator(object):
         self.sfp.setHandler(pids.TALK_IN, self.talkInHandler)
 
         self.bottom.open()
-        t = Thread(name='DeviceSimulator', target=self.keepalive)
-        # t.setDaemon(True)
-        t.start()  # run keep aliver in thread
+
+        # run keep aliver in thread
+        Thread(name='DeviceSimulator', target=self.keepalive).start()
 
     def talkInHandler(self, packet):
         self.sfp.upper.output.emit(packet[2:])
