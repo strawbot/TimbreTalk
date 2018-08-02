@@ -81,8 +81,12 @@ class DeviceSimulator(object):
             time.sleep(5)
 
     def cli(self, data):
-        print(data)
-        self.sfp.sendNPS(pids.TALK_OUT, [self.sfp.whoto, self.sfp.whofrom]+map(ord,'\ndevsim: '))
+        text = ''.join(map(chr, data))
+        if 'exit' in text:
+            self.bottom.close()
+        else:
+            print(text)
+            self.sfp.sendNPS(pids.TALK_OUT, [self.sfp.whoto, self.sfp.whofrom]+map(ord,'\ndevsim: '))
 
 
 d = DeviceSimulator()

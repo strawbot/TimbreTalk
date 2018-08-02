@@ -47,6 +47,9 @@ class terminal(QtGui.QMainWindow):
         self.textMutex = QtCore.QMutex()
 
         self.ui.PortSelect.activated.connect(self.selectPort)
+        self.ui.SetSerial.clicked.connect(self.setSerial)
+        self.ui.SetSfp.clicked.connect(self.setSfp)
+
         self.noTalkPort()
         self.ipPortal = ipPort.UdpPortal()
         self.ipPortal.whofrom = pids.IP_HOST
@@ -62,6 +65,12 @@ class terminal(QtGui.QMainWindow):
         self.showPorts()
 
     # gui
+    def setSerial(self):
+        self.protocol.passthru()
+
+    def setSfp(self):
+        self.protocol.connected()
+
     def banner(self):
         self.Window.setWindowTitle('Tiny Timbre Talk '+version)
 

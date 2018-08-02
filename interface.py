@@ -42,11 +42,8 @@ class Interface(object):
         self.unplug()
         self.name = name
 
-    def input(self, data):
+    def no_input(self, data):
         print ("error, {}.input not defined".format(self.name))
-
-    def output(self, data):
-        pass
 
     def no_output(self, data):
         print ("error, {}.output unplugged".format(self.name))
@@ -68,6 +65,7 @@ class Layer(object):
     def __init__(self, name='Layer'):
         self.upper = Interface(name+'.upper')
         self.lower = Interface(name+'.lower')
+        self.connected()
 
     def unplug(self):
         self.upper.unplug()
@@ -81,6 +79,9 @@ class Layer(object):
             self.upper.output.emit(data)
         self.lower.input.connect(upthru)
 
+    def connected(self):
+        self.upper.input.connect(self.upper.no_input)
+        self.lower.input.connect(self.lower.no_input)
 
 if __name__ == "__main__":
     s = signal()

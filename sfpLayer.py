@@ -8,9 +8,11 @@ class SfpLayer (Layer, sfp.sfpProtocol):
     def __init__(self):
         Layer.__init__(self, 'sfpLayer')
         sfp.sfpProtocol.__init__(self)
+        self.setHandler(pids.TALK_OUT, self.talkPacket)
+
+    def connected(self):
         self.lower.input.connect(self.send_data)
         self.upper.input.connect(self.talkOut)
-        self.setHandler(pids.TALK_OUT, self.talkPacket)
 
     def send_data(self, bytes):
         self.rxBytes(map(ord, bytes))
