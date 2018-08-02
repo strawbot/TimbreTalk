@@ -9,6 +9,8 @@
 from portal import *
 import traceback
 from message import warning, error, note, message
+from threading import Thread
+import sys
 
 def module_exists(module_name):
     try:
@@ -72,13 +74,20 @@ class JlinkPort(Port):
         Port.__init__(self, address, name, portal)
         self.link = portal.link
         self.etmlink = 0
+        self.input.connect(self.send_data)
 
     def run(self):
         while self.is_open():
             try:
                 if self.inq.notEmpty():
-                    self.output.emit(self.inq.pull())
-                self.wait(10)
+                    text = ''
+                    for i in range(20):
+                        if not self.inq.notEmpty():
+                            break
+                        text += chr(self.inq.pull())
+                    self.output.emit(text)
+                else:
+                    self.wait(10)
             except Exception, e:
                 self.close()
                 error("run - JLink port exception: %s" % e)
@@ -111,6 +120,9 @@ class JlinkPort(Port):
             if self.link.connected():
                 if self.findEtm():
                     Port.open(self)
+                    t = Thread(name=self.name, target=self.run)
+                    t.setDaemon(True)
+                    t.start()  # run serial port in thread
         except Exception, e:
             self.link.close()
             print >> sys.stderr, e
@@ -141,10 +153,11 @@ class JlinkPortal(Portal):
 
 
 if __name__ == '__main__':
+    from PyQt4.QtCore import QCoreApplication, QTimer
     import sys
-    class app(QApplication):
+    class app(QCoreApplication):
         def __init__(self):
-            QApplication.__init__(self, [])
+            QCoreApplication.__init__(self, [])
             self.timer = QTimer()
             self.timer.timeout.connect(self.test)
             self.timer.start(0)

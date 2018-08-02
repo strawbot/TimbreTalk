@@ -35,8 +35,8 @@ class terminal(QMainWindow):
 
         # talk ports
         self.portlistMutex = QMutex()
-        self.lower = interface.Top('qterm')
-        self.lower.send_data = self.send_data
+        self.lower = interface.Interface('qterm')
+        self.lower.input.connect(self.send_data)
         self.noTalkPort()
         # self.ipPortal = ipPort.UdpPortal()
         # self.jlinkPortal = jlinkPort.JlinkPortal()
@@ -77,7 +77,6 @@ class terminal(QMainWindow):
         self.ui.ClearText.clicked.connect(self.clearText)
         self.ui.saveText.clicked.connect(self.saveText)
         self.textcount = 0
-        self.lower.normal()
 
         # capture all qt errors to terminal window
         def log_uncaught_exceptions(ex_cls, ex, tb):

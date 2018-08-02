@@ -5,6 +5,7 @@ from portal import *
 import socket
 import sys, traceback
 import time
+from threading import Thread
 
 sfp_udp_port = 1337
 udp_poll = 2
@@ -23,9 +24,11 @@ class UdpPort(Port):
         self.timestamp = time.time()
 
 
-class UdpPortal(Portal):
+class UdpPortal(Thread, Portal):
     def __init__(self):
+        Thread.__init__(self)
         Portal.__init__(self, name="UdpPortal")
+        self.setDaemon(True)
         self.start()
 
     def run(self):
@@ -64,10 +67,11 @@ class UdpPortal(Portal):
 
 
 if __name__ == '__main__':
+    from PyQt4.QtCore import QCoreApplication, QTimer
     import sys
-    class app(QApplication):
+    class app(QCoreApplication):
         def __init__(self):
-            QApplication.__init__(self, [])
+            QCoreApplication.__init__(self, [])
             self.timer = QTimer()
             self.timer.timeout.connect(self.test)
             self.timer.start(0)

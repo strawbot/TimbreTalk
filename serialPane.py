@@ -138,7 +138,6 @@ class serialPane(QWidget):
         self.disconnectFlows()
         self.parent.lower.plugin(self.parent.protocol.upper)
         self.parent.talkPort.plugin(self.parent.protocol.lower)
-        self.parent.protocol.lower.output.connect(self.parent.talkPort.send_data)
         if self.ui.LoopBack.isChecked():
             self.parent.talkPort.loopback()
 

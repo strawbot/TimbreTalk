@@ -6,6 +6,9 @@ import traceback
 import serial
 import time
 from message import warning, error, note, message
+from threading import Thread
+from time import sleep
+import sys
 
 class SerialPort(Port):
     # define signals
@@ -18,6 +21,7 @@ class SerialPort(Port):
         Port.__init__(self, name, name, portal)
         self.port = None
         self.rate = 115200
+        self.input.connect(self.send_data)
 
     def run(self):
         while self.is_open():
@@ -53,7 +57,9 @@ class SerialPort(Port):
                 note('opened %s at %d' % (self.name, self.rate))
                 Port.open(self)
                 if thread:
-                    self.start()  # run serial port in thread
+                    t = Thread(name=self.name, target=self.run)
+                    t.setDaemon(True)
+                    t.start()  # run serial port in thread
             except Exception, e:
                 if self.port:
                     self.port.close()
@@ -64,13 +70,10 @@ class SerialPort(Port):
 
     def closePort(self):
         Port.close(self)
-        self.wait(100) # let thread finish
+        sleep(.100) # let thread finish
         self.unplug()
-        for signal in [self.closed, self.ioError, self.ioException]:
-            try:
-                signal.disconnect()
-            except:
-                pass
+        for sig in [self.closed, self.ioError, self.ioException]:
+            sig.disconnect()
 
         if self.isOpen():
             try:
@@ -83,7 +86,7 @@ class SerialPort(Port):
 
     def close(self):
         self.closePort()
-        self.wait(1000)
+        sleep(.1)
 
     def send_data(self, s):
         if self.isOpen():
@@ -120,16 +123,19 @@ class SerialPort(Port):
         self.port.write(data)
 
 
-class SerialPortal(Portal):
+class SerialPortal(Thread, Portal):
     def __init__(self, interval=2):
         self.update_interval = interval
+        Thread.__init__(self)
         Portal.__init__(self, "SerialPortal")
+        self.setDaemon(True)
+        self.running = True
         self.start()
-        self.wait(100)
+        sleep(.1)
 
     def run(self):
         try:
-            while True:
+            while self.running:
                 ports = listports.listports()
                 portlist = [port.name for port in self.ports()]
                 for r in list(set(portlist) - set(ports)):  # items to be removed
@@ -137,21 +143,19 @@ class SerialPortal(Portal):
                 for a in list(set(ports) - set(portlist)):  # items to be added
                     port = SerialPort(a, self)
                     self.add_port(port)
-                time.sleep(self.update_interval)
+                sleep(self.update_interval)
         except Exception, e:
             print >> sys.stderr, e
             traceback.print_exc(file=sys.stderr)
 
+    def exit(self):
+        self.close()
+        self.running = False
+
 
 if __name__ == '__main__':
     import sys
-    class app(QApplication):
-        def __init__(self):
-            QApplication.__init__(self, [])
-            self.timer = QTimer()
-            self.timer.timeout.connect(self.test)
-            self.timer.start(0)
-
+    class Test(object):
         def didopen(self):
             print("port '{}' at address '{}' is open".format(self.port.name, self.port.address))
 
@@ -167,7 +171,7 @@ if __name__ == '__main__':
                 self.port = j = jp.get_port(jp.ports()[0].name)
                 j.opened.connect(self.didopen)
                 j.closed.connect(self.didclose)
-                j.output.connect(self.seeInput, Qt.DirectConnection)
+                j.output.connect(self.seeInput)
                 j.open()
                 if j.is_open():
                     print("yes its open")
@@ -176,13 +180,13 @@ if __name__ == '__main__':
 
                 for i in range(20):
                     j.send_data("test string {}\n".format(i))
-                j.wait(100)
+                sleep(.1)
                 j.close()
-                jp.close()
+                # jp.exit()
             except Exception, e:
                 print >> sys.stderr, e
                 traceback.print_exc(file=sys.stderr)
             finally:
-                self.quit()
-
-    sys.exit(app().exec_())
+                sys.exit(0)
+    t = Test()
+    t.test()

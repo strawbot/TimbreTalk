@@ -1,119 +1,125 @@
 # interfaces for data  Robert Chapman  Jul 26, 2018
-#  input_data is defined by children
-#  output is emitted by children
+#  input is defined
+#  output is called
+#   inter layer connecting is done by defining an output as the others input
 #  routing and coupling is provided by interface
 # Define 2 layers:
 #  layer1, layer2 = Layer(), Layer()
 # To connect layer 1 to layer 2:
-#   layer1.upper.connect(layer2.lower)
+#   layer1.upper.plugin(layer2.lower)
 #  or
-#   layer2.lower.connect(layer1.upper)
+#   layer2.lower.plugin(layer1.upper)
 # For bottom of a stack:
 #  endpoint = Bottom()
-#  layer1.lower.connect(endpoint)
+#  layer1.lower.plugin(endpoint)
 
-from pyqtapi2 import *
-import traceback, sys
+class signal(object):
+    def __init__(self, *args):
+        self.disconnect()
 
-class Interface(QThread):
-    output = Signal(object)
-    input = Signal(object)
-    verbose = False
+        def emit0():  self.__signal()
+        def emit1(arg):  self.__signal(arg)
 
-    def __init__(self, name):
-        QThread.__init__(self)  # needed for signals to work!!
-        self.name = name
-        self.normal()
+        if len(args):
+            self.emit = emit1
+        else:
+            self.emit = emit0
 
-    def send_data(self, data):
-        try:
-            message = "Error: '{}' unassigned send_data".format(self.name)
-            raise Exception(message)
-        except Exception, e:
-            traceback.print_exc(file=sys.stderr)
+    def nothing(*args):
+        pass
 
-    def disconnect_input(self):
-        try:
-            self.input.disconnect()
-            if self.verbose: print("{}.input disconnected".format(self.name))
-        except:
-            pass
+    def disconnect(self):
+        self.__signal = self.nothing
 
-    def loopback(self):
-        self.disconnect_input()
-        self.input.connect(self.output)
-        if self.verbose: print("{} input output looped".format(self.name))
+    def connect(self, action=nothing):
+        self.__signal = action
 
-    def normal(self):
-        self.disconnect_input()
-        self.input.connect(self.send_data, Qt.DirectConnection)
-        if self.verbose: print("{} input connected to send data".format(self.name))
 
-    def plugin(self, interface):
+class Interface(object):
+    def __init__(self, name='interface'):
+        self.input = signal(object)
+        self.output = signal(object)
         self.unplug()
-        interface.unplug()
-        interface.output.connect(self.input, Qt.DirectConnection)
-        if self.verbose: print("{} output connected to {} input".format(interface.name, self.name))
-        self.output.connect(interface.input, Qt.DirectConnection)
-        if self.verbose: print("{} output connected to {} input".format(self.name, interface.name))
+        self.name = name
+
+    def input(self, data):
+        print ("error, {}.input not defined".format(self.name))
+
+    def output(self, data):
+        pass
+
+    def no_output(self, data):
+        print ("error, {}.output unplugged".format(self.name))
 
     def unplug(self):
-        try:
-            self.output.disconnect()
-            if self.verbose: print("{}.output disconnected".format(self.name))
-        except:
-            pass
-        self.normal()
+        self.output.connect(self.no_output)
+
+    def plugin(self, plug):
+        plug.output.connect(self.input.emit)
+        self.output.connect(plug.input.emit)
+
+    def loopback(self):
+        def in2out(data):
+            self.output.emit(data)
+        self.input.connect(in2out)
 
 
-# perhaps bottom and top should be upper and lower or bottom and top
-# should be used in Layer
-class Bottom(Interface):
-    pass
-
-
-class Top(Interface):
-    pass
-
-
-class Layer(QObject):
-    def __init__(self, name):
-        QObject.__init__(self)  # needed for signals to work!!
+class Layer(object):
+    def __init__(self, name='Layer'):
         self.upper = Interface(name+'.upper')
         self.lower = Interface(name+'.lower')
-
-    def passThrough(self):
-        self.normal()
-        self.upper.input.connect(self.lower.output)
-        self.lower.input.connect(self.upper.output)
-
-    def normal(self):
-        self.upper.normal()
-        self.lower.normal()
 
     def unplug(self):
         self.upper.unplug()
         self.lower.unplug()
 
+    def passthru(self):
+        def downthru(data):
+            self.lower.output.emit(data)
+        self.upper.input.connect(downthru)
+        def upthru(data):
+            self.upper.output.emit(data)
+        self.lower.input.connect(upthru)
+
 
 if __name__ == "__main__":
+    s = signal()
+    def hi(): print('hi')
+    s.connect(hi)
+    s.emit()
+
+    s = signal(object)
+    def hi(data):
+        print('input: {}'.format(data))
+    s.connect(hi)
+    s.emit('data')
+
     i = Interface('inter')
-    def hi():
-        print('hi')
     i.output.connect(hi)
     i.loopback()
-    i.input.emit('')
-    i.input.disconnect()
+    i.input.emit('test1')
 
+
+    t = Interface('top')
     l = Layer('lay')
-    t = Top('top')
-    b = Bottom('bot')
+    b = Interface('bot')
+    t.input.connect(hi)
+
+    t.input.emit('testt')
+    b.output.connect(hi)
+    b.loopback()
+    b.input.emit('testl')
+
+    t.plugin(b)
+    t.output.emit('testtbl')
+
+    l.passthru()
+    b.loopback()
     t.plugin(l.upper)
     b.plugin(l.lower)
-    l.passThrough()
-    b.loopback()
-    t.input.connect(hi)
-    t.output.emit('')
+
+    t.output.emit('testlayer')
+
     t.unplug()
     l.unplug()
     b.unplug()
