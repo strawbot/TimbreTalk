@@ -50,8 +50,8 @@ class SfpLayer (Layer, sfp.sfpProtocol):
 
 if __name__ == '__main__':
     from PyQt4.QtCore import QCoreApplication, QTimer
-    from serialPort import SerialPortal
-    from portal import *
+    from serialPort import SerialHub
+    from hub import *
     import sys
     from protocols import pids
     import traceback
@@ -74,8 +74,8 @@ if __name__ == '__main__':
 
         def test(self):
             try:
-                self.portal = SerialPortal()
-                self.port = self.portal.get_port('/dev/cu.usbserial-FT9S9VC1')
+                self.hub = SerialHub()
+                self.port = self.hub.get_port('/dev/cu.usbserial-FT9S9VC1')
                 self.layer = SfpLayer()
                 self.app = Interface('test')
                 # build comm stack
@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
                 self.app.output.emit('\r')
                 self.port.wait(1000)
-                self.portal.close()
+                self.hub.close()
             except Exception, e:
                 print >> sys.stderr, e
                 traceback.print_exc(file=sys.stderr)

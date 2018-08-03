@@ -1,4 +1,4 @@
-# generic port and portal classes for TT to connect to  Robert Chapman  Jul 24, 2018
+# generic port and hub classes for TT to connect to  Robert Chapman  Jul 24, 2018
 
 from interface import *
 from time import sleep
@@ -10,12 +10,12 @@ class Port(Interface):
     closed = signal()
     opened = signal()
 
-    def __init__(self, address=0, name=None, portal=None):
+    def __init__(self, address=0, name=None, hub=None):
         Interface.__init__(self)
         self.address = address
         self.data = self.nodata
         self.name = name
-        self.portal = portal
+        self.hub = hub
         self.__opened = False
         self.input.connect(self.send_data)
 
@@ -43,11 +43,11 @@ class Port(Interface):
         sleep(milliseconds/1000.)
 
 
-class Portal(object):
+class Hub(object):
     __allports = {}
     update = signal()
 
-    def __init__(self, name='Portal'):
+    def __init__(self, name='Hub'):
         self.__ports = {}
         self.name = name
 
@@ -55,22 +55,22 @@ class Portal(object):
         return self.__ports.values()
 
     def all_ports(self): # class
-        return Portal.__allports.values()
+        return Hub.__allports.values()
 
     def add_port(self, port):
         if not self.get_port(port.name):
-            Portal.__allports[port.name] = port
+            Hub.__allports[port.name] = port
             self.__ports[port.name] = port
             self.update.emit()
 
     def remove_port(self, port):
-        if Portal.__allports.get(port.name):
-            x = Portal.__allports.pop(port.name)
+        if Hub.__allports.get(port.name):
+            x = Hub.__allports.pop(port.name)
             x = self.__ports.pop(port.name)
             self.update.emit()
 
     def get_port(self, name):
-        return Portal.__allports.get(name)
+        return Hub.__allports.get(name)
 
     def close(self):
         for port in self.ports():
@@ -88,7 +88,7 @@ if __name__ == '__main__':
 
         def test(self):
             try:
-                jp = Portal()
+                jp = Hub()
                 jp.add_port(Port(12345, 'test port', jp))
                 self.port = j = jp.get_port(jp.ports()[0].name)
                 j.opened.connect(self.didopen)

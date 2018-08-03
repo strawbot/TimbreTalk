@@ -4,7 +4,7 @@ updateUi('terminal')
 
 from PyQt4 import QtGui, QtCore
 from terminal import Ui_Frame
-import interface, portal, ipPort, serialPort, jlinkPort
+import interface, hub, ipPort, serialPort, jlinkPort
 from sfpLayer import SfpLayer, pids
 from threading import Thread
 
@@ -51,16 +51,16 @@ class terminal(QtGui.QMainWindow):
         self.ui.SetSfp.clicked.connect(self.setSfp)
 
         self.noTalkPort()
-        self.ipPortal = ipPort.UdpPortal()
-        self.ipPortal.whofrom = pids.IP_HOST
-        self.jlinkPortal = jlinkPort.JlinkPortal()
-        self.jlinkPortal.whofrom = pids.ETM_HOST
-        self.serialPortal = serialPort.SerialPortal()
-        self.serialPortal.whofrom = pids.MAIN_HOST
+        self.ipHub = ipPort.UdpHub()
+        self.ipHub.whofrom = pids.IP_HOST
+        self.jlinkHub = jlinkPort.JlinkHub()
+        self.jlinkHub.whofrom = pids.ETM_HOST
+        self.serialHub = serialPort.SerialHub()
+        self.serialHub.whofrom = pids.MAIN_HOST
 
-        self.serialPortal.update.connect(self.showPortUpdate)
-        self.jlinkPortal.update.connect(self.showPortUpdate)
-        self.ipPortal.update.connect(self.showPortUpdate)
+        self.serialHub.update.connect(self.showPortUpdate)
+        self.jlinkHub.update.connect(self.showPortUpdate)
+        self.ipHub.update.connect(self.showPortUpdate)
 
         self.showPorts()
 
@@ -124,7 +124,7 @@ class terminal(QtGui.QMainWindow):
     # ports
     def noTalkPort(self):
         self.protocol.lower.unplug()
-        self.talkPort = portal.Port(name='notalk')
+        self.talkPort = hub.Port(name='notalk')
 
     def ioError(self, message):
         error(message)
@@ -138,7 +138,7 @@ class terminal(QtGui.QMainWindow):
         # update port list in combobox
         uiPort = self.ui.PortSelect
         items = [uiPort.itemText(i) for i in range(1, uiPort.count())]
-        ports = [port.name for port in self.serialPortal.all_ports()]
+        ports = [port.name for port in self.serialHub.all_ports()]
 
         for r in list(set(items) - set(ports)):  # items to be removed
             uiPort.removeItem(uiPort.findText(r))
@@ -167,7 +167,7 @@ class terminal(QtGui.QMainWindow):
 
         if self.ui.PortSelect.currentIndex():
             name = str(self.ui.PortSelect.currentText())
-            self.talkPort = self.serialPortal.get_port(name)
+            self.talkPort = self.serialHub.get_port(name)
             def portOpen():
                 self.talkPort.open()
                 if self.talkPort.is_open():
@@ -185,7 +185,7 @@ class terminal(QtGui.QMainWindow):
 
     def connectPort(self):
         self.protocol.lower.plugin(self.talkPort)
-        self.protocol.whofrom = self.talkPort.portal.whofrom
+        self.protocol.whofrom = self.talkPort.hub.whofrom
 
 
 if __name__ == "__main__":

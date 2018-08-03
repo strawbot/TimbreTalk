@@ -6,7 +6,7 @@
 #  ->txq: points to micros byte transmit queue; must read from here
 #  ->rxq: points to mciros byte receive queue; must write to here
 
-from portal import *
+from hub import *
 import traceback
 from message import warning, error, note, message
 from threading import Thread
@@ -70,9 +70,9 @@ class JlinkPort(Port):
     micro = 'EFM32GG380F1024' # make this selectable from GUI
     etmid = 0xFACEF00D
 
-    def __init__(self, address, name, portal):
-        Port.__init__(self, address, name, portal)
-        self.link = portal.link
+    def __init__(self, address, name, hub):
+        Port.__init__(self, address, name, hub)
+        self.link = hub.link
         self.etmlink = 0
 
     def run(self):
@@ -113,7 +113,7 @@ class JlinkPort(Port):
     def open(self):
         self.link.open(self.address)
         try:
-            self.link.set_tif(self.portal.pylink.JLinkInterfaces.SWD)
+            self.link.set_tif(self.hub.pylink.JLinkInterfaces.SWD)
             self.link.connect(self.micro)
             self.link.restart()
             if self.link.connected():
@@ -139,9 +139,9 @@ class JlinkPort(Port):
             note('closed %s' % self.name)
 
 
-class JlinkPortal(Portal):
+class JlinkHub(Hub):
     def __init__(self):
-        Portal.__init__(self, "JlinkPortal")
+        Hub.__init__(self, "JlinkHub")
         if module_exists('pylink'):
             import pylink
             self.link = pylink.JLink()
@@ -172,7 +172,7 @@ if __name__ == '__main__':
 
         def test(self):
             try:
-                jp = JlinkPortal()
+                jp = JlinkHub()
                 self.port = j = jp.get_port(jp.ports()[0].name)
                 j.opened.connect(self.didopen)
                 j.closed.connect(self.didclose)

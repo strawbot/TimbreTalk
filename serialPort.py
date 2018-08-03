@@ -1,6 +1,6 @@
 # pluggable serial port  Robert Chapman  Jul 26, 2018
 
-from portal import *
+from hub import *
 import listports
 import traceback
 import serial
@@ -17,8 +17,8 @@ class SerialPort(Port):
     parity = noparity
     bytesize = serial.EIGHTBITS
 
-    def __init__(self, name, portal):
-        Port.__init__(self, name, name, portal)
+    def __init__(self, name, hub):
+        Port.__init__(self, name, name, hub)
         self.port = None
         self.rate = 115200
 
@@ -122,14 +122,14 @@ class SerialPort(Port):
         self.port.write(data)
 
 
-class SerialPortal(Portal):
+class SerialHub(Hub):
     def __init__(self, interval=2):
         self.update_interval = interval
-        Portal.__init__(self, "SerialPortal")
+        Hub.__init__(self, "SerialHub")
         self.running = True
         t = Thread(name=self.name, target=self.run)
         t.setDaemon(True)
-        t.start()  # run serial portal in thread
+        t.start()  # run serial hub in thread
         sleep(.1)
 
     def run(self):
@@ -166,7 +166,7 @@ if __name__ == '__main__':
 
         def test(self):
             try:
-                jp = SerialPortal()
+                jp = SerialHub()
                 self.port = j = jp.get_port(jp.ports()[0].name)
                 j.opened.connect(self.didopen)
                 j.closed.connect(self.didclose)

@@ -1,7 +1,7 @@
 # support for TT over ip using UDP  Robert Chapman  Jul 24, 2018
 #  inputs periodically send frames to let TT know they can be connected to
 
-from portal import *
+from hub import *
 import socket
 import sys, traceback
 import time
@@ -12,24 +12,24 @@ udp_poll = 2
 udp_stale = 10
 
 class UdpPort(Port):
-    def __init__(self, address, name, portal):
-        Port.__init__(self, address, name, portal)
+    def __init__(self, address, name, hub):
+        Port.__init__(self, address, name, hub)
         self.timestamp = time.time()
 
     def last_timestamp(self):
         return self.timestamp
 
     def send_data(self, data):
-        self.portal.send_data(self.address, data)
+        self.hub.send_data(self.address, data)
         self.timestamp = time.time()
 
 
-class UdpPortal(Portal):
+class UdpHub(Hub):
     def __init__(self):
-        Portal.__init__(self, name="UdpPortal")
+        Hub.__init__(self, name="UdpHub")
         t = Thread(name=self.name, target=self.run)
         t.setDaemon(True)
-        t.start()  # run portal in thread
+        t.start()  # run hub in thread
 
     def run(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -93,7 +93,7 @@ if __name__ == '__main__':
 
         def test(self):
             try:
-                jp = UdpPortal()
+                jp = UdpHub()
                 self.remoteDevice()
                 time.sleep(udp_poll+1)
                 self.port = j = jp.get_port(jp.ports()[0].name)

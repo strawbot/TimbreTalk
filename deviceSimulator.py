@@ -1,6 +1,6 @@
 import socket
 from sfpLayer import SfpLayer, pids
-from portal import Port
+from hub import Port
 from interface import Interface
 import traceback, sys
 from threading import Thread

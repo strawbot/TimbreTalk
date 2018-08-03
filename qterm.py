@@ -5,7 +5,7 @@
 from pyqtapi2 import *
 import sys
 import etmLink
-import interface, portal, ipPort, serialPort, jlinkPort
+import interface, hub, ipPort, serialPort, jlinkPort
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -38,12 +38,12 @@ class terminal(QMainWindow):
         self.lower = interface.Interface('qterm')
         self.lower.input.connect(self.send_data)
         self.noTalkPort()
-        # self.ipPortal = ipPort.UdpPortal()
-        # self.jlinkPortal = jlinkPort.JlinkPortal()
-        self.serialPortal = serialPort.SerialPortal()
-        self.serialPortal.update.connect(self.showPorts)
-        # self.jlinkPortal.update.connect(self.showPorts)
-        # self.ipPortal.update.connect(self.showPorts)
+        # self.ipHub = ipPort.UdpHub()
+        # self.jlinkHub = jlinkPort.JlinkHub()
+        self.serialHub = serialPort.SerialHub()
+        self.serialHub.update.connect(self.showPorts)
+        # self.jlinkHub.update.connect(self.showPorts)
+        # self.ipHub.update.connect(self.showPorts)
         self.showPorts()
 
         # font size adjustment
@@ -246,14 +246,14 @@ class terminal(QMainWindow):
 
     # serial port
     def noTalkPort(self):
-        self.talkPort = portal.Port(name='notalk')
+        self.talkPort = hub.Port(name='notalk')
 
     def showPorts(self):
         self.portlistMutex.lock()
         # update port list in combobox
         uiPort = self.ui.PortSelect
         items = [uiPort.itemText(i) for i in range(1, uiPort.count())]
-        ports = [port.name for port in self.serialPortal.all_ports()]
+        ports = [port.name for port in self.serialHub.all_ports()]
 
         for r in list(set(items)-set(ports)): # items to be removed
             uiPort.removeItem(uiPort.findText(r))
@@ -280,7 +280,7 @@ class terminal(QMainWindow):
             self.talkPort.close()
 
         if self.ui.PortSelect.currentIndex():
-            self.talkPort = self.serialPortal.get_port(self.ui.PortSelect.currentText())
+            self.talkPort = self.serialHub.get_port(self.ui.PortSelect.currentText())
             self.talkPort.open()
             if self.talkPort.is_open():
                 self.talkPort.closed.connect(self.serialDone)
