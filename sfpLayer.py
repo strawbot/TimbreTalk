@@ -50,7 +50,7 @@ class SfpLayer (Layer, sfp.sfpProtocol):
 
 if __name__ == '__main__':
     from PyQt4.QtCore import QCoreApplication, QTimer
-    from serialPort import SerialHub
+    from serialHub import SerialHub
     from hub import *
     import sys
     from protocols import pids

@@ -4,7 +4,7 @@ updateUi('terminal')
 
 from PyQt4 import QtGui, QtCore
 from terminal import Ui_Frame
-import interface, hub, ipPort, serialPort, jlinkPort
+import interface, hub, ipHub, serialHub, jlinkHub
 from sfpLayer import SfpLayer, pids
 from threading import Thread
 
@@ -51,11 +51,11 @@ class terminal(QtGui.QMainWindow):
         self.ui.SetSfp.clicked.connect(self.setSfp)
 
         self.noTalkPort()
-        self.ipHub = ipPort.UdpHub()
+        self.ipHub = ipHub.UdpHub()
         self.ipHub.whofrom = pids.IP_HOST
-        self.jlinkHub = jlinkPort.JlinkHub()
+        self.jlinkHub = jlinkHub.JlinkHub()
         self.jlinkHub.whofrom = pids.ETM_HOST
-        self.serialHub = serialPort.SerialHub()
+        self.serialHub = serialHub.SerialHub()
         self.serialHub.whofrom = pids.MAIN_HOST
 
         self.serialHub.update.connect(self.showPortUpdate)

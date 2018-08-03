@@ -5,7 +5,7 @@
 from pyqtapi2 import *
 import sys
 import etmLink
-import interface, hub, ipPort, serialPort, jlinkPort
+import interface, hub, ipHub, serialHub, jlinkHub
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -40,7 +40,7 @@ class terminal(QMainWindow):
         self.noTalkPort()
         # self.ipHub = ipPort.UdpHub()
         # self.jlinkHub = jlinkPort.JlinkHub()
-        self.serialHub = serialPort.SerialHub()
+        self.serialHub = serialHub.SerialHub()
         self.serialHub.update.connect(self.showPorts)
         # self.jlinkHub.update.connect(self.showPorts)
         # self.ipHub.update.connect(self.showPorts)
