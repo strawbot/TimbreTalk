@@ -60,6 +60,10 @@ class Interface(object):
             self.output.emit(data)
         self.input.connect(in2out)
 
+    def passin(outer, inner): # connect inner port to outer port
+        outer.input.connect(inner.input.emit)
+        inner.output.connect(outer.output.emit)
+
 
 class Layer(object):
     def __init__(self, name='Layer'):

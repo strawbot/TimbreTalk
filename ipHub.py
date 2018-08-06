@@ -3,7 +3,7 @@
 
 from hub import *
 import socket
-import sys, traceback
+import sys, traceback, errno
 import time
 from threading import Thread
 
@@ -33,7 +33,14 @@ class UdpHub(Hub):
 
     def run(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.sock.bind(('192.168.0.9', sfp_udp_port))
+        try:
+            self.sock.bind(('192.168.0.9', sfp_udp_port))
+        except socket.error as e:
+            if e.errno != errno.EADDRINUSE:
+                print(e)
+            self.sock.close()
+            return
+
         self.sock.settimeout(udp_poll)
         while True:
             try:

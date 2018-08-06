@@ -77,6 +77,9 @@ class Hub(object):
             self.remove_port(port)
             port.close()
 
+    def wait(self, milliseconds):
+        sleep(milliseconds/1000.)
+
 
 if __name__ == '__main__':
     class test(object):

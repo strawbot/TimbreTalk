@@ -4,10 +4,8 @@ from hub import *
 import listports
 import traceback
 import serial
-import time
 from message import warning, error, note, message
 from threading import Thread
-from time import sleep
 import sys
 
 class SerialPort(Port):
@@ -17,7 +15,7 @@ class SerialPort(Port):
     parity = noparity
     bytesize = serial.EIGHTBITS
 
-    def __init__(self, name, hub):
+    def __init__(self, name, hub='Serial Hub'):
         Port.__init__(self, name, name, hub)
         self.port = None
         self.rate = 115200
@@ -25,8 +23,9 @@ class SerialPort(Port):
     def run(self):
         while self.is_open():
             try:
-                c = self.port.read(self.port.in_waiting)
-                if c:
+                c = self.port.read(1)
+                if len(c):
+                    c += self.port.read(self.port.in_waiting)
                     self.output.emit(c)
             except IOError:
                 self.closePort()
@@ -62,14 +61,13 @@ class SerialPort(Port):
             except Exception, e:
                 if self.port:
                     self.port.close()
-                self.port = None
                 print >> sys.stderr, e
                 traceback.print_exc(file=sys.stderr)
                 raise Exception('open port failed for ' + self.name)
 
     def closePort(self):
         Port.close(self)
-        sleep(.100) # let thread finish
+        self.wait(100) # let thread finish
         self.unplug()
         for sig in [self.closed, self.ioError, self.ioException]:
             sig.disconnect()
@@ -85,7 +83,7 @@ class SerialPort(Port):
 
     def close(self):
         self.closePort()
-        sleep(.1)
+        self.wait(100)
 
     def send_data(self, s):
         if self.isOpen():
@@ -124,13 +122,13 @@ class SerialPort(Port):
 
 class SerialHub(Hub):
     def __init__(self, interval=2):
-        self.update_interval = interval
+        self.update_interval = interval*1000
         Hub.__init__(self, "SerialHub")
         self.running = True
         t = Thread(name=self.name, target=self.run)
         t.setDaemon(True)
         t.start()  # run serial hub in thread
-        sleep(.1)
+        self.wait(100)
 
     def run(self):
         try:
@@ -142,7 +140,7 @@ class SerialHub(Hub):
                 for a in list(set(ports) - set(portlist)):  # items to be added
                     port = SerialPort(a, self)
                     self.add_port(port)
-                sleep(self.update_interval)
+                self.wait(self.update_interval)
         except Exception, e:
             print >> sys.stderr, e
             traceback.print_exc(file=sys.stderr)
@@ -153,7 +151,8 @@ class SerialHub(Hub):
 
 
 if __name__ == '__main__':
-    import sys
+    from time import sleep
+
     class Test(object):
         def didopen(self):
             print("port '{}' at address '{}' is open".format(self.port.name, self.port.address))
