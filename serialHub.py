@@ -52,8 +52,8 @@ class SerialPort(Port):
                                           xonxoff=0,
                                           rtscts=0,  # hw flow control
                                           bytesize=self.bytesize)
-                note('opened %s at %d' % (self.name, self.rate))
                 Port.open(self)
+                note('opened %s at %d' % (self.name, self.rate))
                 if thread:
                     t = Thread(name=self.name, target=self.run)
                     t.setDaemon(True)
@@ -69,7 +69,7 @@ class SerialPort(Port):
         Port.close(self)
         self.wait(100) # let thread finish
         self.unplug()
-        for sig in [self.closed, self.ioError, self.ioException]:
+        for sig in self.signals:
             sig.disconnect()
 
         if self.isOpen():
@@ -122,7 +122,7 @@ class SerialPort(Port):
 
 class SerialHub(Hub):
     def __init__(self, interval=2):
-        self.update_interval = interval*1000
+        self.update_interval = interval*1000 # change to ms
         Hub.__init__(self, "SerialHub")
         self.running = True
         t = Thread(name=self.name, target=self.run)
@@ -146,8 +146,9 @@ class SerialHub(Hub):
             traceback.print_exc(file=sys.stderr)
 
     def exit(self):
-        self.close()
         self.running = False
+        self.wait(self.update_interval*1.1)
+        self.close()
 
 
 if __name__ == '__main__':

@@ -5,10 +5,6 @@ from time import sleep
 
 class Port(Interface):
     nodata = ''
-    ioError = signal()
-    ioException = signal()
-    closed = signal()
-    opened = signal()
 
     def __init__(self, address=0, name=None, hub=None):
         Interface.__init__(self)
@@ -18,6 +14,11 @@ class Port(Interface):
         self.hub = hub
         self.__opened = False
         self.input.connect(self.send_data)
+        self.ioError = signal()
+        self.ioException = signal()
+        self.closed = signal()
+        self.opened = signal()
+        self.signals = [self.ioError, self.ioException, self.closed, self.opened]
 
     def is_open(self):
         return self.__opened
@@ -48,25 +49,25 @@ class Hub(object):
     update = signal()
 
     def __init__(self, name='Hub'):
-        self.__ports = {}
         self.name = name
+        self.__myports = {}
 
-    def ports(self): # instance
-        return self.__ports.values()
+    def ports(self): # some instance
+        return self.__myports.values()
 
-    def all_ports(self): # class
+    def all_ports(self): # class of all hubs
         return Hub.__allports.values()
 
     def add_port(self, port):
         if not self.get_port(port.name):
             Hub.__allports[port.name] = port
-            self.__ports[port.name] = port
+            self.__myports[port.name] = port
             self.update.emit()
 
     def remove_port(self, port):
         if Hub.__allports.get(port.name):
             x = Hub.__allports.pop(port.name)
-            x = self.__ports.pop(port.name)
+            x = self.__myports.pop(port.name)
             self.update.emit()
 
     def get_port(self, name):

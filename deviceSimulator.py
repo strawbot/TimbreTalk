@@ -64,7 +64,7 @@ class AtPort(Port):
 
     def at(self, cmd, expect="OK", timeout=1):
         self.reply = ''
-        self.port.input.emit(cmd+'\r')
+        self.port.input.emit(cmd + '\r')
         self.port.port.timeout = timeout
         start = time.time()
         while time.time() - start < timeout:
@@ -155,7 +155,7 @@ class DeviceSimulator(object):
             self.bottom = IpPort((ip, sfp_udp_port), 'SfpLayer')
 
         self.top.plugin(self.sfp.upper)
-        self.sfp.lower.plugin(self.bottom)
+        self.sfp.inner.plugin(self.bottom)
         self.top.input.connect(self.cli)
 
         self.sfp.setHandler(pids.TALK_IN, self.talkInHandler)

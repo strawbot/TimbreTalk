@@ -7,6 +7,7 @@ import sys, traceback, errno
 import time
 from threading import Thread
 
+remote_ip = '192.168.0.9'
 sfp_udp_port = 1337
 udp_poll = 2
 udp_stale = 10
@@ -34,10 +35,13 @@ class UdpHub(Hub):
     def run(self):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
-            self.sock.bind(('192.168.0.9', sfp_udp_port))
+            self.sock.bind((remote_ip, sfp_udp_port))
         except socket.error as e:
             if e.errno != errno.EADDRINUSE:
-                print(e)
+                if e.errno == errno.EADDRNOTAVAIL:
+                    print ('Remote ip {} is not availalbe'.format(remote_ip))
+                else:
+                    print(e)
             self.sock.close()
             return
 

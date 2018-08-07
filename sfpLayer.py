@@ -11,19 +11,16 @@ class SfpLayer (Layer, sfp.sfpProtocol):
         self.setHandler(pids.TALK_OUT, self.talkPacket)
 
     def connected(self):
-        self.lower.input.connect(self.send_data)
-        self.upper.input.connect(self.talkOut)
+        self.input.connect(self.talkOut)
+        self.inner.input.connect(self.receive_data)
 
-    def send_data(self, bytes):
+    def receive_data(self, bytes):
         self.rxBytes(map(ord, bytes))
 
     def newFrame(self):
         data = self.txBytes()
         string = ''.join(map(chr, data))
-        self.lower.output.emit(string)
-
-    def newBytes(self, data):
-        self.rxBytes(map(ord, data))
+        self.inner.output.emit(string)
 
     def newPacket(self):
         self.distributer()
@@ -45,24 +42,17 @@ class SfpLayer (Layer, sfp.sfpProtocol):
 
     def talkPacket(self, packet):  # handle text packets
         data = ''.join(map(chr, packet[2:]))
-        self.upper.output.emit(data)
+        self.output.emit(data)
 
 
 if __name__ == '__main__':
-    from PyQt4.QtCore import QCoreApplication, QTimer
     from serialHub import SerialHub
     from hub import *
     import sys
     from protocols import pids
     import traceback
 
-    class app(QCoreApplication):
-        def __init__(self):
-            QCoreApplication.__init__(self, [])
-            self.timer = QTimer()
-            self.timer.timeout.connect(self.test)
-            self.timer.start(0)
-
+    class app(object):
         def didopen(self):
             print("port '{}' at address '{}' is open".format(self.port.name, self.port.address))
 
@@ -79,12 +69,11 @@ if __name__ == '__main__':
                 self.layer = SfpLayer()
                 self.app = Interface('test')
                 # build comm stack
-                self.app.plugin(self.layer.upper)
-                self.layer.lower.plugin(self.port)
+                self.app.plugin(self.layer)
+                self.layer.plugin(self.port)
 
                 self.app.input.connect(self.got_data)
-                self.layer.upper.input.connect(self.layer.send_text)
-                self.layer.lower.input.connect(self.layer.newBytes)
+                self.layer.connected()
                 self.port.opened.connect(self.didopen)
                 self.port.closed.connect(self.didclose)
 
@@ -101,6 +90,7 @@ if __name__ == '__main__':
                 print >> sys.stderr, e
                 traceback.print_exc(file=sys.stderr)
             finally:
-                self.quit()
+                sys.exit(0)
 
-    sys.exit(app().exec_())
+    t = app()
+    t.test()

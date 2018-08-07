@@ -37,7 +37,7 @@ class terminal(QtGui.QMainWindow):
         self.protocol = SfpLayer()
 
         self.top.input.connect(self.textInput)
-        self.top.plugin(self.protocol.upper)
+        self.top.plugin(self.protocol)
 
         # isolate worker threads from GUI thread
         self.textSignal.connect(self.showText)
@@ -123,7 +123,7 @@ class terminal(QtGui.QMainWindow):
 
     # ports
     def noTalkPort(self):
-        self.protocol.lower.unplug()
+        self.protocol.inner.unplug()
         self.talkPort = hub.Port(name='notalk')
 
     def ioError(self, message):
@@ -186,7 +186,7 @@ class terminal(QtGui.QMainWindow):
         self.showPorts()
 
     def connectPort(self):
-        self.protocol.lower.plugin(self.talkPort)
+        self.protocol.plugin(self.talkPort)
         self.protocol.whofrom = self.talkPort.hub.whofrom
 
 
