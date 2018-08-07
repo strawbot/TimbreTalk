@@ -4,7 +4,7 @@ updateUi('terminal')
 
 from PyQt4 import QtGui, QtCore
 from terminal import Ui_Frame
-import interface, hub, ipHub, serialHub, jlinkHub
+import interface, ipHub, serialHub, jlinkHub
 from sfpLayer import SfpLayer, pids
 from threading import Thread
 
@@ -28,6 +28,7 @@ class terminal(QtGui.QMainWindow):
         self.ui.setupUi(self.Window)
         self.banner()
         self.Window.show()
+        self.ui.SendCommand.clicked.connect(self.send_last)
 
         self.ui.textEdit.setCursorWidth(8)
         self.ui.textEdit.installEventFilter(self)
@@ -49,6 +50,7 @@ class terminal(QtGui.QMainWindow):
         self.ui.PortSelect.activated.connect(self.selectPort)
         self.ui.SetSerial.clicked.connect(self.setSerial)
         self.ui.SetSfp.clicked.connect(self.setSfp)
+        self.ui.SetSfp.click()
 
         self.noTalkPort()
         self.ipHub = ipHub.UdpHub()
@@ -102,29 +104,34 @@ class terminal(QtGui.QMainWindow):
         return QtGui.QMainWindow.eventFilter(self, object, event)
 
     def keyin(self, key):  # input is a qstring
-        character = str(key)[0]
+        for character in str(key):
 
-        # detect and change delete key to backspace
-        if character == chr(0x7F):
-            character = chr(0x8)
+            # detect and change delete key to backspace
+            if character == chr(0x7F):
+                character = chr(0x8)
 
-        if character == '\x0d' or character == '\x0a':
-            self.showText(' ')
-            self.linebuffer.append('\x0d')
-            self.top.output.emit(''.join(self.linebuffer[:]))
-            del self.linebuffer[:]
-        elif character == chr(8):
-            if self.linebuffer:
-                self.linebuffer.pop()
+            if character == '\x0d' or character == '\x0a':
+                self.showText('\r')
+                self.linebuffer.append('\x0d')
+                command = ''.join(self.linebuffer[:])
+                self.top.output.emit(command)
+                self.ui.LastCommand.setText(command.strip())
+                del self.linebuffer[:]
+            elif character == chr(8):
+                if self.linebuffer:
+                    self.linebuffer.pop()
+                    self.showText(character)
+            else:
+                self.linebuffer.append(character)
                 self.showText(character)
-        else:
-            self.linebuffer.append(character)
-            self.showText(character)
+
+    def send_last(self):
+        self.keyin(self.ui.LastCommand.text() + '\x0d')
 
     # ports
     def noTalkPort(self):
         self.protocol.inner.unplug()
-        self.talkPort = hub.Port(name='notalk')
+        self.talkPort = interface.Port(name='notalk')
 
     def ioError(self, message):
         error(message)
@@ -198,6 +205,6 @@ if __name__ == "__main__":
     try:
         sys.exit(app.exec_())
     except Exception, e:
-        error("Handler {} exception: {}".format(pids.pids[pid], e))
+        error(e)
         traceback.print_exc(file=sys.stderr)
 

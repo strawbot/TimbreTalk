@@ -6,7 +6,7 @@
 #  ->txq: points to micros byte transmit queue; must read from here
 #  ->rxq: points to mciros byte receive queue; must write to here
 
-from hub import *
+from interface import *
 import traceback
 from message import warning, error, note, message
 from threading import Thread

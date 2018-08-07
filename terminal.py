@@ -25,7 +25,7 @@ except AttributeError:
 class Ui_Frame(object):
     def setupUi(self, Frame):
         Frame.setObjectName(_fromUtf8("Frame"))
-        Frame.resize(938, 533)
+        Frame.resize(938, 570)
         Frame.setFrameShape(QtGui.QFrame.StyledPanel)
         Frame.setFrameShadow(QtGui.QFrame.Raised)
         self.verticalLayout = QtGui.QVBoxLayout(Frame)
@@ -123,6 +123,15 @@ class Ui_Frame(object):
         self.textEdit.setPlainText(_fromUtf8(""))
         self.textEdit.setObjectName(_fromUtf8("textEdit"))
         self.verticalLayout.addWidget(self.textEdit)
+        self.horizontalLayout_2 = QtGui.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName(_fromUtf8("horizontalLayout_2"))
+        self.SendCommand = QtGui.QPushButton(Frame)
+        self.SendCommand.setObjectName(_fromUtf8("SendCommand"))
+        self.horizontalLayout_2.addWidget(self.SendCommand)
+        self.LastCommand = QtGui.QLineEdit(Frame)
+        self.LastCommand.setObjectName(_fromUtf8("LastCommand"))
+        self.horizontalLayout_2.addWidget(self.LastCommand)
+        self.verticalLayout.addLayout(self.horizontalLayout_2)
 
         self.retranslateUi(Frame)
         QtCore.QObject.connect(self.pushButton, QtCore.SIGNAL(_fromUtf8("released()")), self.textEdit.clear)
@@ -136,6 +145,7 @@ class Ui_Frame(object):
         self.SetSfp.setText(_translate("Frame", "SFP", None))
         self.SetSerial.setText(_translate("Frame", "Serial", None))
         self.pushButton.setText(_translate("Frame", "Clear", None))
+        self.SendCommand.setText(_translate("Frame", "Send", None))
 
 
 if __name__ == "__main__":

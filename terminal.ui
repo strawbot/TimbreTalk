@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>938</width>
-    <height>533</height>
+    <height>570</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -277,6 +277,20 @@
       <string/>
      </property>
     </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QPushButton" name="SendCommand">
+       <property name="text">
+        <string>Send</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="LastCommand"/>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

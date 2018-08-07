@@ -1,6 +1,6 @@
 # pluggable serial port  Robert Chapman  Jul 26, 2018
 
-from hub import *
+from interface import *
 import listports
 import traceback
 import serial
@@ -27,9 +27,9 @@ class SerialPort(Port):
                 if len(c):
                     c += self.port.read(self.port.in_waiting)
                     self.output.emit(c)
-            except IOError:
-                self.closePort()
-                note('Alert: device removed while open ')
+            # except IOError:
+            #     self.closePort()
+            #     note('Alert: device removed while open ')
             except Exception, e:
                 self.closePort()
                 error("run - serial port exception: %s" % e)
@@ -58,6 +58,7 @@ class SerialPort(Port):
                     t = Thread(name=self.name, target=self.run)
                     t.setDaemon(True)
                     t.start()  # run serial port in thread
+                sleep(1)
             except Exception, e:
                 if self.port:
                     self.port.close()

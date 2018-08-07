@@ -1,11 +1,11 @@
 import socket
 from sfpLayer import SfpLayer, pids
-from hub import Port
-from interface import Interface, Layer
+from interface import Interface, Layer, Port
 import traceback, sys
-from threading import Thread
+from threading import Thread, Lock
 import time
 from serialHub import SerialPort
+from Queue import Queue
 
 sfp_udp_port = 1337
 ip = '216.123.208.82'
@@ -54,26 +54,85 @@ class IpPort(Port):
 CONNECT = 'CONNECT'
 EOF = '--EOF--Pattern--'
 apn = "m2m-east.telus.iot"
+rcv = "+KUDP_DATA: "
 
-
-class AtPort(Port):
+class AtPort(Layer):
     def __init__(self, name):
-        Port.__init__(self)
+        Layer.__init__(self, 'AtPort')
         self.port = SerialPort(name)
-        self.port.output.connect(self.receiveData)
-
-    def at(self, cmd, expect="OK", timeout=1):
+        self.plugin(self.port)
+        self.inner.input.connect(self.receive_data)
+        self.input.connect(self.send_data)
         self.reply = ''
-        self.port.input.emit(cmd + '\r')
-        self.port.port.timeout = timeout
+        self.dualStream = ''
+        self.frameq = Queue()
+        self.lock = Lock()
+        t = Thread(target=self.frameRunner)
+        t.setDaemon(True)
+        t.start()
+
+    def at(self, cmd, expect="OK", timeout=2, retries=1):
+        while retries >=0:
+            self.reply = ''
+            self.inner.output.emit(cmd + '\r')
+            self.port.port.timeout = timeout
+            if self.wait_for(expect, timeout):
+                return
+            retries -= 1
+        raise Exception("Unexpected reply {} for command {}".format(cmd, self.reply))
+
+    def wait_for(self, expect, timeout=2):
         start = time.time()
         while time.time() - start < timeout:
             if expect in self.reply:
-                return
-        raise Exception("Unexpected reply {} for command {}".format(cmd, self.reply))
+                return True
+        return False
 
-    def receiveData(self, data):
-        self.reply += data
+    def frameRunner(self):
+        while True:
+            frame = self.frameq.get()
+            self.output.emit(frame)
+
+    # +KUDP_DATA: 1,8,"216.123.208.82",1337,<7><f8><7><0><4><d><17>3<d><a>
+    def split_reply_and_receive_streams(self):
+        index = 0
+        try:
+            while index < len(self.dualStream):
+                if self.dualStream[index] == rcv[index]:
+                    index += 1
+                    if index != len(rcv):
+                        continue
+
+                    if self.dualStream.count(',') < 4:
+                        return
+
+                    fields = self.dualStream.split(',', 4)
+                    if len(fields) < 5:
+                        return
+
+                    length = int(fields[1])
+                    if len(fields[4]) < length:
+                        return
+
+                    self.dualStream = fields[4][length:]
+                    frame = fields[4][:length]
+                    self.frameq.put(frame)
+                else:
+                    self.reply += self.dualStream[:1]
+                    self.dualStream = self.dualStream[1:]
+                index = 0
+        except Exception, e:
+            print >> sys.stderr, e
+            traceback.print_exc(file=sys.stderr)
+            print index
+            print self.dualStream
+            sys.exit(0)
+
+    def receive_data(self, data):
+        # self.lock.acquire()
+        self.dualStream += data
+        self.split_reply_and_receive_streams()
+        # self.lock.release()
 
     def startup(self):
         '''startup sequence for cell modem:
@@ -88,30 +147,32 @@ class AtPort(Port):
         send: AT+KCNXCFG=1,"GPRS",m2m-east.telus.iot
         '''
         at = self.at
-        at("AT+CREG?",  expect="+CREG: 1,1", timeout=20)
+        at("AT+CREG?",  expect="+CREG: 1", timeout=2, retries=10)
         at("ATE0")
         at("AT+KSREP=0")
         at("AT+CREG=1")
         at('AT+CGDCONT=1,"IP","{}"'.format(apn))
-        at('AT+CGATT?', expect='+CGATT: 1')
+        at('AT+CGATT?', expect='+CGATT: 1', retries=10)
         at('AT&K3')
         at('AT+KCNXCFG=1,"GPRS",{}'.format(apn))
 
-    def udpOpen(self):
+    def udp_open(self):
         '''UDP open sequence
         send: AT+KCNXTIMER=1,60,1,60
         send: AT+KUDPCFG=1,0  expect: +KUDP_IND: sid
         '''
         self.startup()
         self.at('AT+KCNXTIMER=1,60,1,60')
-        self.at('AT+KUDPCFG=1,0',  expect='+KUDP_IND: 1,1', timeout=5)
+        self.at('AT+KUDPCFG=1,0,,1',  expect='+KUDP_IND: 1,1', timeout=5)
         reply = self.reply.splitlines()[-1]
         self.sid = reply.split(' ')[-1][0]
 
     def open(self):
         self.port.open()
         if self.port.is_open():
-            self.udpOpen()
+            self.udp_open()
+        else:
+            raise Exception("Failed to open port {}".format(self.port.name))
 
     def is_open(self):
         return self.port.is_open()
@@ -122,12 +183,15 @@ class AtPort(Port):
         send: data
         send: EOF
         '''
+        self.lock.acquire()
         self.at('AT+KUDPSND={},{},{},{}'.format(self.sid, ip, sfp_udp_port,len(data)),
-                expect=CONNECT, timeout=5)
-        self.port.input.emit(data)
-        self.port.input.emit(EOF)
+                expect=CONNECT, timeout=5, retries=0)
+        self.inner.output.emit(data)
+        self.inner.output.emit(EOF)
+        self.wait_for("OK", 5)
+        self.lock.release()
 
-    def recUdp(self):
+    def rec_udp(self):
         '''receive sequence
         expect: +KUDP_RCV:
         send: AT+KUDPRCV=sid,size  expect: CONNECT
@@ -138,7 +202,7 @@ class AtPort(Port):
         size = self.reply.split(',')[-1]
         self.at('AT+KUDPRCV={},{}'.format(self.sid, size), expect=EOF)
 
-    def closeUdp(self):
+    def close_udp(self):
         '''UDP close sequence
         send: AT+KUDPCLOSE=sid
         '''
@@ -154,35 +218,53 @@ class DeviceSimulator(object):
         else:
             self.bottom = IpPort((ip, sfp_udp_port), 'SfpLayer')
 
-        self.top.plugin(self.sfp.upper)
-        self.sfp.inner.plugin(self.bottom)
-        self.top.input.connect(self.cli)
+        self.top.plugin(self.sfp)
+        self.sfp.plugin(self.bottom)
+        self.top.input.connect(self.command)
 
         self.sfp.setHandler(pids.TALK_IN, self.talkInHandler)
 
         self.bottom.open()
 
         # run keep aliver in thread
-        Thread(name='DeviceSimulator', target=self.keepalive).start()
+        self.connected = False
+        t = Thread(name='DeviceSimulator', target=self.keepalive)
+        t.setDaemon(True)
+        t.start()
+
+        # run CLI in thread
+        self.commands = Queue()
+        t = Thread(name='CLI', target=self.cli)
+        t.setDaemon(True)
+        t.start()
+        t.join()
+
+    def command(self, data):
+        self.commands.put(data)
 
     def talkInHandler(self, packet):
-        self.sfp.upper.output.emit(packet[2:])
+        self.sfp.output.emit(packet[2:])
 
     def sendHelo(self):
         self.bottom.send_data('helo')
 
     def keepalive(self):
         while self.bottom.is_open():
+            if self.connected:
+                return
             self.bottom.send_data(' ')
             time.sleep(5)
 
-    def cli(self, data):
-        text = ''.join(map(chr, data))
-        if 'exit' in text:
-            self.bottom.close()
-        else:
-            print(text)
-            self.sfp.sendNPS(pids.TALK_OUT, [self.sfp.whoto, self.sfp.whofrom]+map(ord,'\ndevsim: '))
+    def cli(self):
+        while True:
+            text = ''.join(map(chr, self.commands.get()))
+            self.connected = True
+            if 'exit' in text:
+                self.bottom.close()
+                return
+            else:
+                self.sfp.sendNPS(pids.TALK_OUT, [self.sfp.whoto, self.sfp.whofrom]+map(ord,'\ndevsim: '))
 
 
 d = DeviceSimulator("/dev/cu.usbserial-FT9S9VC1")
+# d = DeviceSimulator()

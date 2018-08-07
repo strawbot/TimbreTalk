@@ -1,7 +1,7 @@
 # support for TT over ip using UDP  Robert Chapman  Jul 24, 2018
 #  inputs periodically send frames to let TT know they can be connected to
 
-from hub import *
+from interface import *
 import socket
 import sys, traceback, errno
 import time
