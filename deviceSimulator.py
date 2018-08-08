@@ -222,7 +222,7 @@ class DeviceSimulator(object):
         self.sfp.plugin(self.bottom)
         self.top.input.connect(self.command)
 
-        self.sfp.setHandler(pids.TALK_IN, self.talkInHandler)
+        self.sfp.setHandler(pids.EVAL_PID, self.talkInHandler)
 
         self.bottom.open()
 
@@ -251,8 +251,9 @@ class DeviceSimulator(object):
     def keepalive(self):
         while self.bottom.is_open():
             if self.connected:
-                return
-            self.bottom.send_data(' ')
+                self.connected = False
+            else:
+                self.bottom.send_data(' ')
             time.sleep(5)
 
     def cli(self):
@@ -263,7 +264,7 @@ class DeviceSimulator(object):
                 self.bottom.close()
                 return
             else:
-                self.sfp.sendNPS(pids.TALK_OUT, [self.sfp.whoto, self.sfp.whofrom]+map(ord,'\ndevsim: '))
+                self.sfp.sendNPS(pids.TALK_OUT, [self.sfp.whoto, self.sfp.whofrom]+map(ord,'devsim: '))
 
 
 d = DeviceSimulator("/dev/cu.usbserial-FT9S9VC1")
