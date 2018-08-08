@@ -11,7 +11,7 @@
 #  endpoint = Interface()
 #  layer1.inner.plugin(endpoint)
 
-class signal(object):
+class Signal(object):
     def __init__(self, *args):
         self.disconnect()
 
@@ -38,11 +38,12 @@ class signal(object):
 
 class Interface(object):
     def __init__(self, name='interface'):
-        self.input = signal(object)
-        self.output = signal(object)
+        self.input = Signal(object)
+        self.output = Signal(object)
         self.name = name
         self.input.connect(self.no_input)
         self.output.connect(self.no_output)
+        self.signals = [input, output]
 
     def no_input(self, data):
         raise Exception("Error, {}.input not defined".format(self.name))
@@ -62,11 +63,16 @@ class Interface(object):
             self.output.emit(data)
         self.input.connect(in2out)
 
+    def disconnect(self):
+        for signal in self.signals:
+            signal.disconnect()
+
 
 class Layer(Interface):
     def __init__(self, name='Layer'):
         Interface.__init__(self, name)
         self.inner = Interface(name + '.inner')
+        self.signals += [self.inner.input, self.inner.output]
 
     def unplug(self):
         super(Layer, self).unplug()
@@ -95,11 +101,11 @@ class Port(Interface):
         self.hub = hub
         self.__opened = False
         self.input.connect(self.send_data)
-        self.ioError = signal()
-        self.ioException = signal()
-        self.closed = signal()
-        self.opened = signal()
-        self.signals = [self.ioError, self.ioException, self.closed, self.opened]
+        self.ioError = Signal()
+        self.ioException = Signal()
+        self.closed = Signal()
+        self.opened = Signal()
+        self.signals += [self.ioError, self.ioException, self.closed, self.opened]
 
     def is_open(self):
         return self.__opened
@@ -127,7 +133,7 @@ class Port(Interface):
 
 class Hub(object):
     __allports = {}
-    update = signal()
+    update = Signal()
 
     def __init__(self, name='Hub'):
         self.name = name
@@ -164,12 +170,12 @@ class Hub(object):
 
 
 if __name__ == "__main__":
-    s = signal()
+    s = Signal()
     def lo(): print('lo')
     s.connect(lo)
     s.emit()
 
-    s = signal(object)
+    s = Signal(object)
     def hi(data):  print('input: {}'.format(data))
     s.connect(hi)
     s.emit('data')

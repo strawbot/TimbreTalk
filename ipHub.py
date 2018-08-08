@@ -49,7 +49,7 @@ class UdpHub(Hub):
         while True:
             try:
                 data, address = self.sock.recvfrom(256)  # buffer size is 256 bytes
-                print "address:", address, "received message:", data
+                # print "address:", address, "received message:", data
                 self.receive_data(data, address)
             except socket.timeout:
                 self.update_port_list()

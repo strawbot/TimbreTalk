@@ -262,10 +262,11 @@ class DeviceSimulator(object):
             self.connected = True
             if 'exit' in text:
                 self.bottom.close()
-                return
+                sys.exit(0)
             else:
                 self.sfp.sendNPS(pids.TALK_OUT, [self.sfp.whoto, self.sfp.whofrom]+map(ord,'devsim: '))
 
 
 d = DeviceSimulator("/dev/cu.usbserial-FT9S9VC1")
 # d = DeviceSimulator()
+sys.exit(0)
