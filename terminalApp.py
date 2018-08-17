@@ -7,6 +7,7 @@ from terminal import Ui_Frame
 import interface, ipHub, serialHub, jlinkHub
 from sfpLayer import SfpLayer, pids
 from threading import Thread
+import bisect
 
 version = "V1"
 
@@ -32,7 +33,10 @@ class terminal(QtGui.QMainWindow):
 
         self.ui.textEdit.setCursorWidth(8)
         self.ui.textEdit.installEventFilter(self)
+        self.ui.LastCommand.returnPressed.connect(self.send_last)
         self.linebuffer = []
+        self.commandBuffer = []
+        self.commandHistory = 0
 
         self.top = interface.Interface('terminal')
         self.protocol = SfpLayer()
@@ -97,6 +101,14 @@ class terminal(QtGui.QMainWindow):
                     self.keyin(c)
                 return True
             else:
+                if event.key() == QtCore.Qt.Key_Up:
+                    self.commandHistory = min(self.commandHistory+1, len(self.commandBuffer)-1)
+                    self.ui.LastCommand.setText(self.commandBuffer[self.commandHistory])
+                    return True
+                if event.key() == QtCore.Qt.Key_Down:
+                    self.commandHistory = max(self.commandHistory-1, 0)
+                    self.ui.LastCommand.setText(self.commandBuffer[self.commandHistory])
+                    return True
                 key = event.text()
                 if key:
                     self.keyin(key)
@@ -114,9 +126,12 @@ class terminal(QtGui.QMainWindow):
                 self.showText('\r')
                 self.linebuffer.append('\x0d')
                 command = ''.join(self.linebuffer[:])
-                self.top.output.emit(command)
-                self.ui.LastCommand.setText(command.strip())
                 del self.linebuffer[:]
+                self.top.output.emit(command)
+                command = command.strip()
+                if command:
+                    self.ui.LastCommand.setText(command)
+                    self.commandBuffer.insert(0, command)
             elif character == chr(8):
                 if self.linebuffer:
                     self.linebuffer.pop()
@@ -149,8 +164,10 @@ class terminal(QtGui.QMainWindow):
 
         for r in list(set(items) - set(ports)):  # items to be removed
             uiPort.removeItem(uiPort.findText(r))
+            if r in items:  items.remove(r)
         for a in list(set(ports) - set(items)):  # items to be added
-            uiPort.addItem(a)
+            bisect.insort(items, a)
+            uiPort.insertItem(1 + items.index(a), a)
 
         # check current port against list and select proper item
         if self.talkPort.name:
