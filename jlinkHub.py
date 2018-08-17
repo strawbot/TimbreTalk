@@ -149,8 +149,9 @@ class JlinkHub(Hub):
             emulators = self.link.connected_emulators()
             portlist = [str(d.SerialNumber) for d in emulators]
             for serialno in portlist:
-                if not self.get_port(serialno):
-                    port = JlinkPort(serialno, 'jlink-'+serialno, self)
+                name = 'jlink-'+serialno
+                if not self.get_port(name):
+                    port = JlinkPort(serialno, name, self)
                     self.add_port(port)
 
 
