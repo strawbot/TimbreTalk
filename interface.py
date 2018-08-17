@@ -43,13 +43,13 @@ class Interface(object):
         self.name = name
         self.input.connect(self.no_input)
         self.output.connect(self.no_output)
-        self.signals = [input, output]
+        self.signals = [self.input, self.output]
 
     def no_input(self, data):
-        raise Exception("Error, {}.input not defined".format(self.name))
+        print("Error, {}.input not defined".format(self.name))
 
     def no_output(self, data):
-        raise Exception("Error, {}.output unplugged".format(self.name))
+        print("Error, {}.output unplugged".format(self.name))
 
     def unplug(self):
         self.output.connect(self.no_output)
@@ -153,8 +153,8 @@ class Hub(object):
 
     def remove_port(self, port):
         if Hub.__allports.get(port.name):
-            x = Hub.__allports.pop(port.name)
-            x = self.__myports.pop(port.name)
+            Hub.__allports.pop(port.name)
+            self.__myports.pop(port.name)
             self.update.emit()
 
     def get_port(self, name):
