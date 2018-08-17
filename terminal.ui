@@ -72,9 +72,12 @@
             <property name="insertPolicy">
              <enum>QComboBox::InsertAlphabetically</enum>
             </property>
+            <property name="sizeAdjustPolicy">
+             <enum>QComboBox::AdjustToContents</enum>
+            </property>
             <item>
              <property name="text">
-              <string>(Select host Port)</string>
+              <string>(Select a Port)</string>
              </property>
             </item>
            </widget>
@@ -331,8 +334,8 @@
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>881</x>
-     <y>28</y>
+     <x>923</x>
+     <y>523</y>
     </hint>
     <hint type="destinationlabel">
      <x>790</x>
