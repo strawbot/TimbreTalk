@@ -6,19 +6,17 @@ import socket
 import sys, traceback, errno
 import time
 from threading import Thread
+from protocols.sfp import sfpProtocol
 
 remote_ip = '192.168.0.9'
 sfp_udp_port = 1337
 udp_poll = 2
-udp_stale = 10
+udp_stale = 11
 
 class UdpPort(Port):
     def __init__(self, address, name, hub):
         Port.__init__(self, address, name, hub)
         self.timestamp = time.time()
-
-    def last_timestamp(self):
-        return self.timestamp
 
     def send_data(self, data):
         self.hub.send_data(self.address, data)
@@ -28,6 +26,7 @@ class UdpPort(Port):
 class UdpHub(Hub):
     def __init__(self):
         Hub.__init__(self, name="UdpHub")
+        self.portAddresses = {}
         t = Thread(name=self.name, target=self.run)
         t.setDaemon(True)
         t.start()  # run hub in thread
@@ -61,20 +60,40 @@ class UdpHub(Hub):
         self.sock.close()
 
     def receive_data(self, data, address):
-        name = 'UDP port: {}'.format(address[1])
-        port = self.get_port(name)
+        port = self.portAddresses.get(address)
         if port:
             if port.is_open() and len(data):
                 port.output.emit(data)
         else:
+            packet = sfpProtocol.getPacket(map(ord, data))
+            if not packet:
+                serial_no = 'no id'
+            else:
+                serial_no = ''.join(map(chr, packet[5:]))
+            name = 'UDP port: {} ({})'.format(address[1], serial_no)
             port = UdpPort(address, name, self)
+            port.serial_no = serial_no
             self.add_port(port)
+        port.timestamp = time.time()
 
     def update_port_list(self):
         for port in self.ports():
             if not port.is_open():
-                if time.time() - port.last_timestamp() > udp_stale:
+                if time.time() - port.timestamp > udp_stale:
                     self.remove_port(port)
+
+    def add_port(self, port):
+        serial_no = port.serial_no
+        for checkPort in self.ports():
+            if checkPort.serial_no == serial_no:
+                print checkPort.name, ' is the same as ', port.name
+                self.remove_port(checkPort)
+        super(UdpHub, self).add_port(port)
+        self.portAddresses[port.address] = port
+
+    def remove_port(self, port):
+        super(UdpHub, self).remove_port(port)
+        self.portAddresses.pop(port.address)
 
     def send_data(self, address, data):
         self.sock.sendto(data, address)
