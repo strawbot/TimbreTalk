@@ -4,8 +4,9 @@ updateUi('terminal')
 
 from PyQt4 import QtGui, QtCore
 from terminal import Ui_Frame
-import interface, ipHub, serialHub, jlinkHub
-from sfpLayer import SfpLayer, pids
+from protocols.interface import interface, ipHub, serialHub, jlinkHub
+from protocols.sfpLayer import SfpLayer
+from protocols import pids
 from threading import Thread
 import bisect
 
