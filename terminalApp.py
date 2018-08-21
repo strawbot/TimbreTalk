@@ -193,6 +193,7 @@ class terminal(QtGui.QMainWindow):
         if self.ui.PortSelect.currentIndex():
             name = str(self.ui.PortSelect.currentText())
             self.ui.PortSelect.setDisabled(True)
+            self.ui.textEdit.setDisabled(True)
             self.talkPort = self.serialHub.get_port(name)
             def portOpen():
                 self.talkPort.open()
@@ -204,6 +205,7 @@ class terminal(QtGui.QMainWindow):
                     self.ui.PortSelect.setCurrentIndex(0)
                     self.noTalkPort()
                 self.ui.PortSelect.setDisabled(False)
+                self.ui.textEdit.setDisabled(False)
                 self.showPortUpdate()
             Thread(target=portOpen).start() # run in thread to keep GUI responsive
         else:
