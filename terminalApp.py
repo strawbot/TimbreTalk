@@ -59,7 +59,7 @@ class terminal(QtGui.QMainWindow):
 
         self.noTalkPort()
         self.ipHub = ipHub.UdpHub()
-        self.ipHub.whofrom = pids.IP_HOST
+        self.ipHub.whofrom = pids.UDP_HOST
         self.jlinkHub = jlinkHub.JlinkHub()
         self.jlinkHub.whofrom = pids.ETM_HOST
         self.serialHub = serialHub.SerialHub()
