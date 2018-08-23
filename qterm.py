@@ -4,8 +4,7 @@
 
 from pyqtapi2 import *
 import sys
-import etmLink
-import interface, ipHub, serialHub, jlinkHub
+from protocols.interface import interface, ipHub, serialHub, jlinkHub
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -19,8 +18,8 @@ updateUi('mainWindow')
 from mainWindow import Ui_MainWindow
 import traceback
 
-import listports, serialio
-from message import *
+from protocols.interface import listports, serialio
+from protocols.interface.message import *
 
 class terminal(QMainWindow):
     def __init__(self, app, parent=None, source=None):

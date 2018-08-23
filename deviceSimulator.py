@@ -66,7 +66,6 @@ class AtPort(Layer):
         self.reply = ''
         self.dualStream = ''
         self.frameq = Queue()
-        self.lock = Lock()
         t = Thread(target=self.frameRunner)
         t.setDaemon(True)
         t.start()
@@ -81,7 +80,7 @@ class AtPort(Layer):
             retries -= 1
         raise Exception("Unexpected reply {} for command {}".format(cmd, self.reply))
 
-    def wait_for(self, expect, timeout=2):
+    def wait_for(self, expect="OK", timeout=2):
         start = time.time()
         while time.time() - start < timeout:
             if expect in self.reply:
@@ -129,10 +128,8 @@ class AtPort(Layer):
             sys.exit(0)
 
     def receive_data(self, data):
-        # self.lock.acquire()
         self.dualStream += data
         self.split_reply_and_receive_streams()
-        # self.lock.release()
 
     def startup(self):
         '''startup sequence for cell modem:
@@ -159,7 +156,7 @@ class AtPort(Layer):
     def udp_open(self):
         '''UDP open sequence
         send: AT+KCNXTIMER=1,60,1,60
-        send: AT+KUDPCFG=1,0  expect: +KUDP_IND: sid
+        send: AT+KUDPCFG=1,0,,1  expect: +KUDP_IND: sid
         '''
         self.startup()
         self.at('AT+KCNXTIMER=1,60,1,60')
@@ -181,26 +178,13 @@ class AtPort(Layer):
         '''send sequence
         send: AT+KUDPSND=sid,destip,destport,size  expect: CONNECT
         send: data
-        send: EOF
+        send: EOF  expect: OK
         '''
-        self.lock.acquire()
         self.at('AT+KUDPSND={},{},{},{}'.format(self.sid, ip, sfp_udp_port,len(data)),
                 expect=CONNECT, timeout=5, retries=0)
         self.inner.output.emit(data)
         self.inner.output.emit(EOF)
-        self.wait_for("OK", 5)
-        self.lock.release()
-
-    def rec_udp(self):
-        '''receive sequence
-        expect: +KUDP_RCV:
-        send: AT+KUDPRCV=sid,size  expect: CONNECT
-        expect: data
-        expect: EOF
-        '''
-        self.at('', expect='+KUDP_RCV:', timeout=5)
-        size = self.reply.split(',')[-1]
-        self.at('AT+KUDPRCV={},{}'.format(self.sid, size), expect=EOF)
+        self.wait_for(timeout=5)
 
     def close_udp(self):
         '''UDP close sequence
@@ -253,7 +237,7 @@ class DeviceSimulator(object):
             if self.connected:
                 self.connected = False
             else:
-                self.bottom.send_data(' ')
+                self.bottom.send_data(chr(0))
             time.sleep(5)
 
     def cli(self):

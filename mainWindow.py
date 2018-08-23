@@ -1792,7 +1792,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.Controls.setCurrentIndex(0)
+        self.Controls.setCurrentIndex(1)
         self.BaudRate.setCurrentIndex(6)
         self.textColor.setCurrentIndex(1)
         self.targetSelect.setCurrentIndex(-1)
@@ -1808,6 +1808,9 @@ class Ui_MainWindow(object):
         self.MonitorBaud4.setCurrentIndex(5)
         self.MonitorColor4.setCurrentIndex(2)
         QtCore.QObject.connect(self.ClearText, QtCore.SIGNAL(_fromUtf8("clicked()")), self.textEdit.clear)
+        QtCore.QObject.connect(self.PasteText, QtCore.SIGNAL(_fromUtf8("released()")), self.textEdit.paste)
+        QtCore.QObject.connect(self.CopyText, QtCore.SIGNAL(_fromUtf8("released()")), self.textEdit.copy)
+        QtCore.QObject.connect(self.SelectText, QtCore.SIGNAL(_fromUtf8("released()")), self.textEdit.selectAll)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         MainWindow.setTabOrder(self.phrase1, self.phrase2)
         MainWindow.setTabOrder(self.phrase2, self.phrase3)

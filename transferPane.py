@@ -1,7 +1,7 @@
 # panel for srecords  Robert Chapman III  Dec 5, 2012
 
 from pyqtapi2 import *
-from message import *
+from protocols.interface.message import *
 from protocols import pids
 from endian import *
 from srecordTransfer import sRecordTransfer, ubootTransfer

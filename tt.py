@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 # GUI for serial transactions using Qt	Robert Chapman III	Sep 28, 2012
-version='1.8.0'
+version='1.9.0'
 
 from pyqtapi2 import *
 from protocols.pids import DIRECT, whoDict
@@ -11,11 +11,11 @@ from compileui import updateUi
 updateUi('mainWindow')
 updateUi('tabs')
 
-from message import *
+from protocols.interface.message import *
 import qterm, serialPane, transferPane
 import infopane
 import utilitypane
-from sfpLayer import SfpLayer
+from protocols.sfpLayer import SfpLayer
 
 class timbreTalk(qterm.terminal):
     def __init__(self, app):

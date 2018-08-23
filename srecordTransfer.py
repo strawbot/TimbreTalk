@@ -10,7 +10,7 @@ import os
 from imageTransfer import imageTransfer
 from protocols import pids
 from endian import *
-from message import *
+from protocols.interface.message import *
 from checksum import fletcher32
 from targets import *
 from buildversion import *

@@ -4,7 +4,7 @@ from pyqtapi2 import *
 
 import sys, traceback	
 from endian import *
-from message import *
+from protocols.interface.message import *
 from imageTransfer import imageTransfer
 import xmodem
 from threading import Timer

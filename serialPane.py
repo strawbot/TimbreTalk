@@ -1,10 +1,10 @@
 # serial panel for qtran  Robert Chapman III  Oct 20, 2012
 
 from pyqtapi2 import *
-from message import *
+from protocols.interface.message import *
 from protocols import pids
 import sys, traceback	
-from etmLink import etmLink
+from protocols.interface import jlinkHub
 
 CRETURN = 0xD
 
@@ -32,7 +32,7 @@ class serialPane(QWidget):
         # setup
         self.ui.SFP.click()
         # self.protocol.setHandler(pids.TALK_OUT, self.talkPacket)
-        self.protocol.upper.send_data = self.talkSink
+        self.protocol.send_data = self.talkSink
 
     def portParametersMenu(self):
         # menu for serial port parameters
@@ -69,9 +69,10 @@ class serialPane(QWidget):
                 break
 
     def setParamButtonText(self):
-        if etmLink.isPort(str(self.ui.PortSelect.currentText())):
-            self.setWhoFrom(pids.ETM_HOST)
-            return
+        ### TODO: Fix
+        # if jlinkHub.isPort(str(self.ui.PortSelect.currentText())):
+        #     self.setWhoFrom(pids.ETM_HOST)
+        #     return
 
         self.setWhoFrom(pids.MAIN_HOST)
         return
@@ -136,8 +137,8 @@ class serialPane(QWidget):
             note('changed to SFP')
             self.resetRcvr()
         self.disconnectFlows()
-        self.parent.lower.plugin(self.parent.protocol.upper)
-        self.parent.talkPort.plugin(self.parent.protocol.lower)
+        self.parent.lower.plugin(self.parent.protocol)
+        self.parent.protocol.plugin(self.parent.talkPort)
         if self.ui.LoopBack.isChecked():
             self.parent.talkPort.loopback()
 
@@ -145,8 +146,8 @@ class serialPane(QWidget):
         if not self.ui.ATwifi.isChecked():
             note('changed to AT')
         self.disconnectFlows()
-        self.parent.plugin(self.parent.protocol.upper)
-        self.parent.talkPort.plugin(self.parent.protocol.lower)
+        self.parent.plugin(self.parent.protocol)
+        self.parent.protocol.plugin(self.parent.talkPort)
         if self.ui.LoopBack.isChecked():
             self.parent.talkPort.loopback()
         self.parent.lower.output.connect(self.ATSink)

@@ -8,7 +8,7 @@ from pyqtapi2 import *
 
 from protocols import pids
 from endian import *
-from message import *
+from protocols.interface.message import *
 
 # parameter spids
 AUTOBOOT_PARAM = 1 # whether to autoboot (1) or not (0)

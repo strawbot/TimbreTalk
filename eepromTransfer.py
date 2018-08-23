@@ -4,7 +4,7 @@ from pyqtapi2 import *
 from imageTransfer import imageTransfer
 from transfer import *
 from protocols import pids
-from message import *
+from protocols.interface.message import *
 import binascii
 
 class eepromTransfer(imageTransfer):

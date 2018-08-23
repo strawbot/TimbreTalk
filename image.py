@@ -3,7 +3,7 @@
 from pyqtapi2 import *
 
 import sys, traceback
-from message import *
+from protocols.interface.message import *
 from checksum import fletcher32
 import os
 from ctypes import *

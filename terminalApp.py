@@ -10,6 +10,11 @@ from protocols import pids
 from threading import Thread
 import bisect
 
+try:
+    _fromUtf8 = QtCore.QString.fromUtf8
+except AttributeError:
+    _fromUtf8 = lambda s: s
+
 version = "V1"
 
 def note(text):
@@ -70,6 +75,15 @@ class terminal(QtGui.QMainWindow):
         self.ipHub.update.connect(self.showPortUpdate)
 
         self.showPorts()
+
+        if sys.platform == 'darwin':
+            self.raise_()
+        else:
+            font = self.ui.textEdit.font()
+            if sys.platform[:5] == 'linux':
+                font.setFamily(_fromUtf8("Andale Mono"))
+            font.setPointSize(font.pointSize() - 3)
+            self.ui.textEdit.setFont(font)
 
     # gui
     def setSerial(self):
