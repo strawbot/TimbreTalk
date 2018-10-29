@@ -46,13 +46,6 @@ class timbreTalk(qterm.terminal):
         SerialTab, \
         SrecordTab, \
         ReleaseTab, \
-        TestTab, \
-        PhraseTab = range(5)
-        # adjustments for terminal app
-        self.ui.Controls.setCurrentIndex(SerialTab)
-
-    def banner(self):
-        self.setWindowTitle('Timbre Talk '+version)
 
     def connectPort(self):
         self.serialPane.connectPort()
@@ -70,7 +63,14 @@ class timbreTalk(qterm.terminal):
         del(points[-1]) # remove routing points
         self.ui.whoTo.clear()
         self.ui.whoTo.insertItems(0, points)
-        self.ui.whoFrom.clear()
+        self.ui.whoFrom.clear
+        TestTab, \
+        PhraseTab = range(5)
+        # adjustments for terminal app
+        self.ui.Controls.setCurrentIndex(SerialTab)
+
+    def banner(self):
+        self.setWindowTitle('Timbre Talk '+version)()
         self.ui.whoFrom.insertItems(0, points)
         self.ui.whoTo.currentIndexChanged.connect(self.selectWhoTo)
         self.ui.whoFrom.currentIndexChanged.connect(self.selectWhoFrom)

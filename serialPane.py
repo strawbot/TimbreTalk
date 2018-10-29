@@ -110,7 +110,7 @@ class serialPane(QWidget):
             error("can't set Params")
 
     def disconnectFlows(self):
-        self.parent.lower.unplug()
+        self.parent.inner.unplug()
         self.protocol.unplug()
         self.parent.talkPort.unplug()
 
@@ -137,7 +137,7 @@ class serialPane(QWidget):
             note('changed to SFP')
             self.resetRcvr()
         self.disconnectFlows()
-        self.parent.lower.plugin(self.parent.protocol)
+        self.parent.inner.plugin(self.parent.protocol)
         self.parent.protocol.plugin(self.parent.talkPort)
         if self.ui.LoopBack.isChecked():
             self.parent.talkPort.loopback()
@@ -150,7 +150,7 @@ class serialPane(QWidget):
         self.parent.protocol.plugin(self.parent.talkPort)
         if self.ui.LoopBack.isChecked():
             self.parent.talkPort.loopback()
-        self.parent.lower.output.connect(self.ATSink)
+        self.parent.inner.output.connect(self.ATSink)
 
     def protocolDump(self, flag):
         self.protocol.VERBOSE = flag
@@ -159,7 +159,7 @@ class serialPane(QWidget):
     # talk connections
     def talkPacket(self, packet): # handle text packets
         data = ''.join(map(chr, packet[2:]))
-        self.parent.lower.input.emit(data)
+        self.parent.inner.input.emit(data)
 
     def talkSink(self, s): # have a text port
         s = str(s)

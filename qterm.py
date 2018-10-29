@@ -18,7 +18,6 @@ updateUi('mainWindow')
 from mainWindow import Ui_MainWindow
 import traceback
 
-from protocols.interface import listports, serialio
 from protocols.interface.message import *
 
 class terminal(QMainWindow):
@@ -34,8 +33,8 @@ class terminal(QMainWindow):
 
         # talk ports
         self.portlistMutex = QMutex()
-        self.lower = interface.Interface('qterm')
-        self.lower.input.connect(self.send_data)
+        self.inner = interface.Interface('qterm')
+        self.inner.input.connect(self.send_data)
         self.noTalkPort()
         # self.ipHub = ipPort.UdpHub()
         # self.jlinkHub = jlinkPort.JlinkHub()
@@ -304,7 +303,7 @@ class terminal(QMainWindow):
         note('Serial thread finished')
 
     def connectPort(self):
-        self.lower.plugin(self.talkPort)
+        self.inner.plugin(self.talkPort)
         if self.ui.LoopBack.isChecked():
             self.talkPort.loopback()
         else:
@@ -344,7 +343,7 @@ class terminal(QMainWindow):
             character = chr(0x8)
 
         if self.single:
-            self.lower.output.emit(character)
+            self.inner.output.emit(character)
             if self.linebuffer:
                 del self.linebuffer[:]
             if self.echo:
@@ -352,7 +351,7 @@ class terminal(QMainWindow):
         else:
             if character == '\x0d' or character == '\x0a':
                 self.write('\x0a')
-                self.lower.output.emit(''.join(self.linebuffer[:]))
+                self.inner.output.emit(''.join(self.linebuffer[:]))
                 del self.linebuffer[:]
             elif character == chr(8):
                 if self.linebuffer:

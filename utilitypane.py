@@ -6,7 +6,6 @@ from protocols.interface.message import *
 from protocols import sfp, pids
 from endian import *
 from image import *
-from protocols.interface import listports, serialio
 from microTransfer import stmTransfer, efmTransfer
 from jamTransfer import jamSender
 from eepromTransfer import eepromTransfer
