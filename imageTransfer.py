@@ -9,7 +9,7 @@ from checksum import fletcher32
 import image
 from transfer import *
 
-class imageTransfer(image.imageRecord):
+class imageTransfer(image.imageRecord, QThread):
 	setProgress = Signal(object)
 	setAction = Signal(object)
 	# perhaps the following parameters should be in the children files which use SFP

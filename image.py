@@ -253,45 +253,9 @@ class imageRecord(QObject):
 	information about the parts to build the image.
 	'''
 	def addElfRecord(self):
+		from elfdump import *
+		
 		if printme: print("adding elf record")
-		# named constants
-		EI_MAG0, EI_MAG1, EI_MAG2, EI_MAG3, EI_CLASS, EI_DATA, EI_VERSION, EI_PAD, EI_NIDENT = range(8) + [16]
-		ELFMAG0, ELFMAG1, ELFMAG2, ELFMAG3 = '\x7f', 'E', 'L', 'F'
-		ELFCLASSNONE, ELFCLASS32, ELFCLASS64 = range(3)
-		ELFDATANONE, ELFDATA2LSB, ELFDATA2MSB = range(3)
-		ET_NONE, ET_REL, ET_EXEC, ET_DYN, ET_CORE = range(5)
-		EM_NONE, EM_M32, EM_SPARC, EM_386, EM_68K, EM_88K, EM_86O, EM_MIPS, EM_ARM = range(6) + [7,8,0x28]
-
-		def elfHeader(base):
-			class elfHeaderBase(base):
-				_fields_ = [('ident', c_ubyte * EI_NIDENT),
-							('type', c_ushort),
-							('machine', c_ushort),
-							('version', c_uint32),
-							('entry', c_uint32),
-							('phoff', c_uint32),
-							('shoff', c_uint32),
-							('flags', c_uint32),
-							('ehsize', c_ushort),
-							('phentsize', c_ushort),
-							('phnum', c_ushort),
-							('shentsize', c_ushort),
-							('shnum', c_ushort),
-							('shstrndx', c_ushort)]
-			return elfHeaderBase()
-
-		# format of program headers used to find image sections
-		def programHeader(base):
-			class programHeaderBase(base):
-				_fields_ = [('p_type', c_uint32),
-							('p_offset', c_uint32),
-							('p_vaddr', c_uint32),
-							('p_paddr', c_uint32),
-							('p_filesz', c_uint32),
-							('p_memsz', c_uint32),
-							('p_flags', c_uint32),
-							('p_align', c_uint32)]
-			return programHeaderBase()
 
 		# determine endian
 		file = open(self.file, 'rb')

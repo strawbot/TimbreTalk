@@ -107,6 +107,8 @@ def elfDump(file):
 	elf = elfHeader(endian)
 	file.seek(EI_MAG0)
 	file.readinto(elf)
+	
+	
 	ehDump(elf)
 	
 	# program header
@@ -129,4 +131,5 @@ def elfDump(file):
 
 	file.close()
 
-elfDump(sys.argv[1])
+if __name__ == "__main__":
+	elfDump(sys.argv[1])
