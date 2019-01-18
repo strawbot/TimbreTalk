@@ -117,12 +117,14 @@ class terminal(QtGui.QMainWindow):
                 return True
             else:
                 if event.key() == QtCore.Qt.Key_Up:
-                    self.commandHistory = min(self.commandHistory+1, len(self.commandBuffer)-1)
-                    self.ui.LastCommand.setText(self.commandBuffer[self.commandHistory])
+                    if len(self.commandBuffer):
+                        self.commandHistory = min(self.commandHistory+1, len(self.commandBuffer)-1)
+                        self.ui.LastCommand.setText(self.commandBuffer[self.commandHistory])
                     return True
                 if event.key() == QtCore.Qt.Key_Down:
-                    self.commandHistory = max(self.commandHistory-1, 0)
-                    self.ui.LastCommand.setText(self.commandBuffer[self.commandHistory])
+                    if len(self.commandBuffer):
+                        self.commandHistory = max(self.commandHistory-1, 0)
+                        self.ui.LastCommand.setText(self.commandBuffer[self.commandHistory])
                     return True
                 key = event.text()
                 if key:
@@ -146,7 +148,8 @@ class terminal(QtGui.QMainWindow):
                 command = command.strip()
                 if command:
                     self.ui.LastCommand.setText(command)
-                    self.commandBuffer.insert(0, command)
+                    if command not in self.commandBuffer:
+                        self.commandBuffer.insert(0, command)
             elif character == chr(8):
                 if self.linebuffer:
                     self.linebuffer.pop()
