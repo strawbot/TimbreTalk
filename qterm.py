@@ -4,7 +4,7 @@
 
 from pyqtapi2 import *
 
-import etmLink
+from protocols.interface.etmLink import etmLink
 import sys
 
 try:
@@ -32,7 +32,7 @@ class terminal(QMainWindow):
 		# connect(fontSizeSpin, SIGNAL(valueChanged(int), textEdit, SLOT(setFontPointSize(int));
 		self.ui.fontSize.valueChanged.connect(self.setFontSize)
 
-		self.etm = etmLink.etmLink()
+		self.etm = etmLink()
 
 		# serial port
 		self.sptimer = QTimer()

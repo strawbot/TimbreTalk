@@ -4,7 +4,7 @@ from pyqtapi2 import *
 from message import *
 from protocols import pids
 import sys, traceback	
-from etmLink import etmLink
+from protocols.interface.etmLink import etmLink
 
 CRETURN = 0xD
 
