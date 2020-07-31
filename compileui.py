@@ -1,6 +1,6 @@
 # translate .ui into .py file if out of date
 
-from PyQt4.uic import compileUi
+from PyQt5.uic import compileUi
 import time, os
 
 def fileModTime(file): # return file modified date

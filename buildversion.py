@@ -170,7 +170,7 @@ def versionDate(image):
 		if string:
 			if printme: print 'input string:', string, '  converted to:', MDYHMSasYMDHMS(string)
 			result = MDYHMSasYMDHMS(string)
-	except Exception, e:
+	except Exception as e:
 		print >>sys.stderr, e
 		traceback.print_exc(file=sys.stderr)
 	finally:

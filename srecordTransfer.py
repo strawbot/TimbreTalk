@@ -142,7 +142,7 @@ class sRecordTransfer(imageTransfer):
 			self.createImage(self.file)
 			self.appName, self.releaseDate, self.version = \
 			 extractNameDateVersion(self.image, self.endian)
-		except Exception, e:
+		except Exception as e:
 			print >>sys.stderr, e
 			traceback.print_exc(file=sys.stderr)
 	
@@ -213,7 +213,7 @@ class sRecordTransfer(imageTransfer):
 				self.retries = 5
 			else:
 				self.stopSending()
-		except Exception, e:
+		except Exception as e:
 			print >>sys.stderr, e
 			traceback.print_exc(file=sys.stderr)
 			self.stopSending()
@@ -433,6 +433,6 @@ class ubootTransfer(sRecordTransfer):
 			self.appName = [0]*APP_NAME_LENGTH
 			self.appName[:len(ubootTag)] = map(ord, ubootTag)
 			if printme: print >>sys.stderr, self.size, self.checksum
-		except Exception, e:
+		except Exception as e:
 			print >>sys.stderr, e
 			traceback.print_exc(file=sys.stderr)

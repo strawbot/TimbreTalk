@@ -2,13 +2,14 @@
 from compileui import updateUi
 updateUi('terminal')
 
-from PyQt4 import QtGui, QtCore
+from PyQt5 import QtGui, QtCore
 from terminal import Ui_Frame
 from protocols.interface import interface, ipHub, serialHub, jlinkHub
 from protocols.sfpLayer import SfpLayer
 from protocols import pids
 from threading import Thread
 import bisect
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFrame
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -23,14 +24,13 @@ def note(text):
 def error(text):
     print >> sys.stderr, text
 
-
-class terminal(QtGui.QMainWindow):
+class terminal(QMainWindow):
     textSignal = QtCore.pyqtSignal(object)
     showPortSignal = QtCore.pyqtSignal()
 
     def __init__(self):
         super(terminal, self).__init__()
-        self.Window = QtGui.QFrame()
+        self.Window = QFrame()
         self.ui = Ui_Frame()
         self.ui.setupUi(self.Window)
         self.banner()
@@ -100,7 +100,7 @@ class terminal(QtGui.QMainWindow):
 
     def showText(self, text):
         self.textMutex.lock()
-        self.ui.textEdit.moveCursor(QtGui.QTextCursor.End)  # get cursor to end of text
+        self.ui.textEdit.moveCursor(QTextCursor.End)  # get cursor to end of text
         if text == chr(8):
             self.ui.textEdit.textCursor().deletePreviousChar()
         else:
@@ -111,8 +111,8 @@ class terminal(QtGui.QMainWindow):
 
     def eventFilter(self, object, event):
         if event.type() == QtCore.QEvent.KeyPress:
-            if (event.matches(QtGui.QKeySequence.Paste)):
-                for c in QtGui.QApplication.clipboard().text():
+            if (event.matches(QKeySequence.Paste)):
+                for c in QApplication.clipboard().text():
                     self.keyin(c)
                 return True
             else:
@@ -130,7 +130,7 @@ class terminal(QtGui.QMainWindow):
                 if key:
                     self.keyin(key)
                     return True # means stop event propagation
-        return QtGui.QMainWindow.eventFilter(self, object, event)
+        return QMainWindow.eventFilter(self, object, event)
 
     def keyin(self, key):  # input is a qstring
         for character in str(key):
@@ -237,11 +237,11 @@ class terminal(QtGui.QMainWindow):
 if __name__ == "__main__":
     import sys, traceback
 
-    app = QtGui.QApplication(sys.argv)
+    app = QApplication(sys.argv)
     terminal = terminal()
     try:
         sys.exit(app.exec_())
-    except Exception, e:
+    except Exception as e:
         error(e)
         traceback.print_exc(file=sys.stderr)
 

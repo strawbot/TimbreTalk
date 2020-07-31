@@ -19,7 +19,7 @@ class IpPort(Port):
             t.setDaemon(True)
             t.start()  # run port in thread
             self.wait(100)
-        except Exception, e:
+        except Exception as e:
             print >> sys.stderr, e
             traceback.print_exc(file=sys.stderr)
             print('Unknown exception, not opening socket')
@@ -38,7 +38,7 @@ class IpPort(Port):
                 self.output.emit(data)
             except socket.timeout:
                 pass
-            except Exception, e:
+            except Exception as e:
                 print >> sys.stderr, e
                 traceback.print_exc(file=sys.stderr)
                 print('Unknown exception, quitting IpPort')
@@ -120,7 +120,7 @@ class AtPort(Layer):
                     self.reply += self.dualStream[:1]
                     self.dualStream = self.dualStream[1:]
                 index = 0
-        except Exception, e:
+        except Exception as e:
             print >> sys.stderr, e
             traceback.print_exc(file=sys.stderr)
             print index

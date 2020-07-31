@@ -70,8 +70,8 @@ class timbreTalk(qterm.terminal):
         self.ui.Controls.setCurrentIndex(SerialTab)
 
     def banner(self):
-        self.setWindowTitle('Timbre Talk '+version)()
-        self.ui.whoFrom.insertItems(0, points)
+        self.setWindowTitle('Timbre Talk '+version)
+        # self.ui.whoFrom.insertItems(0, points)
         self.ui.whoTo.currentIndexChanged.connect(self.selectWhoTo)
         self.ui.whoFrom.currentIndexChanged.connect(self.selectWhoFrom)
 

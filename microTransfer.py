@@ -125,7 +125,7 @@ class stmTransfer(microTransfer):
         try:
             note('sending: ' + reduce(lambda a, b: a + b, map(hex, bytes)))
             self.parent.serialPort.sink(bytes)
-        except Exception, e:
+        except Exception as e:
             print >> sys.stderr, e
             traceback.print_exc(file=sys.stderr)
 

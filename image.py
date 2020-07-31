@@ -55,7 +55,7 @@ class imageRecord(QObject):
 			self.setName.emit(self.name)
 			self.setSize.emit(str(self.size))
 			self.setStart.emit(hex(self.start))
-		except Exception, e:
+		except Exception as e:
 			print >>sys.stderr, e
 			traceback.print_exc(file=sys.stderr)
 	

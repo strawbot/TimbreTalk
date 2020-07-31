@@ -126,7 +126,7 @@ class srecordPane(QWidget):
 	def sendSrecord(self):
 		try:
 			self.runCommand(SEND)
-		except Exception, e:
+		except Exception as e:
 			print >>sys.stderr, e
 			traceback.print_exc(file=sys.stderr)
 		
@@ -138,7 +138,7 @@ class srecordPane(QWidget):
 			if file:
 				target.useFile(file)
 			self.showSrecordValues()
-		except Exception, e:
+		except Exception as e:
 			print >>sys.stderr, e
 			traceback.print_exc(file=sys.stderr)
 		

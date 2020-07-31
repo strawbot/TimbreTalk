@@ -176,7 +176,7 @@ class terminal(QMainWindow):
                     except Queue.Empty:
                         print 'Empty exception'
                         pass
-                    except Exception, e:
+                    except Exception as e:
                         print >>sys.stderr, e
                         traceback.print_exc(file=sys.stderr)
 
@@ -447,7 +447,7 @@ class terminal(QMainWindow):
                 self.ui.textEdit.find(text, QTextDocument().FindBackward)
             else:
                 self.ui.textEdit.find(text)
-        except Exception, e:
+        except Exception as e:
             print >>sys.stderr, e
             traceback.print_exc(file=sys.stderr)
 
@@ -460,7 +460,7 @@ class terminal(QMainWindow):
             try:
                 text = self.ui.textEdit.toPlainText()
                 open(filename, "w").write(text.encode("utf-8"))
-            except Exception, e:
+            except Exception as e:
                 print >>sys.stderr, e
                 traceback.print_exc(file=sys.stderr)
 
