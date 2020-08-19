@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1044</width>
-    <height>567</height>
+    <height>588</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -115,7 +115,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_11">
               <item>
-               <widget class="QComboBox" name="M1BaudRate_5">
+               <widget class="QComboBox" name="BaudRate">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
                   <horstretch>0</horstretch>
@@ -215,8 +215,11 @@
                 <property name="acceptDrops">
                  <bool>false</bool>
                 </property>
+                <property name="currentText">
+                 <string>white</string>
+                </property>
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <property name="maxVisibleItems">
                  <number>10</number>
@@ -301,72 +304,49 @@
            <property name="title">
             <string>Protocol</string>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_8">
+           <layout class="QVBoxLayout" name="verticalLayout_6">
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_5">
               <item>
-               <layout class="QVBoxLayout" name="verticalLayout_6">
-                <item>
-                 <widget class="QRadioButton" name="SetSerial">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Serial</string>
-                  </property>
-                  <attribute name="buttonGroup">
-                   <string notr="true">buttonGroup</string>
-                  </attribute>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="SetSfp">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>SFP</string>
-                  </property>
-                  <property name="checked">
-                   <bool>true</bool>
-                  </property>
-                  <attribute name="buttonGroup">
-                   <string notr="true">buttonGroup</string>
-                  </attribute>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QRadioButton" name="Alert2_IND">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Alert2 IND</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QRadioButton" name="SetSfp">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>SFP</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">buttonGroup</string>
+                </attribute>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="SetSerial">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Serial</string>
+                </property>
+                <attribute name="buttonGroup">
+                 <string notr="true">buttonGroup</string>
+                </attribute>
+               </widget>
               </item>
               <item>
                <spacer name="horizontalSpacer_3">
@@ -381,61 +361,74 @@
                 </property>
                </spacer>
               </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
-               <layout class="QFormLayout" name="formLayout_6">
-                <item row="0" column="0">
-                 <widget class="QLabel" name="label_5">
-                  <property name="text">
-                   <string>From:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="0" column="1">
-                 <widget class="QComboBox" name="whoFrom">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QLabel" name="label_4">
-                  <property name="text">
-                   <string>To:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="1">
-                 <widget class="QComboBox" name="whoTo">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>0</height>
-                   </size>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>16777215</width>
-                    <height>16777215</height>
-                   </size>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <widget class="QLabel" name="label_5">
+                <property name="text">
+                 <string>From:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="whoTo">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_4">
+                <property name="text">
+                 <string>To:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="whoFrom">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_18">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
               </item>
              </layout>
             </item>
@@ -541,7 +534,7 @@
          <item>
           <widget class="QGroupBox" name="groupBox">
            <property name="title">
-            <string>M1</string>
+            <string>al200</string>
            </property>
            <layout class="QFormLayout" name="formLayout">
             <item row="0" column="0">
@@ -569,7 +562,7 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="M1BaudRate">
+             <widget class="QComboBox" name="MonitorBaud1">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
                 <horstretch>0</horstretch>
@@ -659,6 +652,11 @@
                 <string>SFP</string>
                </property>
               </item>
+              <item>
+               <property name="text">
+                <string>Alert2 IND</string>
+               </property>
+              </item>
              </widget>
             </item>
             <item row="1" column="1">
@@ -729,7 +727,7 @@
          <item>
           <widget class="QGroupBox" name="groupBox_2">
            <property name="title">
-            <string>M2</string>
+            <string>cs600</string>
            </property>
            <layout class="QFormLayout" name="formLayout_4">
             <item row="0" column="0">
@@ -751,7 +749,7 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="M1BaudRate_2">
+             <widget class="QComboBox" name="MonitorBaud2">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
                 <horstretch>0</horstretch>
@@ -839,6 +837,11 @@
               <item>
                <property name="text">
                 <string>SFP</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Alert2 IND</string>
                </property>
               </item>
              </widget>
@@ -933,7 +936,7 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="M1BaudRate_3">
+             <widget class="QComboBox" name="MonitorBaud3">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
                 <horstretch>0</horstretch>
@@ -1021,6 +1024,11 @@
               <item>
                <property name="text">
                 <string>SFP</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Alert2 IND</string>
                </property>
               </item>
              </widget>
@@ -1112,7 +1120,7 @@
              </widget>
             </item>
             <item row="0" column="1">
-             <widget class="QComboBox" name="M1BaudRate_4">
+             <widget class="QComboBox" name="MonitorBaud4">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
                 <horstretch>0</horstretch>
@@ -1200,6 +1208,11 @@
               <item>
                <property name="text">
                 <string>SFP</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Alert2 IND</string>
                </property>
               </item>
              </widget>
@@ -1307,7 +1320,7 @@
       <layout class="QHBoxLayout" name="horizontalLayout_3"/>
      </item>
      <item>
-      <widget class="QPlainTextEdit" name="OutViewer">
+      <widget class="QPlainTextEdit" name="Console">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -1479,7 +1492,10 @@
         <cursorShape>IBeamCursor</cursorShape>
        </property>
        <property name="styleSheet">
-        <string notr="true">font: cyan;</string>
+        <string notr="true"/>
+       </property>
+       <property name="inputMethodHints">
+        <set>Qt::ImhNone</set>
        </property>
        <property name="horizontalScrollBarPolicy">
         <enum>Qt::ScrollBarAsNeeded</enum>
@@ -1504,12 +1520,12 @@
   <connection>
    <sender>pushButton</sender>
    <signal>released()</signal>
-   <receiver>OutViewer</receiver>
+   <receiver>Console</receiver>
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>923</x>
-     <y>523</y>
+     <x>366</x>
+     <y>405</y>
     </hint>
     <hint type="destinationlabel">
      <x>790</x>
@@ -1517,8 +1533,140 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>SetSfp</sender>
+   <signal>clicked()</signal>
+   <receiver>whoTo</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>68</x>
+     <y>204</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>129</x>
+     <y>237</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SetSerial</sender>
+   <signal>clicked()</signal>
+   <receiver>whoTo</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>139</x>
+     <y>206</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>154</x>
+     <y>236</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SetSerial</sender>
+   <signal>clicked()</signal>
+   <receiver>whoFrom</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>109</x>
+     <y>209</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>239</x>
+     <y>231</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SetSfp</sender>
+   <signal>clicked()</signal>
+   <receiver>whoFrom</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>85</x>
+     <y>194</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>279</x>
+     <y>237</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SetSfp</sender>
+   <signal>clicked()</signal>
+   <receiver>label_5</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>72</x>
+     <y>203</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>70</x>
+     <y>238</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SetSfp</sender>
+   <signal>clicked()</signal>
+   <receiver>label_4</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>52</x>
+     <y>207</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>195</x>
+     <y>239</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SetSerial</sender>
+   <signal>clicked()</signal>
+   <receiver>label_5</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>121</x>
+     <y>196</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>55</x>
+     <y>239</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SetSerial</sender>
+   <signal>clicked()</signal>
+   <receiver>label_4</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>114</x>
+     <y>204</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>189</x>
+     <y>232</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <buttongroups>
-  <buttongroup name="buttonGroup"/>
+  <buttongroup name="buttonGroup">
+   <property name="exclusive">
+    <bool>true</bool>
+   </property>
+  </buttongroup>
  </buttongroups>
 </ui>
