@@ -8,24 +8,21 @@ from protocols.interface import interface, ipHub, serialHub, jlinkHub
 from protocols.sfpLayer import SfpLayer
 from protocols import pids
 from threading import Thread
-import bisect
+from protocols.interface.message import note, warning, error, setTextOutput, eprint
+
+from monitor import portMonitor, updatePortCombo
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
 except AttributeError:
     _fromUtf8 = lambda s: s
 
-version = "V1"
-
-def note(text):
-    print >> sys.stdout, text
-
-def error(text):
-    print >> sys.stderr, text
+version = "V2"
 
 class terminal(QtWidgets.QMainWindow):
     textSignal = QtCore.pyqtSignal(object)
     showPortSignal = QtCore.pyqtSignal()
+    serialPortUpdate = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(terminal, self).__init__()
@@ -34,6 +31,8 @@ class terminal(QtWidgets.QMainWindow):
         self.ui.setupUi(self.Window)
         self.banner()
         self.Window.show()
+
+        setTextOutput(self.messageOut)
 
         self.linebuffer = []
 
@@ -86,6 +85,13 @@ class terminal(QtWidgets.QMainWindow):
                          "error":"tomato"}
         self.setColor()
 
+        # monitor tab
+        for group in self.ui.PortMonitors.findChildren(QtWidgets.QGroupBox):
+            port, baud, protocol, color = group.findChildren(QtWidgets.QComboBox)
+            portMonitor(port, baud, protocol, color)
+
+        self.serialPortUpdate.connect(portMonitor.updatePortList)
+
         self.showPorts()
 
         if sys.platform == 'darwin':
@@ -96,6 +102,8 @@ class terminal(QtWidgets.QMainWindow):
                 font.setFamily(_fromUtf8("Andale Mono"))
             font.setPointSize(font.pointSize() - 3)
             self.ui.Console.setFont(font)
+
+        self.portParametersMenu()
 
     # gui
     def setSerial(self):
@@ -110,11 +118,11 @@ class terminal(QtWidgets.QMainWindow):
             self.talkPort.setRate(self.rate)
 
     def setColor(self):
-        self.color = self.colorMap[self.ui.ConsoleColor.currentText()]
+        self.color = QtGui.QColor(self.colorMap[self.ui.ConsoleColor.currentText()])
 
-    def useColor(self):
+    def useColor(self, color):
         tf = self.ui.Console.currentCharFormat()
-        tf.setForeground(QtGui.QColor(self.color))
+        tf.setForeground(color)
         self.ui.Console.setCurrentCharFormat(tf)
 
     def banner(self):
@@ -123,18 +131,28 @@ class terminal(QtWidgets.QMainWindow):
     def textInput(self, text):
         self.textSignal.emit(text)
 
-    def showText(self, text):
+    def messageOut(self, text, style=''):
+        if style:
+            self.showText(text, QtGui.QColor(self.colorMap[style]))
+        else:
+            self.showText(text)
+
+    def showText(self, text, color=None):
+        print(type(text),text)
+        if color == None:
+            color = self.color
         self.textMutex.lock()
         self.ui.Console.moveCursor(QtGui.QTextCursor.End)  # get cursor to end of text
         if text == chr(8):
             self.ui.Console.textCursor().deletePreviousChar()
-            sb = self.ui.Console.verticalScrollBar()
-            sb.setValue(sb.maximum())
         else:
             if type(text) == type(b''):
-                text = text.decode(errors='ignore')
-            self.useColor()
+                text = text.decode(errors='ignore') # todo: shift to asciihex
+            self.useColor(color)
             self.ui.Console.insertPlainText(text)
+        # self.ui.Console.moveCursor(QtGui.QTextCursor.End)  # get cursor to end of text
+        sb = self.ui.Console.verticalScrollBar()
+        sb.setValue(sb.maximum())
         self.textMutex.unlock()
 
     def eventFilter(self, object, event):
@@ -166,6 +184,54 @@ class terminal(QtWidgets.QMainWindow):
                 self.linebuffer.append(character)
                 self.showText(character)
 
+    # parity n' stuff
+    def portParametersMenu(self):
+        # menu for serial port parameters
+        paramenu = QtWidgets.QMenu(self)
+        paramenu.addAction("N 8 1", lambda: self.setParam('N', 8, 1))
+        paramenu.addAction("E 8 1", lambda: self.setParam('E', 8, 1))
+
+        paritymenu = paramenu.addMenu('Parity')
+        paritymenu.addAction('None', lambda: self.setParam('N',0,0))
+        paritymenu.addAction('Even', lambda: self.setParam('E',0,0))
+        paritymenu.addAction('Odd', lambda: self.setParam('O',0,0))
+
+        bytesizemenu = paramenu.addMenu('Byte size')
+        bytesizemenu.addAction('8', lambda: self.setParam(0,8,0))
+        bytesizemenu.addAction('7', lambda: self.setParam(0,7,0))
+        bytesizemenu.addAction('6', lambda: self.setParam(0,6,0))
+        bytesizemenu.addAction('5', lambda: self.setParam(0,5,0))
+
+        stopmenu = paramenu.addMenu('Stopbits')
+        stopmenu.addAction('1', lambda: self.setParam(0,0,1))
+        stopmenu.addAction('1.5', lambda: self.setParam(0,0,1.5))
+        stopmenu.addAction('2', lambda: self.setParam(0,0,2))
+
+        self.ui.toolButton.setMenu(paramenu)
+
+        # self.setParamButtonText()
+    def setParam(self, parity, bytesize, stopbits):
+        try:
+            sp = self.talkPort
+            if parity: sp.parity = parity
+            if bytesize: sp.bytesize = bytesize
+            if stopbits: sp.stopbits = stopbits
+            self.setParamButtonText()
+
+            if sp:
+                note('Changed port settings to %s%d%d'%(sp.parity,sp.bytesize,sp.stopbits))
+        except Exception as e:
+            eprint(e)
+            traceback.print_exc(file=sys.stderr)
+            error("can't set Params")
+
+    def setParamButtonText(self):
+        sp = self.talkPort
+        if sp.stopbits == 1.5:
+            self.ui.toolButton.setText("%s %i %0.1f" % (sp.parity, sp.bytesize, sp.stopbits))
+        else:
+            self.ui.toolButton.setText("%s %i %i" % (sp.parity, sp.bytesize, sp.stopbits))
+
     # ports
     def noTalkPort(self):
         self.protocol.inner.unplug()
@@ -179,19 +245,10 @@ class terminal(QtWidgets.QMainWindow):
         self.showPortSignal.emit()
 
     def showPorts(self):
-        self.portlistMutex.lock()
-        # update port list in combobox
         uiPort = self.ui.PortSelect
-        items = [uiPort.itemText(i) for i in range(1, uiPort.count())]
+        self.portlistMutex.lock()
         ports = [port.name for port in self.serialHub.all_ports()]
-
-        for r in list(set(items) - set(ports)):  # items to be removed
-            uiPort.removeItem(uiPort.findText(r))
-            if r in items:  items.remove(r)
-        for a in list(set(ports) - set(items)):  # items to be added
-            bisect.insort(items, a)
-            uiPort.insertItem(1 + items.index(a), a)
-
+        updatePortCombo(uiPort, ports)
         # check current port against list and select proper item
         if self.talkPort.name:
             if self.talkPort.name != uiPort.currentText():
@@ -201,12 +258,9 @@ class terminal(QtWidgets.QMainWindow):
                     self.noTalkPort()
                 uiPort.setCurrentIndex(index)
 
-        # set item zero
-        text = '(Disconnect)' if uiPort.currentIndex() else '(Select a Port)'
-        if uiPort.itemText(0) != text:
-            uiPort.setItemText(0, text)
+        final = [uiPort.itemText(i) for i in range(1, uiPort.count())]
         self.portlistMutex.unlock()
-
+        self.serialPortUpdate.emit(final)
 
     def selectPort(self):
         if self.talkPort.is_open():

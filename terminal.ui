@@ -37,7 +37,7 @@
         </sizepolicy>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <property name="elideMode">
         <enum>Qt::ElideNone</enum>
@@ -189,7 +189,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QToolButton" name="toolButton_2">
+               <widget class="QToolButton" name="toolButton">
                 <property name="enabled">
                  <bool>true</bool>
                 </property>
@@ -216,10 +216,10 @@
                  <bool>false</bool>
                 </property>
                 <property name="currentText">
-                 <string>white</string>
+                 <string>cyan</string>
                 </property>
                 <property name="currentIndex">
-                 <number>0</number>
+                 <number>1</number>
                 </property>
                 <property name="maxVisibleItems">
                  <number>10</number>
@@ -373,18 +373,21 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="whoTo">
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
+               <widget class="QSpinBox" name="whoTo">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
                 </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>16777215</height>
-                 </size>
+                <property name="styleSheet">
+                 <string notr="true">text-transform: uppercase;</string>
+                </property>
+                <property name="maximum">
+                 <number>255</number>
+                </property>
+                <property name="displayIntegerBase">
+                 <number>16</number>
                 </property>
                </widget>
               </item>
@@ -396,24 +399,27 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="whoFrom">
+               <widget class="QSpinBox" name="whoFrom">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
+                <property name="styleSheet">
+                 <string notr="true">text-transform: uppercase;</string>
                 </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>16777215</height>
-                 </size>
+                <property name="specialValueText">
+                 <string>0</string>
+                </property>
+                <property name="prefix">
+                 <string/>
+                </property>
+                <property name="maximum">
+                 <number>255</number>
+                </property>
+                <property name="displayIntegerBase">
+                 <number>16</number>
                 </property>
                </widget>
               </item>
@@ -526,7 +532,7 @@
          </item>
         </layout>
        </widget>
-       <widget class="QWidget" name="tab_2">
+       <widget class="QWidget" name="PortMonitors">
         <attribute name="title">
          <string>Monitor</string>
         </attribute>
@@ -1525,75 +1531,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>366</x>
-     <y>405</y>
+     <y>398</y>
     </hint>
     <hint type="destinationlabel">
      <x>790</x>
      <y>98</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SetSfp</sender>
-   <signal>clicked()</signal>
-   <receiver>whoTo</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>68</x>
-     <y>204</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>129</x>
-     <y>237</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SetSerial</sender>
-   <signal>clicked()</signal>
-   <receiver>whoTo</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>139</x>
-     <y>206</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>154</x>
-     <y>236</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SetSerial</sender>
-   <signal>clicked()</signal>
-   <receiver>whoFrom</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>109</x>
-     <y>209</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>239</x>
-     <y>231</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SetSfp</sender>
-   <signal>clicked()</signal>
-   <receiver>whoFrom</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>85</x>
-     <y>194</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>279</x>
-     <y>237</y>
     </hint>
    </hints>
   </connection>
@@ -1624,8 +1566,8 @@
      <y>207</y>
     </hint>
     <hint type="destinationlabel">
-     <x>195</x>
-     <y>239</y>
+     <x>159</x>
+     <y>247</y>
     </hint>
    </hints>
   </connection>
@@ -1656,8 +1598,72 @@
      <y>204</y>
     </hint>
     <hint type="destinationlabel">
-     <x>189</x>
-     <y>232</y>
+     <x>159</x>
+     <y>247</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SetSerial</sender>
+   <signal>clicked()</signal>
+   <receiver>whoFrom</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>127</x>
+     <y>210</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>187</x>
+     <y>231</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SetSerial</sender>
+   <signal>clicked()</signal>
+   <receiver>whoTo</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>106</x>
+     <y>208</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>101</x>
+     <y>238</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SetSfp</sender>
+   <signal>clicked()</signal>
+   <receiver>whoTo</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>56</x>
+     <y>197</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>88</x>
+     <y>237</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>SetSfp</sender>
+   <signal>clicked()</signal>
+   <receiver>whoFrom</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>45</x>
+     <y>201</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>178</x>
+     <y>228</y>
     </hint>
    </hints>
   </connection>
