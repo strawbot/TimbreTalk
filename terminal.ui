@@ -50,7 +50,7 @@
          <item>
           <widget class="QGroupBox" name="groupBox_8">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -64,7 +64,7 @@
            <property name="title">
             <string>Port</string>
            </property>
-           <layout class="QVBoxLayout" name="verticalLayout_19">
+           <layout class="QVBoxLayout" name="verticalLayout_8">
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_14">
               <item>
@@ -98,6 +98,71 @@
                </widget>
               </item>
               <item>
+               <widget class="QComboBox" name="ConsoleColor">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="acceptDrops">
+                 <bool>false</bool>
+                </property>
+                <property name="currentText">
+                 <string>cyan</string>
+                </property>
+                <property name="currentIndex">
+                 <number>1</number>
+                </property>
+                <property name="maxVisibleItems">
+                 <number>10</number>
+                </property>
+                <property name="frame">
+                 <bool>true</bool>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>white</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>cyan</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>blue</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>green</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>yellow</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>orange</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>magenta</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>red</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
                <spacer name="horizontalSpacer_16">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -113,7 +178,34 @@
              </layout>
             </item>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <layout class="QHBoxLayout" name="horizontalLayout_6">
+              <item>
+               <widget class="QComboBox" name="ConsoleProtocol">
+                <property name="currentIndex">
+                 <number>2</number>
+                </property>
+                <item>
+                 <property name="text">
+                  <string>ASCII</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Hex</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>SFP</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Alert2 IND</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
               <item>
                <widget class="QComboBox" name="BaudRate">
                 <property name="sizePolicy">
@@ -205,71 +297,6 @@
                </widget>
               </item>
               <item>
-               <widget class="QComboBox" name="ConsoleColor">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="acceptDrops">
-                 <bool>false</bool>
-                </property>
-                <property name="currentText">
-                 <string>cyan</string>
-                </property>
-                <property name="currentIndex">
-                 <number>1</number>
-                </property>
-                <property name="maxVisibleItems">
-                 <number>10</number>
-                </property>
-                <property name="frame">
-                 <bool>true</bool>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>white</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>cyan</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>blue</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>green</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>yellow</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>orange</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>magenta</string>
-                 </property>
-                </item>
-                <item>
-                 <property name="text">
-                  <string>red</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item>
                <spacer name="horizontalSpacer_17">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -290,7 +317,7 @@
          <item>
           <widget class="QGroupBox" name="groupBox_6">
            <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+            <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -305,64 +332,6 @@
             <string>Protocol</string>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_6">
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_5">
-              <item>
-               <widget class="QRadioButton" name="SetSfp">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>SFP</string>
-                </property>
-                <property name="checked">
-                 <bool>true</bool>
-                </property>
-                <attribute name="buttonGroup">
-                 <string notr="true">buttonGroup</string>
-                </attribute>
-               </widget>
-              </item>
-              <item>
-               <widget class="QRadioButton" name="SetSerial">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="text">
-                 <string>Serial</string>
-                </property>
-                <attribute name="buttonGroup">
-                 <string notr="true">buttonGroup</string>
-                </attribute>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_3">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-             </layout>
-            </item>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_4">
               <item>
@@ -538,13 +507,20 @@
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_2">
          <item>
-          <widget class="QGroupBox" name="groupBox">
-           <property name="title">
-            <string>al200</string>
-           </property>
-           <layout class="QFormLayout" name="formLayout">
+          <widget class="MonitorFrame" name="frame">
+           <layout class="QGridLayout" name="gridLayout_4">
             <item row="0" column="0">
-             <widget class="QComboBox" name="MonitorPort1">
+             <widget class="QLineEdit" name="m1name">
+              <property name="styleSheet">
+               <string notr="true">background-color: palette(window);</string>
+              </property>
+              <property name="text">
+               <string>M1</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1" colspan="2">
+             <widget class="PortCombo" name="MonitorPort1">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
                 <horstretch>0</horstretch>
@@ -567,106 +543,8 @@
               </item>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="MonitorBaud1">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="acceptDrops">
-               <bool>false</bool>
-              </property>
-              <property name="currentIndex">
-               <number>6</number>
-              </property>
-              <property name="frame">
-               <bool>true</bool>
-              </property>
-              <item>
-               <property name="text">
-                <string>1200</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>9600</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>19200</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>28800</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>38400</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>57600</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>115200</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>230400</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>460800</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>500000</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>921600</string>
-               </property>
-              </item>
-             </widget>
-            </item>
             <item row="1" column="0">
-             <widget class="QComboBox" name="MonitorFormat1">
-              <item>
-               <property name="text">
-                <string>ASCII</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Hex</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>SFP</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Alert2 IND</string>
-               </property>
-              </item>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QComboBox" name="MonitorColor1">
+             <widget class="ColorCombo" name="MonitorColor1">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -727,35 +605,32 @@
               </item>
              </widget>
             </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="groupBox_2">
-           <property name="title">
-            <string>cs600</string>
-           </property>
-           <layout class="QFormLayout" name="formLayout_4">
-            <item row="0" column="0">
-             <widget class="QComboBox" name="MonitorPort2">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="sizeAdjustPolicy">
-               <enum>QComboBox::AdjustToContents</enum>
-              </property>
+            <item row="1" column="1">
+             <widget class="FormatCombo" name="MonitorFormat1">
               <item>
                <property name="text">
-                <string>(Select a Port)</string>
+                <string>ASCII</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Hex</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>SFP</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Alert2 IND</string>
                </property>
               </item>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="MonitorBaud2">
+            <item row="1" column="2">
+             <widget class="BaudCombo" name="MonitorBaud1">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
                 <horstretch>0</horstretch>
@@ -828,32 +703,42 @@
               </item>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QComboBox" name="MonitorFormat2">
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="MonitorFrame" name="frame_2">
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="0" column="0">
+             <widget class="QLineEdit" name="m2name">
+              <property name="styleSheet">
+               <string notr="true">background-color: palette(window);</string>
+              </property>
+              <property name="text">
+               <string>M2</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1" colspan="2">
+             <widget class="PortCombo" name="MonitorPort2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QComboBox::AdjustToContents</enum>
+              </property>
               <item>
                <property name="text">
-                <string>ASCII</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Hex</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>SFP</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Alert2 IND</string>
+                <string>(Select a Port)</string>
                </property>
               </item>
              </widget>
             </item>
-            <item row="1" column="1">
-             <widget class="QComboBox" name="MonitorColor2">
+            <item row="1" column="0">
+             <widget class="ColorCombo" name="MonitorColor2">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -914,35 +799,32 @@
               </item>
              </widget>
             </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="groupBox_3">
-           <property name="title">
-            <string>M3</string>
-           </property>
-           <layout class="QFormLayout" name="formLayout_2">
-            <item row="0" column="0">
-             <widget class="QComboBox" name="MonitorPort3">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="sizeAdjustPolicy">
-               <enum>QComboBox::AdjustToContents</enum>
-              </property>
+            <item row="1" column="1">
+             <widget class="FormatCombo" name="MonitorFormat2">
               <item>
                <property name="text">
-                <string>(Select a Port)</string>
+                <string>ASCII</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Hex</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>SFP</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Alert2 IND</string>
                </property>
               </item>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="MonitorBaud3">
+            <item row="1" column="2">
+             <widget class="BaudCombo" name="MonitorBaud2">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
                 <horstretch>0</horstretch>
@@ -1015,32 +897,42 @@
               </item>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QComboBox" name="MonitorFormat3">
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="MonitorFrame" name="frame_3">
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0">
+             <widget class="QLineEdit" name="m3name">
+              <property name="styleSheet">
+               <string notr="true">background-color: palette(window);</string>
+              </property>
+              <property name="text">
+               <string>M3</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1" colspan="2">
+             <widget class="PortCombo" name="MonitorPort3">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QComboBox::AdjustToContents</enum>
+              </property>
               <item>
                <property name="text">
-                <string>ASCII</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Hex</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>SFP</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Alert2 IND</string>
+                <string>(Select a Port)</string>
                </property>
               </item>
              </widget>
             </item>
-            <item row="1" column="1">
-             <widget class="QComboBox" name="MonitorColor3">
+            <item row="1" column="0">
+             <widget class="ColorCombo" name="MonitorColor3">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -1098,35 +990,32 @@
               </item>
              </widget>
             </item>
-           </layout>
-          </widget>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="groupBox_4">
-           <property name="title">
-            <string>M4</string>
-           </property>
-           <layout class="QFormLayout" name="formLayout_3">
-            <item row="0" column="0">
-             <widget class="QComboBox" name="MonitorPort4">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="sizeAdjustPolicy">
-               <enum>QComboBox::AdjustToContents</enum>
-              </property>
+            <item row="1" column="1">
+             <widget class="FormatCombo" name="MonitorFormat3">
               <item>
                <property name="text">
-                <string>(Select a Port)</string>
+                <string>ASCII</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Hex</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>SFP</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Alert2 IND</string>
                </property>
               </item>
              </widget>
             </item>
-            <item row="0" column="1">
-             <widget class="QComboBox" name="MonitorBaud4">
+            <item row="1" column="2">
+             <widget class="BaudCombo" name="MonitorBaud3">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
                 <horstretch>0</horstretch>
@@ -1199,32 +1088,42 @@
               </item>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QComboBox" name="MonitorFormat4">
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="MonitorFrame" name="frame_4">
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="0" column="0">
+             <widget class="QLineEdit" name="m4name">
+              <property name="styleSheet">
+               <string notr="true">background-color: palette(window);</string>
+              </property>
+              <property name="text">
+               <string>M4</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1" colspan="2">
+             <widget class="PortCombo" name="MonitorPort4">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="sizeAdjustPolicy">
+               <enum>QComboBox::AdjustToContents</enum>
+              </property>
               <item>
                <property name="text">
-                <string>ASCII</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Hex</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>SFP</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string>Alert2 IND</string>
+                <string>(Select a Port)</string>
                </property>
               </item>
              </widget>
             </item>
-            <item row="1" column="1">
-             <widget class="QComboBox" name="MonitorColor4">
+            <item row="1" column="0">
+             <widget class="ColorCombo" name="MonitorColor4">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                 <horstretch>0</horstretch>
@@ -1278,6 +1177,104 @@
               <item>
                <property name="text">
                 <string>red</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="FormatCombo" name="MonitorFormat4">
+              <item>
+               <property name="text">
+                <string>ASCII</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Hex</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>SFP</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Alert2 IND</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item row="1" column="2">
+             <widget class="BaudCombo" name="MonitorBaud4">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="acceptDrops">
+               <bool>false</bool>
+              </property>
+              <property name="currentIndex">
+               <number>6</number>
+              </property>
+              <property name="frame">
+               <bool>true</bool>
+              </property>
+              <item>
+               <property name="text">
+                <string>1200</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>9600</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>19200</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>28800</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>38400</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>57600</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>115200</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>230400</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>460800</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>500000</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>921600</string>
                </property>
               </item>
              </widget>
@@ -1521,6 +1518,34 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>PortCombo</class>
+   <extends>QComboBox</extends>
+   <header>portcombo.h</header>
+  </customwidget>
+  <customwidget>
+   <class>BaudCombo</class>
+   <extends>QComboBox</extends>
+   <header>baudcombo.h</header>
+  </customwidget>
+  <customwidget>
+   <class>FormatCombo</class>
+   <extends>QComboBox</extends>
+   <header>formatcombo.h</header>
+  </customwidget>
+  <customwidget>
+   <class>ColorCombo</class>
+   <extends>QComboBox</extends>
+   <header>colorcombo.h</header>
+  </customwidget>
+  <customwidget>
+   <class>MonitorFrame</class>
+   <extends>QFrame</extends>
+   <header>monitorframe.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
@@ -1531,139 +1556,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>366</x>
-     <y>398</y>
+     <y>397</y>
     </hint>
     <hint type="destinationlabel">
      <x>790</x>
      <y>98</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SetSfp</sender>
-   <signal>clicked()</signal>
-   <receiver>label_5</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>72</x>
-     <y>203</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>70</x>
-     <y>238</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SetSfp</sender>
-   <signal>clicked()</signal>
-   <receiver>label_4</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>52</x>
-     <y>207</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>159</x>
-     <y>247</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SetSerial</sender>
-   <signal>clicked()</signal>
-   <receiver>label_5</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>121</x>
-     <y>196</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>55</x>
-     <y>239</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SetSerial</sender>
-   <signal>clicked()</signal>
-   <receiver>label_4</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>114</x>
-     <y>204</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>159</x>
-     <y>247</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SetSerial</sender>
-   <signal>clicked()</signal>
-   <receiver>whoFrom</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>127</x>
-     <y>210</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>187</x>
-     <y>231</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SetSerial</sender>
-   <signal>clicked()</signal>
-   <receiver>whoTo</receiver>
-   <slot>hide()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>106</x>
-     <y>208</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>101</x>
-     <y>238</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SetSfp</sender>
-   <signal>clicked()</signal>
-   <receiver>whoTo</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>56</x>
-     <y>197</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>88</x>
-     <y>237</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>SetSfp</sender>
-   <signal>clicked()</signal>
-   <receiver>whoFrom</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>45</x>
-     <y>201</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>178</x>
-     <y>228</y>
     </hint>
    </hints>
   </connection>

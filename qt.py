@@ -2,10 +2,8 @@ import sys
 
 if 'PyQt5' in sys.modules:
     # PyQt5
-    from PyQt5 import QtGui as QtGui
-    from PyQt5 import QtWidgets as QtWidgets
-    from PyQt5 import QtCore as QtCore
-    from PyQt5.QtCore import pyqtSignal as Signal, pyqtSlot as Slot
+    from PyQt5 import QtGui, QtWidgets, QtCore
+    from PyQt5.QtCore import pyqtSignal, pyqtSlot
 
 else:
     sys.exit(1)

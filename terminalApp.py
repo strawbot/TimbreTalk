@@ -11,6 +11,11 @@ from threading import Thread
 from protocols.interface.message import note, warning, error, setTextOutput, eprint
 
 from monitor import portMonitor, updatePortCombo
+from portcombo import PortCombo
+from baudcombo import BaudCombo
+from colorcombo import ColorCombo
+from formatcombo import FormatCombo
+from monitorframe import MonitorFrame
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -49,11 +54,11 @@ class terminal(QtWidgets.QMainWindow):
         self.portlistMutex = QtCore.QMutex()
         self.textMutex = QtCore.QMutex()
 
-        self.ui.PortSelect.activated.connect(self.selectPort)
-        self.ui.SetSerial.clicked.connect(self.setSerial)
-        self.ui.SetSfp.clicked.connect(self.setSfp)
-        self.ui.SetSfp.click()
-        self.ui.BaudRate.activated.connect(self.selectRate)
+        # self.ui.PortSelect.activated.connect(self.selectPort)
+        # self.ui.SetSerial.clicked.connect(self.setSerial)
+        # self.ui.SetSfp.clicked.connect(self.setSfp)
+        # self.ui.SetSfp.click()
+        # self.ui.BaudRate.activated.connect(self.selectRate)
         self.ui.BaudRate.currentIndexChanged.connect(self.selectRate)
         self.ui.ConsoleColor.activated.connect(self.setColor)
 
@@ -86,12 +91,19 @@ class terminal(QtWidgets.QMainWindow):
         self.setColor()
 
         # monitor tab
-        for group in self.ui.PortMonitors.findChildren(QtWidgets.QGroupBox):
-            port, baud, protocol, color = group.findChildren(QtWidgets.QComboBox)
-            portMonitor(port, baud, protocol, color)
+        for widget in self.ui.PortMonitors.findChildren(MonitorFrame):
+            print(widget.objectName())
+            port = widget.findChildren(PortCombo)[0]
+            baud = widget.findChildren(BaudCombo)[0]
+            color = widget.findChildren(ColorCombo)[0]
+            protocol = widget.findChildren(FormatCombo)[0]
+            print('Mon groups:', baud.currentText(), color.currentText(), protocol.currentText(), port.currentText())
+            mname = widget.findChildren(QtWidgets.QLineEdit)[0]
+            pm = portMonitor(port, baud, mname, protocol, color)
+            pm.monitorOut.connect(self.messageOut)
+            pm.monitorOut.emit(mname.text(), 'white')
 
         self.serialPortUpdate.connect(portMonitor.updatePortList)
-
         self.showPorts()
 
         if sys.platform == 'darwin':

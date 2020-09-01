@@ -31,23 +31,35 @@ def updatePortCombo(uiPort, ports):
 class portMonitor(QtCore.QObject):
     ports = []
     portlist = []
+    monitorOut = QtCore.pyqtSignal(object,object)
 
-    def __init__(self, port, baud, protocol, color):
+    def __init__(self, port, baud, name, protocol, color):
         QtCore.QObject.__init__(self)
         print(port.objectName())
         portMonitor.ports.append(self)
         self.port = port
         self.baud = baud
+        self.tag = name
         self.protocol = protocol
         self.color = color
+
+    def out(self, text):
+        full = '\n123.456ms ' + self.tag.text() + ': ' + text
+        self.monitorOut.emit(full, self.color.currentText())
 
     @classmethod
     def updatePortList(cls, portlist):
         if listsDiffer(cls.portlist, portlist):
             for self in cls.ports:
                 updatePortCombo(self.port, portlist)
-
+                self.out('port list updated')
             cls.portlist = portlist
+
+
+
+
+
+
         # self.ui.PortSelect.activated.connect(self.selectPort)
         # self.ui.SetSerial.clicked.connect(self.setSerial)
         # self.ui.SetSfp.clicked.connect(self.setSfp)
