@@ -2,6 +2,24 @@
 
 from qt import QtCore
 import bisect
+import time
+import traceback
+
+from protocols.interface import interface, serialHub
+from protocols.sfpLayer import SfpLayer
+from protocols import pids
+from threading import Thread
+from protocols.interface.message import *
+
+# tools
+def current_milli_time():
+    return int(round(time.time() * 1000))
+
+def timestamp():
+    return "%.3f: " % (current_milli_time()/1000)
+
+from datetime import datetime, timezone
+datetime.now(timezone.utc).strftime("%Y%m%d")
 
 def listsDiffer(a, b):
     if len(a) == len(b):
@@ -28,39 +46,140 @@ def updatePortCombo(uiPort, ports):
         uiPort.setItemText(0, text)
 
 
+# utilities
+def isAscii(c):
+    if type(c) == type('0'):
+        c = ord(c)
+    return ord(' ') <= c <= ord('~')
+
+def toHex(c):
+    if type(c) == type('0'):
+        c = ord(c)
+    return '<{:02X}>'.format(c)
+
+def asciify(s):
+    text = [chr(c) if isAscii(c) else toHex(c) for c in s]
+    return ''.join(text)
+
+def hexify(s):
+    return ''.join(map(lambda x: ' ' + hex(x)[2:], s))
+
+
+# common class for all port monitors; class keeps list of instances
 class portMonitor(QtCore.QObject):
     ports = []
     portlist = []
     monitorOut = QtCore.pyqtSignal(object,object)
 
-    def __init__(self, port, baud, name, protocol, color):
-        QtCore.QObject.__init__(self)
-        print(port.objectName())
-        portMonitor.ports.append(self)
-        self.port = port
-        self.baud = baud
-        self.tag = name
-        self.protocol = protocol
-        self.color = color
-
-    def out(self, text):
-        full = '\n123.456ms ' + self.tag.text() + ': ' + text
-        self.monitorOut.emit(full, self.color.currentText())
-
     @classmethod
     def updatePortList(cls, portlist):
         if listsDiffer(cls.portlist, portlist):
             for self in cls.ports:
-                updatePortCombo(self.port, portlist)
+                updatePortCombo(self.uiport, portlist)
                 self.out('port list updated')
             cls.portlist = portlist
 
+    def __init__(self, port, baud, name, protocol, color):
+        QtCore.QObject.__init__(self)
+        print(port.objectName())
+        portMonitor.ports.append(self)
 
+        self.uiport = port
+        self.uibaud = baud
+        self.uitag = name
+        self.uiprotocol = protocol
+        self.uicolor = color
 
+        self.serialHub = serialHub.SerialHub()
+        self.top = interface.Interface('terminal')
+        self.protocol = SfpLayer()
+        self.top.plugin(self.protocol)
+        self.noMoniPort()
+        self.inner = interface.Interface('ttt')
+        self.inner.input.connect(self.send_data)
 
+        self.uiport.activated.connect(self.selectPort)
+        self.uibaud.activated.connect(self.selectRate)
 
+        self.messages(messageQueue())
 
-        # self.ui.PortSelect.activated.connect(self.selectPort)
+    def out(self, text):
+        full = '\n%s' % timestamp() + self.uitag.text() + ': ' + text
+        self.monitorOut.emit(full, self.uicolor.currentText())
+
+    def send_data(self, text):
+        text_type = type(text)
+        if text_type == type((0,)):
+            print('type tuple of type',type(text[0]))
+            self.monitorOut.emit(*text)
+        else:
+            print('type ',type(text), text)
+            self.out(asciify(text))
+
+    def messages(self, q): # handle messages piped in from other threads
+        class messageThread(QtCore.QThread):
+            def __init__(self, parent, q):
+                QtCore.QThread.__init__(self)
+                self.q = q
+                self.parent = parent
+                self.setObjectName("MessageThread")
+
+            def run(self):
+                while True:
+                    try:
+                        s = self.q.get()
+                        if s:
+                            self.parent.send_data(s)
+                    except Exception as e:
+                        eprint(e)
+                        traceback.print_exc(file=sys.stderr)
+
+        self.mthread = messageThread(self, q)
+        self.mthread.start()
+
+    # ports
+    def noMoniPort(self):
+        self.protocol.inner.unplug()
+        self.moniPort = interface.Port(name='notalk')
+
+    def ioError(self, message):
+        error(message)
+        self.moniPort.close()
+
+    def rate(self):
+        return int(self.uibaud.currentText())
+
+    def selectRate(self):
+        if self.moniPort.is_open():
+            self.moniPort.setRate(self.rate())
+
+    def selectPort(self):
+        print('select port')
+        if self.moniPort.is_open():
+            self.moniPort.close()
+
+        if self.uiport.currentIndex():
+            name = str(self.uiport.currentText())
+            self.uiport.setDisabled(True)
+            self.moniPort = self.serialHub.get_port(name)
+            def portOpen():
+                self.moniPort.open(rate=self.rate())
+                if self.moniPort.is_open():
+                    self.moniPort.ioError.connect(self.ioError)
+                    self.moniPort.ioException.connect(self.ioError)
+                    self.connectPort()
+                else:
+                    self.uiport.setCurrentIndex(0)
+                    self.noTalkPort()
+                self.uiport.setDisabled(False)
+            Thread(target=portOpen).start() # run in thread to keep GUI responsive
+        else:
+            self.noTalkPort()
+
+    def connectPort(self):
+        self.inner.plugin(self.moniPort)
+
+        # self.uiport.activated.connect(self.selectPort)
         # self.ui.SetSerial.clicked.connect(self.setSerial)
         # self.ui.SetSfp.clicked.connect(self.setSfp)
         # self.ui.SetSfp.click()

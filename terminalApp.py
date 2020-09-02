@@ -65,8 +65,6 @@ class terminal(QtWidgets.QMainWindow):
         # self.ui.Console.setEnabled(True)
         self.ui.Console.installEventFilter(self)
         self.noTalkPort()
-        self.ipHub = ipHub.UdpHub()
-        self.ipHub.whofrom = pids.UDP_HOST
         self.jlinkHub = jlinkHub.JlinkHub()
         self.jlinkHub.whofrom = pids.ETM_HOST
         self.serialHub = serialHub.SerialHub()
@@ -74,7 +72,6 @@ class terminal(QtWidgets.QMainWindow):
 
         self.serialHub.update.connect(self.showPortUpdate)
         self.jlinkHub.update.connect(self.showPortUpdate)
-        self.ipHub.update.connect(self.showPortUpdate)
 
         self.rate = int(self.ui.BaudRate.currentText())
         self.colorMap = {"white":"white",
@@ -126,7 +123,7 @@ class terminal(QtWidgets.QMainWindow):
 
     def selectRate(self):
         self.rate = int(self.ui.BaudRate.currentText())
-        if self.talkPort:
+        if self.talkPort.is_open():
             self.talkPort.setRate(self.rate)
 
     def setColor(self):
