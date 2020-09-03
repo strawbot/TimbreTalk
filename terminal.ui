@@ -1673,6 +1673,70 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>MonitorBaud1</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorBaud1</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>358</x>
+     <y>113</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>342</x>
+     <y>117</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorBaud2</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorBaud2</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>357</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>332</x>
+     <y>219</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorBaud3</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorBaud3</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>357</x>
+     <y>307</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>330</x>
+     <y>320</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorBaud4</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorBaud4</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>350</x>
+     <y>403</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>309</x>
+     <y>404</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <buttongroups>
   <buttongroup name="buttonGroup">

@@ -59,7 +59,7 @@ def asciify(s):
     return ''.join(text)
 
 def hexify(s):
-    return ''.join(map(lambda x: ' ' + hex(x)[2:], s))
+    return ''.join(map(lambda x: ' ' + toHex(x)[1:3], s))
 
 
 # common class for all port monitors; class keeps list of instances
@@ -99,6 +99,7 @@ class portMonitor(QtCore.QObject):
 
     def __init__(self, port, baud, name, protocol, color):
         QtCore.QObject.__init__(self)
+        self.messages(messageQueue())
         print(port.objectName())
         portMonitor.ports.append(self)
 
@@ -118,8 +119,10 @@ class portMonitor(QtCore.QObject):
 
         self.uiport.activated.connect(self.selectPort)
         self.uibaud.activated.connect(self.selectRate)
+        self.uiprotocol.activated.connect(self.selectProtocol)
 
-        self.messages(messageQueue())
+        self.translate = self.ascii_translate
+
 
     # settings
     def port(self):
@@ -163,13 +166,11 @@ class portMonitor(QtCore.QObject):
     def send_data(self, text):
         text_type = type(text)
         if text_type == type((0,)):
-            print('type tuple of type',type(text[0]))
+            print('type tuple of type', type(text[0]))
             self.monitorOut.emit(*text)
         else:
-            print('type ',type(text), text)
-            char_time = 1 / (self.rate() / 10)
-            start = int(current_milli_time() - len(text) * char_time)
-            self.out(asciify(text), start=start)
+            print('type ', type(text), text)
+            self.translate(text)
 
     def messages(self, q): # handle messages piped in from other threads
         class messageThread(QtCore.QThread):
@@ -233,3 +234,23 @@ class portMonitor(QtCore.QObject):
 
     def noTalkPort(self):
         self.talkPort = interface.Port(name='notalk')
+
+    # protocols
+    def selectProtocol(self):
+        protocol = self.translator()
+        if protocol == 'ASCII':
+            self.translate = self.ascii_translate
+        elif protocol == 'Hex':
+            self.translate = self.hex_translate
+        else:
+            error('No protocol for selection:'+self.translator())
+
+    def ascii_translate(self,text):
+        char_time = 1 / (self.rate() / 10)
+        start = int(current_milli_time() - len(text) * char_time)
+        self.out(asciify(text), start=start)
+
+    def hex_translate(self,text):
+        char_time = 1 / (self.rate() / 10)
+        start = int(current_milli_time() - len(text) * char_time)
+        self.out(hexify(text), start=start)
