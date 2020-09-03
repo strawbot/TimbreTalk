@@ -18,9 +18,6 @@ def current_milli_time():
 def timestamp():
     return "%.3f: " % (current_milli_time()/1000)
 
-from datetime import datetime, timezone
-datetime.now(timezone.utc).strftime("%Y%m%d")
-
 def listsDiffer(a, b):
     if len(a) == len(b):
         for x, y in zip(a, b):
@@ -70,6 +67,7 @@ class portMonitor(QtCore.QObject):
     ports = []
     portlist = []
     monitorOut = QtCore.pyqtSignal(object,object)
+    settings = QtCore.QSettings("TWE", "Tiny Timbre Talk")
 
     @classmethod
     def updatePortList(cls, portlist):
@@ -78,6 +76,26 @@ class portMonitor(QtCore.QObject):
                 updatePortCombo(self.uiport, portlist)
                 self.out('port list updated')
             cls.portlist = portlist
+
+    @classmethod
+    def save(cls):
+        for self in cls.ports:
+            cls.settings.setValue(self.uiport.objectName(),self.port())
+            cls.settings.setValue(self.uibaud.objectName(),self.baud())
+            cls.settings.setValue(self.uitag.objectName(),self.tag())
+            cls.settings.setValue(self.uiprotocol.objectName(),self.translator())
+            cls.settings.setValue(self.uicolor.objectName(),self.color())
+
+    @classmethod
+    def load(cls):
+        for self in cls.ports:
+            self.setTag(cls.settings.value(self.uitag.objectName()))
+            self.setTranslator(cls.settings.value(self.uiprotocol.objectName()))
+            self.setColor(cls.settings.value(self.uicolor.objectName()))
+            self.setBaud(cls.settings.value(self.uibaud.objectName()))
+            portname = cls.settings.value(self.uiport.objectName())
+            self.setPort(portname)
+            self.uiport.activated.emit(self.uiport.currentIndex())
 
     def __init__(self, port, baud, name, protocol, color):
         QtCore.QObject.__init__(self)
@@ -106,6 +124,40 @@ class portMonitor(QtCore.QObject):
     def out(self, text):
         full = '\n%s' % timestamp() + self.uitag.text() + ': ' + text
         self.monitorOut.emit(full, self.uicolor.currentText())
+    # settings
+    def port(self):
+        return self.uiport.currentText()
+
+    def setPort(self,text):
+        self.uiport.setCurrentText(text)
+
+    def rate(self):
+        return int(self.uibaud.currentText())
+
+    def baud(self):
+        return self.uibaud.currentText()
+
+    def setBaud(self, text):
+        self.uibaud.setCurrentText(text)
+
+    def tag(self):
+        return self.uitag.text()
+
+    def setTag(self, text):
+        self.uitag.setText(text)
+
+    def translator(self):
+        return self.uiprotocol.currentText()
+
+    def setTranslator(self, text):
+        self.uiprotocol.setCurrentText(text)
+
+    def color(self):
+        return self.uicolor.currentText()
+
+    def setColor(self, text):
+        self.uicolor.setCurrentText(text)
+
 
     def send_data(self, text):
         text_type = type(text)
@@ -146,9 +198,6 @@ class portMonitor(QtCore.QObject):
         error(message)
         self.moniPort.close()
 
-    def rate(self):
-        return int(self.uibaud.currentText())
-
     def selectRate(self):
         if self.moniPort.is_open():
             self.moniPort.setRate(self.rate())
@@ -179,84 +228,5 @@ class portMonitor(QtCore.QObject):
     def connectPort(self):
         self.inner.plugin(self.moniPort)
 
-        # self.uiport.activated.connect(self.selectPort)
-        # self.ui.SetSerial.clicked.connect(self.setSerial)
-        # self.ui.SetSfp.clicked.connect(self.setSfp)
-        # self.ui.SetSfp.click()
-        # self.ui.BaudRate.activated.connect(self.selectRate)
-        # self.ui.BaudRate.currentIndexChanged.connect(self.selectRate)
-        # self.ui.ConsoleColor.activated.connect(self.setColor)
-        #
-
-    #     # self.sfp = sfp.sfpProtocol()
-    #     #
-    #     # self.useColor = dict(zip(["white", "cyan", "blue", "green", "yellow", "orange", "magenta", "red"],
-    #     #                          ["white", "cyan", "deepskyblue", "springgreen", "yellow", "orange", "magenta",
-    #     #                           "tomato"]))
-    #     # self.port = port
-    #     # self.baud = baud
-    #     # self.color = color.currentText
-    #     # self.format = format
-    #     #
-    #     # self.port.activated.connect(self.selectPort)
-    #     # self.baud.activated.connect(self.selectRate)
-    #     #
-    #     # self.sfp.newPacket = self.distributer
-    #     # self.serial = serialio.serialPort(int(self.baud.currentText()))
-    #     # self.portname = None
-    #     # self.whoami = whoami
-    #
-    # def distributer(self):  # distribute packets from queue
-    #     if not self.sfp.receivedPool.empty():
-    #         packet = self.sfp.receivedPool.get()
-    #         pid = packet[0]
-    #         if pids.pids.get(pid):
-    #             self.text("Packet: {} {}".format(pids.pids[pid], asciify(map(chr, packet[1:]))))
-    #         else:
-    #             error("Unknown PID: (0x{:02x})".format(pid))
-    #
-    # def selectRate(self):
-    #     self.port.setRate(int(self.baud.currentText()))
-    #
-    # def selectPort(self):
-    #     if self.serial.isOpen():
-    #         self.serial.close()
-    #     if self.port.currentIndex():
-    #         self.portname = self.port.currentText()
-    #         self.serial.open(self.portname, self.serial.rate)
-    #         if self.serial.isOpen():
-    #             self.serial.closed.connect(self.serialDone)
-    #             self.serial.ioError.connect(self.ioError)
-    #             self.serial.ioException.connect(self.ioError)
-    #             self.connectPort()
-    #         else:
-    #             self.port.setCurrentIndex(0)
-    #             self.portname = None
-    #     else:
-    #         self.portname = None
-    #
-    # def serialDone(self):
-    #     note('{}: serial thread finished'.format(self.portname))
-    #
-    # def ioError(self, message):
-    #     error(message)
-    #
-    # def connectPort(self):  # override in children
-    #     self.serial.source.connect(self.sink)
-    #
-    # def text(self, text):
-    #     color = self.useColor[self.color()]
-    #     message('\n{} '.format(self.whoami) + self.timestamp() + text, color)
-    #
-    # def sink(self, s):
-    #     format = self.format.currentText()
-    #     if format == 'ASCII':
-    #         self.text(asciify(s))
-    #     elif format == 'SFP':
-    #         self.sfp.rxBytes(map(ord, s))
-    #     else:
-    #         self.text(hexify(s))
-    #
-    # def timestamp(self):
-    #     ms = current_milli_time()
-    #     return "%d.%03d: " % (ms / 1000, ms % 1000)
+    def noTalkPort(self):
+        self.talkPort = interface.Port(name='notalk')

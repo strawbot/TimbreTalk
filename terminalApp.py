@@ -101,6 +101,8 @@ class terminal(QtWidgets.QMainWindow):
             pm.monitorOut.emit(mname.text(), 'white')
 
         self.serialPortUpdate.connect(portMonitor.updatePortList)
+        self.ui.SavePortMonitor.clicked.connect(portMonitor.save)
+        self.ui.LoadPortMonitor.clicked.connect(portMonitor.load)
         self.showPorts()
 
         if sys.platform == 'darwin':
