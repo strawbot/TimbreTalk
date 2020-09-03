@@ -121,9 +121,6 @@ class portMonitor(QtCore.QObject):
 
         self.messages(messageQueue())
 
-    def out(self, text):
-        full = '\n%s' % timestamp() + self.uitag.text() + ': ' + text
-        self.monitorOut.emit(full, self.uicolor.currentText())
     # settings
     def port(self):
         return self.uiport.currentText()
@@ -158,6 +155,10 @@ class portMonitor(QtCore.QObject):
     def setColor(self, text):
         self.uicolor.setCurrentText(text)
 
+    # output
+    def out(self, text, start=current_milli_time()):
+        report = '\n{} {:.3f}: {}'.format(self.uitag.text(), start/1000, text)
+        self.monitorOut.emit(report, self.uicolor.currentText())
 
     def send_data(self, text):
         text_type = type(text)
@@ -166,7 +167,9 @@ class portMonitor(QtCore.QObject):
             self.monitorOut.emit(*text)
         else:
             print('type ',type(text), text)
-            self.out(asciify(text))
+            char_time = 1 / (self.rate() / 10)
+            start = int(current_milli_time() - len(text) * char_time)
+            self.out(asciify(text), start=start)
 
     def messages(self, q): # handle messages piped in from other threads
         class messageThread(QtCore.QThread):
