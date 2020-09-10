@@ -19,6 +19,9 @@
   <property name="windowTitle">
    <string>Frame</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <property name="frameShape">
    <enum>QFrame::StyledPanel</enum>
   </property>
@@ -624,7 +627,12 @@
               </item>
               <item>
                <property name="text">
-                <string>Alert2 IND</string>
+                <string>ALERT2 IND</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>AirLink PDU</string>
                </property>
               </item>
              </widget>
@@ -818,7 +826,12 @@
               </item>
               <item>
                <property name="text">
-                <string>Alert2 IND</string>
+                <string>ALERT2 IND</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>AirLink PDU</string>
                </property>
               </item>
              </widget>
@@ -1009,7 +1022,12 @@
               </item>
               <item>
                <property name="text">
-                <string>Alert2 IND</string>
+                <string>ALERT2 IND</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>AirLink PDU</string>
                </property>
               </item>
              </widget>
@@ -1200,7 +1218,12 @@
               </item>
               <item>
                <property name="text">
-                <string>Alert2 IND</string>
+                <string>ALERT2 IND</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>AirLink PDU</string>
                </property>
               </item>
              </widget>
@@ -1737,12 +1760,197 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>MonitorFormat4</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorFormat4</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>252</x>
+     <y>398</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>215</x>
+     <y>413</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorFormat3</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorFormat3</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>221</x>
+     <y>306</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>197</x>
+     <y>312</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorFormat2</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorFormat2</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>258</x>
+     <y>206</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>241</x>
+     <y>214</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorFormat1</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorFormat1</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>208</x>
+     <y>117</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>196</x>
+     <y>125</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorColor1</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorColor1</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>84</x>
+     <y>116</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>59</x>
+     <y>126</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorColor2</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorColor2</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>78</x>
+     <y>207</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>61</x>
+     <y>215</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorColor3</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorColor3</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>95</x>
+     <y>308</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>79</x>
+     <y>315</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorColor4</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorColor4</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>73</x>
+     <y>408</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>55</x>
+     <y>411</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorPort2</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorPort2</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>289</x>
+     <y>165</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>314</x>
+     <y>163</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorPort3</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorPort3</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>270</x>
+     <y>262</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>306</x>
+     <y>256</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorPort4</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorPort4</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>288</x>
+     <y>354</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>326</x>
+     <y>354</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MonitorPort1</sender>
+   <signal>currentTextChanged(QString)</signal>
+   <receiver>MonitorPort1</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>285</x>
+     <y>64</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>306</x>
+     <y>70</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
- <buttongroups>
-  <buttongroup name="buttonGroup">
-   <property name="exclusive">
-    <bool>true</bool>
-   </property>
-  </buttongroup>
- </buttongroups>
 </ui>
