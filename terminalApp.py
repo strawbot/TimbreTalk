@@ -137,7 +137,7 @@ class terminal(QtWidgets.QMainWindow):
         self.ui.Console.setCurrentCharFormat(tf)
 
     def banner(self):
-        self.Window.setWindowTitle('Tiny Timbre Talk '+version)
+        self.Window.setWindowTitle('ConMon '+version)
 
     def textInput(self, text):
         self.textSignal.emit(text)
