@@ -54,13 +54,12 @@ class terminal(QtWidgets.QMainWindow):
         self.portlistMutex = QtCore.QMutex()
         self.textMutex = QtCore.QMutex()
 
-        # self.ui.PortSelect.activated.connect(self.selectPort)
-        # self.ui.SetSerial.clicked.connect(self.setSerial)
-        # self.ui.SetSfp.clicked.connect(self.setSfp)
-        # self.ui.SetSfp.click()
-        # self.ui.BaudRate.activated.connect(self.selectRate)
+        self.ui.PortSelect.activated.connect(self.selectPort)
+        self.ui.ConsoleProtocol.activated.connect(self.selectProtocol)
+        self.ui.BaudRate.activated.connect(self.selectRate)
         self.ui.BaudRate.currentIndexChanged.connect(self.selectRate)
         self.ui.ConsoleColor.activated.connect(self.setColor)
+        self.ui.SendHex.clicked.connect(self.sendHex)
 
         # self.ui.Console.setEnabled(True)
         self.ui.Console.installEventFilter(self)
@@ -73,7 +72,8 @@ class terminal(QtWidgets.QMainWindow):
         self.serialHub.update.connect(self.showPortUpdate)
         self.jlinkHub.update.connect(self.showPortUpdate)
 
-        self.rate = int(self.ui.BaudRate.currentText())
+        self.rate = lambda : int(self.ui.BaudRate.currentText())
+
         self.colorMap = {"white":"white",
                          "cyan":"cyan",
                          "blue":"deepskyblue",
@@ -117,16 +117,20 @@ class terminal(QtWidgets.QMainWindow):
         self.portParametersMenu()
 
     # gui
-    def setSerial(self):
-        self.protocol.passthru()
-
-    def setSfp(self):
-        self.protocol.connected()
+    def selectProtocol(self):
+        prot = self.ui.ConsoleProtocol.currentText()
+        if prot == 'Serial':
+            self.protocol.passthru()
+        elif prot == 'SFP':
+            self.protocol.connected()
+        elif prot == 'Alert2 IND':
+            warning('Under Construction')
+        else:
+            error(prot,'is not accounted for')
 
     def selectRate(self):
-        self.rate = int(self.ui.BaudRate.currentText())
         if self.talkPort.is_open():
-            self.talkPort.setRate(self.rate)
+            self.talkPort.setRate(self.rate())
 
     def setColor(self):
         self.color = QtGui.QColor(self.colorMap[self.ui.ConsoleColor.currentText()])
@@ -282,8 +286,7 @@ class terminal(QtWidgets.QMainWindow):
             self.ui.PortSelect.setDisabled(True)
             self.talkPort = self.serialHub.get_port(name)
             def portOpen():
-                self.talkPort.open()
-                self.talkPort.setRate(self.rate)
+                self.talkPort.open(rate=self.rate())
                 if self.talkPort.is_open():
                     self.talkPort.ioError.connect(self.ioError)
                     self.talkPort.ioException.connect(self.ioError)
@@ -302,6 +305,15 @@ class terminal(QtWidgets.QMainWindow):
         self.protocol.plugin(self.talkPort)
         self.protocol.whofrom = self.talkPort.hub.whofrom
 
+    def sendHex(self):
+        try:
+            text = self.ui.hexStr.text()
+            if len(text):
+                self.top.output.emit(bytes.fromhex(text))
+        except Exception:
+            error('bad hex string')
+            traceback.print_exc(file=sys.stderr)
+
 
 if __name__ == "__main__":
     import sys, traceback
@@ -311,6 +323,6 @@ if __name__ == "__main__":
     try:
         sys.exit(app.exec_())
     except Exception as e:
-        error(e)
+        # sys.error(e)
         traceback.print_exc(file=sys.stderr)
 
