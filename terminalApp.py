@@ -63,7 +63,7 @@ class terminal(QtWidgets.QMainWindow):
 
         # self.ui.Console.setEnabled(True)
         self.ui.Console.installEventFilter(self)
-        self.noTalkPort()
+        self.noConsole()
         self.jlinkHub = jlinkHub.JlinkHub()
         self.jlinkHub.whofrom = pids.ETM_HOST
         self.serialHub = serialHub.SerialHub()
@@ -88,7 +88,7 @@ class terminal(QtWidgets.QMainWindow):
         self.setColor()
 
         # monitor tab
-        for widget in self.ui.PortMonitors.findChildren(MonitorFrame):
+        for widget in self.ui.PortMonitors_tab.findChildren(MonitorFrame):
             print(widget.objectName())
             port = widget.findChildren(PortCombo)[0]
             baud = widget.findChildren(BaudCombo)[0]
@@ -129,8 +129,8 @@ class terminal(QtWidgets.QMainWindow):
             error(prot,'is not accounted for')
 
     def selectRate(self):
-        if self.talkPort.is_open():
-            self.talkPort.setRate(self.rate())
+        if self.console.is_open():
+            self.console.setRate(self.rate())
 
     def setColor(self):
         self.color = QtGui.QColor(self.colorMap[self.ui.ConsoleColor.currentText()])
@@ -227,7 +227,7 @@ class terminal(QtWidgets.QMainWindow):
         # self.setParamButtonText()
     def setParam(self, parity, bytesize, stopbits):
         try:
-            sp = self.talkPort
+            sp = self.console
             if parity: sp.parity = parity
             if bytesize: sp.bytesize = bytesize
             if stopbits: sp.stopbits = stopbits
@@ -241,20 +241,20 @@ class terminal(QtWidgets.QMainWindow):
             error("can't set Params")
 
     def setParamButtonText(self):
-        sp = self.talkPort
+        sp = self.console
         if sp.stopbits == 1.5:
             self.ui.toolButton.setText("%s %i %0.1f" % (sp.parity, sp.bytesize, sp.stopbits))
         else:
             self.ui.toolButton.setText("%s %i %i" % (sp.parity, sp.bytesize, sp.stopbits))
 
     # ports
-    def noTalkPort(self):
+    def noConsole(self):
         self.protocol.inner.unplug()
-        self.talkPort = interface.Port(name='notalk')
+        self.console = interface.Port(name='notalk')
 
     def ioError(self, message):
         error(message)
-        self.talkPort.close()
+        self.console.close()
 
     def showPortUpdate(self):
         self.showPortSignal.emit()
@@ -265,12 +265,12 @@ class terminal(QtWidgets.QMainWindow):
         ports = [port.name for port in self.serialHub.all_ports()]
         updatePortCombo(uiPort, ports)
         # check current port against list and select proper item
-        if self.talkPort.name:
-            if self.talkPort.name != uiPort.currentText():
-                index = uiPort.findText(self.talkPort.name)
+        if self.console.name:
+            if self.console.name != uiPort.currentText():
+                index = uiPort.findText(self.console.name)
                 if index == -1:
                     index = 0
-                    self.noTalkPort()
+                    self.noConsole()
                 uiPort.setCurrentIndex(index)
 
         final = [uiPort.itemText(i) for i in range(1, uiPort.count())]
@@ -278,43 +278,45 @@ class terminal(QtWidgets.QMainWindow):
         self.serialPortUpdate.emit(final)
 
     def selectPort(self):
-        if self.talkPort.is_open():
-            self.talkPort.close()
+        if self.console.is_open():
+            self.console.close()
 
         if self.ui.PortSelect.currentIndex():
             name = str(self.ui.PortSelect.currentText())
             self.ui.PortSelect.setDisabled(True)
-            self.talkPort = self.serialHub.get_port(name)
+            self.console = self.serialHub.get_port(name)
             def portOpen():
-                self.talkPort.open(rate=self.rate())
-                if self.talkPort.is_open():
-                    self.talkPort.ioError.connect(self.ioError)
-                    self.talkPort.ioException.connect(self.ioError)
+                self.console.open(rate=self.rate())
+                if self.console.is_open():
+                    self.console.ioError.connect(self.ioError)
+                    self.console.ioException.connect(self.ioError)
                     self.connectPort()
                 else:
                     self.ui.PortSelect.setCurrentIndex(0)
-                    self.noTalkPort()
+                    self.noConsole()
                 self.ui.PortSelect.setDisabled(False)
                 self.showPortUpdate()
             Thread(target=portOpen).start() # run in thread to keep GUI responsive
         else:
-            self.noTalkPort()
+            self.noConsole()
         self.showPorts()
 
     def connectPort(self):
-        self.protocol.plugin(self.talkPort)
-        self.protocol.whofrom = self.talkPort.hub.whofrom
+        self.protocol.plugin(self.console)
+        # self.protocol.whofrom = self.console.hub.whofrom
 
-    def sendHex(self):
+    def sendHex(self): # need more than 1 hex string; also set all to UC
+        # 41 4C 32 32 62 03 0A 03 61 01 38 set parameter
         try:
             text = self.ui.hexStr.text()
             if len(text):
-                self.top.output.emit(bytes.fromhex(text))
+                self.top.output.emit(list(bytes.fromhex(text)))
         except Exception:
             error('bad hex string')
             traceback.print_exc(file=sys.stderr)
 
 
+# base application
 if __name__ == "__main__":
     import sys, traceback
 

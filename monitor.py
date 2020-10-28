@@ -189,10 +189,10 @@ class portMonitor(QtCore.QObject):
 
     def messages(self, q): # handle messages piped in from other threads
         class messageThread(QtCore.QThread):
-            def __init__(self, parent, q):
+            def __init__(self, port, q):
                 QtCore.QThread.__init__(self)
                 self.q = q
-                self.parent = parent
+                self.port = port
                 self.setObjectName("MessageThread")
 
             def run(self):
@@ -200,7 +200,7 @@ class portMonitor(QtCore.QObject):
                     try:
                         s = self.q.get()
                         if s:
-                            self.parent.send_data(s)
+                            self.port.send_data(s)
                     except Exception as e:
                         eprint(e)
                         traceback.print_exc(file=sys.stderr)
