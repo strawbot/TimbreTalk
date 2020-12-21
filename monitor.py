@@ -12,7 +12,7 @@ from protocols.sfpLayer import SfpLayer
 from protocols.airlink import decode_mant_header
 from protocols import pids
 from protocols.interface.message import *
-from protocols.alert2_decode import alert1, alert2, xnum, d, value_decode
+from protocols.alert2_decode import checkAlert2
 
 # tools
 def current_milli_time():
@@ -69,7 +69,6 @@ class portMonitor(QtCore.QObject):
     ports = []
     portlist = []
     monitorOut = QtCore.pyqtSignal(object,object)
-    settings = QtCore.QSettings("TWE", "Tiny Timbre Talk")
 
     @classmethod
     def updatePortList(cls, portlist):
@@ -80,22 +79,22 @@ class portMonitor(QtCore.QObject):
             cls.portlist = portlist
 
     @classmethod
-    def save(cls):
+    def save(cls, settings):
         for self in cls.ports:
-            cls.settings.setValue(self.uiport.objectName(),self.port())
-            cls.settings.setValue(self.uibaud.objectName(),self.baud())
-            cls.settings.setValue(self.uitag.objectName(),self.tag())
-            cls.settings.setValue(self.uiprotocol.objectName(),self.translator())
-            cls.settings.setValue(self.uicolor.objectName(),self.color())
+            settings.setValue(self.uiport.objectName(),self.port())
+            settings.setValue(self.uibaud.objectName(),self.baud())
+            settings.setValue(self.uitag.objectName(),self.tag())
+            settings.setValue(self.uiprotocol.objectName(),self.translator())
+            settings.setValue(self.uicolor.objectName(),self.color())
 
     @classmethod
-    def load(cls):
+    def load(cls, settings):
         for self in cls.ports:
-            self.setTag(cls.settings.value(self.uitag.objectName()))
-            self.setTranslator(cls.settings.value(self.uiprotocol.objectName()))
-            self.setColor(cls.settings.value(self.uicolor.objectName()))
-            self.setBaud(cls.settings.value(self.uibaud.objectName()))
-            portname = cls.settings.value(self.uiport.objectName())
+            self.setTag(settings.value(self.uitag.objectName()))
+            self.setTranslator(settings.value(self.uiprotocol.objectName()))
+            self.setColor(settings.value(self.uicolor.objectName()))
+            self.setBaud(settings.value(self.uibaud.objectName()))
+            portname = settings.value(self.uiport.objectName())
             # update state
             self.setPort(portname)
             self.uiport.activated.emit(self.uiport.currentIndex())
@@ -126,10 +125,7 @@ class portMonitor(QtCore.QObject):
         self.uiprotocol.activated.connect(self.selectProtocol)
 
         self.translate = self.ascii_translate
-        self.ind = []
-        self.flow = bytearray()
-        self.times = []
-
+        self.checkAlert2 = checkAlert2()
 
     # settings
     def port(self):
@@ -177,13 +173,14 @@ class portMonitor(QtCore.QObject):
             self.monitorOut.emit(*text)
         else:
             print('type ', type(text), text)
-            char_time = 1 / (self.rate() / 10)
+            char_ms = 1000 / (self.rate() / 10)
             end = current_milli_time()
-            start = int(end - len(text) * char_time)
-            end = int(end - char_time)
+            start = int(end - len(text) * char_ms)
+            end = int(end - char_ms)
             try:
                 self.translate(start,text,end)
             except Exception as e:
+                print('start,text,end:',start,text,end)
                 eprint(e)
                 traceback.print_exc(file=sys.stderr)
 
@@ -276,51 +273,7 @@ class portMonitor(QtCore.QObject):
         self.out(report, start=start)
 
     def ind_translate(self,start,text,end):
-        self.ind.append((start,text))
-        self.flow += text
-        step = (end - start) / len(text)
-        if step:
-            self.times += [int(t) for t in np.arange(start, end, step)]
-        else:
-            self.times.append(start)
-        self.checkAlert2()
-
-    def checkAlert2(self):
-        # decoders
-        def xnum(pdu):  # return 7 bit number or 15 bit number if first bit is high; plus remainder
-            num = pdu[0]
-            if num & 0x80:
-                num = ((num & 0x7F) << 8) + pdu[1]
-                return (pdu[2:], num)
-            return (pdu[1:], num)
-
-        def decode(flow):  # b'414C44525432...'
-            if len(flow) == 0:
-                return 'empty PDU'
-            pdu, type = xnum(flow)
-            pdu, tlv_length = xnum(pdu)
-
-            defn = d.get(type, '--')
-            value = value_decode(type, pdu)
-
-            return 'ALERT2 {:>2}[ {:0>2x}{} {}[ {} ]]'.format(len(pdu), type, '{' + defn + '}', tlv_length, value)
-
-        query = bytearray(list(map(ord, 'ALERT2')))
-        length = len(query)
-        while len(self.flow) >= length + 2:
-            index = self.flow.find(query)
-            if index == 0:
-                pdu, length = xnum(self.flow[length:])
-                if len(pdu) < length:
-                    return
-                report = decode(pdu[:length])
-                self.flow = pdu[length:]
-            elif index > 0:
-                report = self.flow[:index].decode('utf-8', 'replace')
-                self.flow = self.flow[index:]
-            else:
-                return
-            start = self.times[0]
-            self.times = self.times[-len(self.flow):]
+        report, start = self.checkAlert2(start, end, text)
+        if report:
             self.out(report, start=start)
 

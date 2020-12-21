@@ -2,6 +2,8 @@
 from compileui import updateUi
 updateUi('terminal')
 
+# save from Phrases: 0 enabletdma c! 900 transmitaudiomodulationvoltage s!
+# save from Send Hex: 41 4C 32 32 62 07 0A 03 18 01 01 78 00
 from qt import QtGui, QtWidgets, QtCore
 from terminal import Ui_Frame
 from protocols.interface import interface, ipHub, serialHub, jlinkHub
@@ -22,12 +24,14 @@ try:
 except AttributeError:
     _fromUtf8 = lambda s: s
 
+appname = "TimbreTalk "
 version = "V2"
 
 class terminal(QtWidgets.QMainWindow):
     textSignal = QtCore.pyqtSignal(object)
     showPortSignal = QtCore.pyqtSignal()
     serialPortUpdate = QtCore.pyqtSignal(object)
+    settings = QtCore.QSettings("TWE", "Tiny Timbre Talk")
 
     def __init__(self):
         super(terminal, self).__init__()
@@ -36,7 +40,6 @@ class terminal(QtWidgets.QMainWindow):
         self.ui.setupUi(self.Window)
         self.banner()
         self.Window.show()
-
         setTextOutput(self.messageOut)
 
         self.linebuffer = []
@@ -101,8 +104,8 @@ class terminal(QtWidgets.QMainWindow):
             pm.monitorOut.emit(mname.text(), 'white')
 
         self.serialPortUpdate.connect(portMonitor.updatePortList)
-        self.ui.SavePortMonitor.clicked.connect(portMonitor.save)
-        self.ui.LoadPortMonitor.clicked.connect(portMonitor.load)
+        self.ui.SavePortMonitor.clicked.connect(self.save_settings)
+        self.ui.LoadPortMonitor.clicked.connect(self.load_settings)
         self.showPorts()
 
         if sys.platform == 'darwin':
@@ -117,6 +120,19 @@ class terminal(QtWidgets.QMainWindow):
         self.portParametersMenu()
 
     # gui
+    def save_settings(self):
+        self.settings.setValue('Window Geometry', self.Window.geometry())
+        self.settings.setValue(self.ui.hexStr.objectName(), self.ui.hexStr.text())
+        portMonitor.save(self.settings)
+
+    def load_settings(self):
+        try:
+            portMonitor.load(self.settings)
+            self.ui.hexStr.setText(self.settings.value(self.ui.hexStr.objectName()))
+            self.Window.setGeometry(self.settings.value('Window Geometry'))
+        except TypeError:
+            self.save_settings() # some settingn hasn't been set
+
     def selectProtocol(self):
         prot = self.ui.ConsoleProtocol.currentText()
         if prot == 'Serial':
@@ -141,7 +157,7 @@ class terminal(QtWidgets.QMainWindow):
         self.ui.Console.setCurrentCharFormat(tf)
 
     def banner(self):
-        self.Window.setWindowTitle('ConMon '+version)
+        self.Window.setWindowTitle(appname+version)
 
     def textInput(self, text):
         self.textSignal.emit(text)
@@ -305,12 +321,13 @@ class terminal(QtWidgets.QMainWindow):
         self.protocol.plugin(self.console)
         # self.protocol.whofrom = self.console.hub.whofrom
 
+    # need to fix this to work under other protocols than Serial
     def sendHex(self): # need more than 1 hex string; also set all to UC
         # 41 4C 32 32 62 03 0A 03 61 01 38 set parameter
         try:
             text = self.ui.hexStr.text()
             if len(text):
-                self.top.output.emit(list(bytes.fromhex(text)))
+                self.top.output.emit(bytes.fromhex(text))
         except Exception:
             error('bad hex string')
             traceback.print_exc(file=sys.stderr)
