@@ -1,7 +1,16 @@
 # update GUI from designer
 from compileui import updateUi
 updateUi('terminal')
-
+'''
+900 transmitaudiomodulationvoltage s! 0 enabletdma c! 
+5 beacon
+100 carrieronlytime s! 100 rftailtime s! 100 agctime s!
+100 transmitaudiomodulationvoltage s!
+0 beacon
+0x80000 10 mem
+whoami
+runapp
+'''
 # save from Phrases: 0 enabletdma c! 900 transmitaudiomodulationvoltage s!
 # save from Send Hex: 41 4C 32 32 62 07 0A 03 18 01 01 78 00
 from qt import QtGui, QtWidgets, QtCore
@@ -123,6 +132,11 @@ class terminal(QtWidgets.QMainWindow):
     def save_settings(self):
         self.settings.setValue('Window Geometry', self.Window.geometry())
         self.settings.setValue(self.ui.hexStr.objectName(), self.ui.hexStr.text())
+        self.settings.setValue(self.ui.ConsoleColor.objectName(),str(self.ui.ConsoleColor.currentText()))
+        self.settings.setValue(self.ui.ConsoleProtocol.objectName(),str(self.ui.ConsoleProtocol.currentText()))
+        self.settings.setValue(self.ui.BaudRate.objectName(),str(self.ui.BaudRate.currentText()))
+        self.settings.setValue(self.ui.PortSelect.objectName(),str(self.ui.PortSelect.currentText()))
+        self.settings.setValue(self.ui.Tabs.objectName(),self.ui.Tabs.currentIndex())
         portMonitor.save(self.settings)
 
     def load_settings(self):
@@ -130,6 +144,15 @@ class terminal(QtWidgets.QMainWindow):
             portMonitor.load(self.settings)
             self.ui.hexStr.setText(self.settings.value(self.ui.hexStr.objectName()))
             self.Window.setGeometry(self.settings.value('Window Geometry'))
+            self.ui.ConsoleColor.setCurrentText(self.settings.value(self.ui.ConsoleColor.objectName()))
+            self.ui.ConsoleProtocol.setCurrentText(self.settings.value(self.ui.ConsoleProtocol.objectName()))
+            self.ui.BaudRate.setCurrentText(self.settings.value(self.ui.BaudRate.objectName()))
+            self.ui.PortSelect.setCurrentText(self.settings.value(self.ui.PortSelect.objectName()))
+            self.ui.Tabs.setCurrentIndex(self.settings.value(self.ui.Tabs.objectName()))
+            self.selectProtocol()
+            self.selectRate()
+            self.setColor()
+            self.selectPort()
         except TypeError:
             self.save_settings() # some settingn hasn't been set
 

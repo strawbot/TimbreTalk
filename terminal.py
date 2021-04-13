@@ -524,6 +524,12 @@ class Ui_Frame(object):
         spacerItem4 = QtWidgets.QSpacerItem(20, 13, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_2.addItem(spacerItem4)
         self.Tabs.addTab(self.PortMonitors_tab, "")
+        self.Transfer = QtWidgets.QWidget()
+        self.Transfer.setObjectName("Transfer")
+        self.commandLinkButton = QtWidgets.QCommandLinkButton(self.Transfer)
+        self.commandLinkButton.setGeometry(QtCore.QRect(130, 170, 193, 41))
+        self.commandLinkButton.setObjectName("commandLinkButton")
+        self.Tabs.addTab(self.Transfer, "")
         self.Sampler_tab = QtWidgets.QWidget()
         self.Sampler_tab.setObjectName("Sampler_tab")
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout(self.Sampler_tab)
@@ -671,6 +677,9 @@ class Ui_Frame(object):
         self.LoadPortMonitor = QtWidgets.QPushButton(self.frame_5)
         self.LoadPortMonitor.setObjectName("LoadPortMonitor")
         self.horizontalLayout_2.addWidget(self.LoadPortMonitor)
+        self.DefaultsPortMonitor = QtWidgets.QPushButton(self.frame_5)
+        self.DefaultsPortMonitor.setObjectName("DefaultsPortMonitor")
+        self.horizontalLayout_2.addWidget(self.DefaultsPortMonitor)
         self.verticalLayout_10.addWidget(self.frame_5)
         spacerItem6 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_10.addItem(spacerItem6)
@@ -755,7 +764,7 @@ class Ui_Frame(object):
         self.horizontalLayout_7.addLayout(self.verticalLayout)
 
         self.retranslateUi(Frame)
-        self.Tabs.setCurrentIndex(0)
+        self.Tabs.setCurrentIndex(2)
         self.ConsoleColor.setCurrentIndex(1)
         self.ConsoleProtocol.setCurrentIndex(1)
         self.BaudRate.setCurrentIndex(6)
@@ -970,6 +979,8 @@ class Ui_Frame(object):
         self.MonitorBaud4.setItemText(10, _translate("Frame", "921600"))
         self.MonitorBaud4.setItemText(11, _translate("Frame", "1000000"))
         self.Tabs.setTabText(self.Tabs.indexOf(self.PortMonitors_tab), _translate("Frame", "Monitor"))
+        self.commandLinkButton.setText(_translate("Frame", "Send a file to device using TxOs"))
+        self.Tabs.setTabText(self.Tabs.indexOf(self.Transfer), _translate("Frame", "Transfer"))
         self.groupBox_2.setTitle(_translate("Frame", "Capture:"))
         self.pushButton_4.setText(_translate("Frame", "Capture!"))
         self.groupBox_3.setTitle(_translate("Frame", "Process"))
@@ -1000,6 +1011,7 @@ class Ui_Frame(object):
         self.label.setText(_translate("Frame", "Settings:"))
         self.SavePortMonitor.setText(_translate("Frame", "Save"))
         self.LoadPortMonitor.setText(_translate("Frame", "Load"))
+        self.DefaultsPortMonitor.setText(_translate("Frame", "Defaults"))
 from baudcombo import BaudCombo
 from colorcombo import ColorCombo
 from formatcombo import FormatCombo

@@ -45,7 +45,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>2</number>
          </property>
          <property name="elideMode">
           <enum>Qt::ElideNone</enum>
@@ -1418,6 +1418,24 @@
            </item>
           </layout>
          </widget>
+         <widget class="QWidget" name="Transfer">
+          <attribute name="title">
+           <string>Transfer</string>
+          </attribute>
+          <widget class="QCommandLinkButton" name="commandLinkButton">
+           <property name="geometry">
+            <rect>
+             <x>130</x>
+             <y>170</y>
+             <width>193</width>
+             <height>41</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Send a file to device using TxOs</string>
+           </property>
+          </widget>
+         </widget>
          <widget class="QWidget" name="Sampler_tab">
           <attribute name="title">
            <string>Sampler</string>
@@ -1763,6 +1781,13 @@
          <widget class="QPushButton" name="LoadPortMonitor">
           <property name="text">
            <string>Load</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="DefaultsPortMonitor">
+          <property name="text">
+           <string>Defaults</string>
           </property>
          </widget>
         </item>
