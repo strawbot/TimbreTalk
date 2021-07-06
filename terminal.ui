@@ -45,7 +45,7 @@
           </sizepolicy>
          </property>
          <property name="currentIndex">
-          <number>2</number>
+          <number>0</number>
          </property>
          <property name="elideMode">
           <enum>Qt::ElideNone</enum>
@@ -1743,7 +1743,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QFrame" name="frame_5">
+      <widget class="QGroupBox" name="groupBox_5">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -1756,35 +1756,39 @@
          <height>0</height>
         </size>
        </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
+       <property name="title">
+        <string>Settings</string>
        </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QLabel" name="label">
+       <layout class="QGridLayout" name="gridLayout_6">
+        <item row="0" column="4">
+         <widget class="QCheckBox" name="Auto_Load">
           <property name="text">
-           <string>Settings:</string>
+           <string>Load At Startup</string>
           </property>
          </widget>
         </item>
-        <item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
          <widget class="QPushButton" name="SavePortMonitor">
           <property name="text">
            <string>Save</string>
           </property>
          </widget>
         </item>
-        <item>
+        <item row="0" column="3">
          <widget class="QPushButton" name="LoadPortMonitor">
           <property name="text">
            <string>Load</string>
           </property>
          </widget>
         </item>
-        <item>
+        <item row="0" column="1">
          <widget class="QPushButton" name="DefaultsPortMonitor">
           <property name="text">
            <string>Defaults</string>
@@ -2365,29 +2369,13 @@
   </connection>
   <connection>
    <sender>pushButton</sender>
-   <signal>released()</signal>
-   <receiver>Console</receiver>
-   <slot>update()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>313</x>
-     <y>371</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>497</x>
-     <y>362</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton</sender>
    <signal>pressed()</signal>
    <receiver>Console</receiver>
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>341</x>
-     <y>373</y>
+     <x>414</x>
+     <y>363</y>
     </hint>
     <hint type="destinationlabel">
      <x>521</x>
@@ -2407,7 +2395,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>375</x>
-     <y>429</y>
+     <y>462</y>
     </hint>
    </hints>
   </connection>
@@ -2418,12 +2406,12 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>358</x>
-     <y>79</y>
+     <x>413</x>
+     <y>112</y>
     </hint>
     <hint type="destinationlabel">
      <x>381</x>
-     <y>397</y>
+     <y>427</y>
     </hint>
    </hints>
   </connection>
@@ -2434,12 +2422,12 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>362</x>
-     <y>80</y>
+     <x>413</x>
+     <y>112</y>
     </hint>
     <hint type="destinationlabel">
      <x>363</x>
-     <y>365</y>
+     <y>392</y>
     </hint>
    </hints>
   </connection>
@@ -2455,7 +2443,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>376</x>
-     <y>333</y>
+     <y>357</y>
     </hint>
    </hints>
   </connection>
@@ -2466,12 +2454,12 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>362</x>
-     <y>80</y>
+     <x>413</x>
+     <y>112</y>
     </hint>
     <hint type="destinationlabel">
      <x>367</x>
-     <y>301</y>
+     <y>322</y>
     </hint>
    </hints>
   </connection>
@@ -2498,8 +2486,8 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>368</x>
-     <y>79</y>
+     <x>413</x>
+     <y>112</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
@@ -2514,8 +2502,8 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>380</x>
-     <y>78</y>
+     <x>413</x>
+     <y>112</y>
     </hint>
     <hint type="destinationlabel">
      <x>363</x>
@@ -2530,8 +2518,8 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>347</x>
-     <y>78</y>
+     <x>413</x>
+     <y>112</y>
     </hint>
     <hint type="destinationlabel">
      <x>411</x>
@@ -2647,7 +2635,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>223</x>
-     <y>301</y>
+     <y>322</y>
     </hint>
    </hints>
   </connection>
@@ -2663,7 +2651,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>232</x>
-     <y>333</y>
+     <y>357</y>
     </hint>
    </hints>
   </connection>
@@ -2679,7 +2667,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>219</x>
-     <y>365</y>
+     <y>392</y>
     </hint>
    </hints>
   </connection>
@@ -2695,7 +2683,7 @@
     </hint>
     <hint type="destinationlabel">
      <x>237</x>
-     <y>397</y>
+     <y>427</y>
     </hint>
    </hints>
   </connection>
@@ -2711,7 +2699,23 @@
     </hint>
     <hint type="destinationlabel">
      <x>231</x>
-     <y>429</y>
+     <y>462</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>released()</signal>
+   <receiver>Console</receiver>
+   <slot>repaint()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>369</x>
+     <y>343</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>544</x>
+     <y>324</y>
     </hint>
    </hints>
   </connection>

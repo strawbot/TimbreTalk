@@ -127,6 +127,8 @@ class terminal(QtWidgets.QMainWindow):
             self.ui.Console.setFont(font)
 
         self.portParametersMenu()
+        if self.settings.value(self.ui.Auto_Load.objectName()):
+            self.load_settings()
 
     # gui
     def save_settings(self):
@@ -137,6 +139,7 @@ class terminal(QtWidgets.QMainWindow):
         self.settings.setValue(self.ui.BaudRate.objectName(),str(self.ui.BaudRate.currentText()))
         self.settings.setValue(self.ui.PortSelect.objectName(),str(self.ui.PortSelect.currentText()))
         self.settings.setValue(self.ui.Tabs.objectName(),self.ui.Tabs.currentIndex())
+        self.settings.setValue(self.ui.Auto_Load.objectName(),self.ui.Auto_Load.isChecked())
         portMonitor.save(self.settings)
 
     def load_settings(self):
@@ -149,6 +152,7 @@ class terminal(QtWidgets.QMainWindow):
             self.ui.BaudRate.setCurrentText(self.settings.value(self.ui.BaudRate.objectName()))
             self.ui.PortSelect.setCurrentText(self.settings.value(self.ui.PortSelect.objectName()))
             self.ui.Tabs.setCurrentIndex(self.settings.value(self.ui.Tabs.objectName()))
+            self.ui.Auto_Load.setChecked(self.settings.value(self.ui.Auto_Load.objectName()))
             self.selectProtocol()
             self.selectRate()
             self.setColor()
