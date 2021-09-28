@@ -109,6 +109,14 @@ class serialPane(QWidget):
             traceback.print_exc(file=sys.stderr)
             error("can't set Params")
 
+    def sendText(self):
+        try:
+            self.parent.talkPort.input.emit(bytearray.fromhex(self.ui.textStr.text()))
+        except Exception as e:
+            print >>sys.stderr, e
+            traceback.print_exc(file=sys.stderr)
+            error("can't set Params")
+
     def disconnectFlows(self):
         self.parent.inner.unplug()
         self.protocol.unplug()

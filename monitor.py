@@ -10,6 +10,7 @@ import numpy as np
 from protocols.interface import interface, serialHub
 from protocols.sfpLayer import SfpLayer
 from protocols.airlink import decode_mant_header
+from protocols.decode_dcp import decode_dcp
 from protocols import pids
 from protocols.interface.message import *
 from protocols.alert2_decode import checkAlert2
@@ -228,15 +229,21 @@ class portMonitor(QtCore.QObject):
             self.uiport.setDisabled(True)
             self.moniPort = self.serialHub.get_port(name)
             def portOpen():
-                self.moniPort.open(rate=self.rate())
-                if self.moniPort.is_open():
-                    self.moniPort.ioError.connect(self.ioError)
-                    self.moniPort.ioException.connect(self.ioError)
-                    self.connectPort()
-                else:
+                try:
+                    self.moniPort.open(rate=self.rate())
+                    if self.moniPort.is_open():
+                        self.moniPort.ioError.connect(self.ioError)
+                        self.moniPort.ioException.connect(self.ioError)
+                        self.connectPort()
+                    else:
+                        self.uiport.setCurrentIndex(0)
+                        self.noTalkPort()
+                    self.uiport.setDisabled(False)
+                except:
+                    error("%s failed to open"%name)
                     self.uiport.setCurrentIndex(0)
                     self.noTalkPort()
-                self.uiport.setDisabled(False)
+                    self.uiport.setDisabled(False)
             Thread(target=portOpen).start() # run in thread to keep GUI responsive
         else:
             self.noTalkPort()
@@ -258,6 +265,9 @@ class portMonitor(QtCore.QObject):
             self.translate = self.alpdu_translate
         elif protocol == 'ALERT2 IND':
             self.translate = self.ind_translate
+        elif protocol == 'Dev Config':
+            self.dcp_hold = bytearray()
+            self.translate = self.dcp_translate
         else:
             error('No protocol for selection:'+self.translator())
 
@@ -277,3 +287,14 @@ class portMonitor(QtCore.QObject):
         if report:
             self.out(report, start=start)
 
+    def dcp_translate(self,start,text,end):
+        before = len(text)
+        if len(self.dcp_hold) == 0:
+            self.dcp_start = start
+        self.dcp_hold += text
+        report = decode_dcp(self.dcp_hold)
+        if report:
+            self.out(report, start=start)
+        after = len(text)
+        if after and before != after:
+            self.dcp_translate(start, text, end)

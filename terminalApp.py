@@ -72,6 +72,8 @@ class terminal(QtWidgets.QMainWindow):
         self.ui.BaudRate.currentIndexChanged.connect(self.selectRate)
         self.ui.ConsoleColor.activated.connect(self.setColor)
         self.ui.SendHex.clicked.connect(self.sendHex)
+        self.ui.SendText.clicked.connect(self.sendText)
+        self.ui.SendFile.clicked.connect(self.sendFile)
 
         # self.ui.Console.setEnabled(True)
         self.ui.Console.installEventFilter(self)
@@ -134,6 +136,7 @@ class terminal(QtWidgets.QMainWindow):
     def save_settings(self):
         self.settings.setValue('Window Geometry', self.Window.geometry())
         self.settings.setValue(self.ui.hexStr.objectName(), self.ui.hexStr.text())
+        self.settings.setValue(self.ui.textStr.objectName(), self.ui.textStr.text())
         self.settings.setValue(self.ui.ConsoleColor.objectName(),str(self.ui.ConsoleColor.currentText()))
         self.settings.setValue(self.ui.ConsoleProtocol.objectName(),str(self.ui.ConsoleProtocol.currentText()))
         self.settings.setValue(self.ui.BaudRate.objectName(),str(self.ui.BaudRate.currentText()))
@@ -146,6 +149,7 @@ class terminal(QtWidgets.QMainWindow):
         try:
             portMonitor.load(self.settings)
             self.ui.hexStr.setText(self.settings.value(self.ui.hexStr.objectName()))
+            self.ui.textStr.setText(self.settings.value(self.ui.textStr.objectName()))
             self.Window.setGeometry(self.settings.value('Window Geometry'))
             self.ui.ConsoleColor.setCurrentText(self.settings.value(self.ui.ConsoleColor.objectName()))
             self.ui.ConsoleProtocol.setCurrentText(self.settings.value(self.ui.ConsoleProtocol.objectName()))
@@ -358,6 +362,18 @@ class terminal(QtWidgets.QMainWindow):
         except Exception:
             error('bad hex string')
             traceback.print_exc(file=sys.stderr)
+
+    def sendText(self):
+        try:
+            text = self.ui.textStr.text()
+            if len(text):
+                self.keyin(text+'\n')
+        except Exception:
+            error('bad text string')
+            traceback.print_exc(file=sys.stderr)
+
+    def sendFile(self):
+        print("Not defined yet")
 
 
 # base application
