@@ -288,13 +288,15 @@ class portMonitor(QtCore.QObject):
             self.out(report, start=start)
 
     def dcp_translate(self,start,text,end):
-        before = len(text)
         if len(self.dcp_hold) == 0:
             self.dcp_start = start
         self.dcp_hold += text
-        report = decode_dcp(self.dcp_hold)
-        if report:
-            self.out(report, start=start)
-        after = len(text)
-        if after and before != after:
-            self.dcp_translate(start, text, end)
+
+        while True:
+            before = len(self.dcp_hold)
+            report = decode_dcp(self.dcp_hold)
+            after = len(self.dcp_hold)
+            if report:
+                self.out(report, start=self.dcp_start)
+            if after == 0 or before == after:
+                break
