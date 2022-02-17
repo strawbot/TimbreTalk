@@ -10,6 +10,7 @@ from microTransfer import stmTransfer, efmTransfer
 from jamTransfer import jamSender
 from eepromTransfer import eepromTransfer
 from configTransfer import configTransfer
+from protocols.utilities import *
 
 current_milli_time = lambda: int(round(time.time() * 1000))
 
@@ -194,19 +195,6 @@ class utilityPane(QWidget):
                 uiPort.setItemText(0, text)
 
         self.sptimer.singleShot(1000, self.listPorts)
-
-# utilities
-def isAscii(c):
-    return c >= ' ' and c <= '~'
-
-def toHex(c):
-    return '<' + hex(ord(c))[2:] + '>'
-
-def asciify(s):
-    return ''.join([c if isAscii(c) else toHex(c) for c in s])
-
-def hexify(s):
-    return ''.join(map(lambda x: ' ' + hex(ord(x))[2:], s))
 
 class portMonitor(QObject):
 

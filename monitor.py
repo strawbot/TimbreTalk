@@ -14,6 +14,7 @@ from protocols.decode_dcp import decode_dcp
 from protocols import pids
 from protocols.interface.message import *
 from protocols.alert2_decode import checkAlert2
+from protocols.utilities import *
 
 # tools
 def current_milli_time():
@@ -45,25 +46,6 @@ def updatePortCombo(uiPort, ports):
     text = '(Disconnect)' if uiPort.currentIndex() else '(Select a Port)'
     if uiPort.itemText(0) != text:
         uiPort.setItemText(0, text)
-
-# utilities
-def isAscii(c):
-    if type(c) == type('0'):
-        c = ord(c)
-    return ord(' ') <= c <= ord('~')
-
-def toHex(c):
-    if type(c) == type('0'):
-        c = ord(c)
-    return '<{:02X}>'.format(c)
-
-def asciify(s):
-    text = [chr(c) if isAscii(c) else toHex(c) for c in s]
-    return ''.join(text)
-
-def hexify(s):
-    return ''.join(map(lambda x: ' ' + toHex(x)[1:3], s))
-
 
 # common class for all port monitors; class keeps list of instances
 class portMonitor(QtCore.QObject):

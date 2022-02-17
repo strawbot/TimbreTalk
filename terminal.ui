@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1073</width>
-    <height>645</height>
+    <height>656</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -31,7 +31,7 @@
   <property name="frameShadow">
    <enum>QFrame::Raised</enum>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_7">
+  <layout class="QHBoxLayout" name="horizontalLayout_3">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_10">
      <item>
@@ -1812,38 +1812,6 @@
       </widget>
      </item>
      <item>
-      <widget class="QWidget" name="widget" native="true">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>20</height>
-        </size>
-       </property>
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton">
-          <property name="text">
-           <string>Clear Output</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item>
       <spacer name="verticalSpacer_3">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -1864,13 +1832,10 @@
       <number>0</number>
      </property>
      <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3"/>
-     </item>
-     <item>
       <widget class="QPlainTextEdit" name="Console">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>0</horstretch>
+         <horstretch>1</horstretch>
          <verstretch>1</verstretch>
         </sizepolicy>
        </property>
@@ -2733,22 +2698,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>Console</receiver>
-   <slot>clear()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>369</x>
-     <y>343</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>544</x>
-     <y>324</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>textStr</sender>
    <signal>returnPressed()</signal>
    <receiver>SendText</receiver>
@@ -2777,22 +2726,6 @@
     <hint type="destinationlabel">
      <x>127</x>
      <y>384</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>pushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>Console</receiver>
-   <slot>repaint()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>399</x>
-     <y>350</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>511</x>
-     <y>351</y>
     </hint>
    </hints>
   </connection>
