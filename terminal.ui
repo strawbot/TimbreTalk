@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1073</width>
-    <height>656</height>
+    <width>1078</width>
+    <height>711</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -31,7 +31,7 @@
   <property name="frameShadow">
    <enum>QFrame::Raised</enum>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout_3">
+  <layout class="QHBoxLayout" name="horizontalLayout_7">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_10">
      <item>
@@ -504,30 +504,20 @@
               </item>
               <item>
                <layout class="QGridLayout" name="gridLayout_5">
-                <item row="1" column="1" colspan="2">
-                 <widget class="QLineEdit" name="textStr"/>
-                </item>
-                <item row="2" column="1">
-                 <widget class="QLineEdit" name="fileStr"/>
-                </item>
-                <item row="2" column="0">
-                 <widget class="QPushButton" name="SendFile">
-                  <property name="text">
-                   <string>Send File:</string>
-                  </property>
-                 </widget>
-                </item>
-                <item row="1" column="0">
-                 <widget class="QPushButton" name="SendText">
-                  <property name="text">
-                   <string>Send Text:</string>
-                  </property>
-                 </widget>
-                </item>
                 <item row="0" column="0">
                  <widget class="QPushButton" name="SendHex">
                   <property name="text">
                    <string>Send Hex:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1" colspan="2">
+                 <widget class="QLineEdit" name="textStr2"/>
+                </item>
+                <item row="2" column="0">
+                 <widget class="QPushButton" name="SendText1">
+                  <property name="text">
+                   <string>Send Text:</string>
                   </property>
                  </widget>
                 </item>
@@ -553,10 +543,50 @@
                   </property>
                  </widget>
                 </item>
-                <item row="2" column="2">
+                <item row="5" column="1" colspan="2">
+                 <widget class="QLineEdit" name="textStr4"/>
+                </item>
+                <item row="7" column="2">
                  <widget class="QPushButton" name="FileSelect">
                   <property name="text">
                    <string>...</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="0">
+                 <widget class="QPushButton" name="SendFile">
+                  <property name="text">
+                   <string>Send File:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="7" column="1">
+                 <widget class="QLineEdit" name="fileStr"/>
+                </item>
+                <item row="2" column="1" colspan="2">
+                 <widget class="QLineEdit" name="textStr1"/>
+                </item>
+                <item row="4" column="1" colspan="2">
+                 <widget class="QLineEdit" name="textStr3"/>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QPushButton" name="SendText2">
+                  <property name="text">
+                   <string>Send Text:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="4" column="0">
+                 <widget class="QPushButton" name="SendText3">
+                  <property name="text">
+                   <string>Send Text:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="5" column="0">
+                 <widget class="QPushButton" name="SendText4">
+                  <property name="text">
+                   <string>Send Text:</string>
                   </property>
                  </widget>
                 </item>
@@ -1824,204 +1854,234 @@
        </property>
       </spacer>
      </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_2"/>
+     </item>
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <property name="spacing">
-      <number>0</number>
-     </property>
+    <layout class="QVBoxLayout" name="verticalLayout_12">
      <item>
-      <widget class="QPlainTextEdit" name="Console">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-         <horstretch>1</horstretch>
-         <verstretch>1</verstretch>
-        </sizepolicy>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <property name="spacing">
+        <number>0</number>
        </property>
-       <property name="minimumSize">
-        <size>
-         <width>600</width>
-         <height>470</height>
-        </size>
-       </property>
-       <property name="palette">
-        <palette>
-         <active>
-          <colorrole role="WindowText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>255</green>
-             <blue>255</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="Text">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>255</green>
-             <blue>255</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="ButtonText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>255</green>
-             <blue>255</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="Base">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>0</green>
-             <blue>0</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="PlaceholderText">
-           <brush brushstyle="NoBrush">
-            <color alpha="128">
-             <red>0</red>
-             <green>255</green>
-             <blue>255</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </active>
-         <inactive>
-          <colorrole role="WindowText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>255</green>
-             <blue>255</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="Text">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>255</green>
-             <blue>255</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="ButtonText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>255</green>
-             <blue>255</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="Base">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>0</green>
-             <blue>0</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="PlaceholderText">
-           <brush brushstyle="NoBrush">
-            <color alpha="128">
-             <red>0</red>
-             <green>255</green>
-             <blue>255</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </inactive>
-         <disabled>
-          <colorrole role="WindowText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>255</green>
-             <blue>255</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="Text">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>255</green>
-             <blue>255</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="ButtonText">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>0</red>
-             <green>255</green>
-             <blue>255</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="Base">
-           <brush brushstyle="SolidPattern">
-            <color alpha="255">
-             <red>212</red>
-             <green>208</green>
-             <blue>200</blue>
-            </color>
-           </brush>
-          </colorrole>
-          <colorrole role="PlaceholderText">
-           <brush brushstyle="NoBrush">
-            <color alpha="128">
-             <red>0</red>
-             <green>255</green>
-             <blue>255</blue>
-            </color>
-           </brush>
-          </colorrole>
-         </disabled>
-        </palette>
-       </property>
-       <property name="font">
-        <font>
-         <family>Courier</family>
-         <pointsize>12</pointsize>
-         <weight>50</weight>
-         <italic>false</italic>
-         <bold>false</bold>
-         <kerning>false</kerning>
-        </font>
-       </property>
-       <property name="cursor" stdset="0">
-        <cursorShape>IBeamCursor</cursorShape>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="inputMethodHints">
-        <set>Qt::ImhNone</set>
-       </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAsNeeded</enum>
-       </property>
-       <property name="undoRedoEnabled">
-        <bool>false</bool>
-       </property>
-       <property name="lineWrapMode">
-        <enum>QPlainTextEdit::WidgetWidth</enum>
-       </property>
-       <property name="plainText">
-        <string/>
-       </property>
-      </widget>
+       <item>
+        <widget class="QPlainTextEdit" name="Console">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+           <horstretch>1</horstretch>
+           <verstretch>1</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>600</width>
+           <height>470</height>
+          </size>
+         </property>
+         <property name="palette">
+          <palette>
+           <active>
+            <colorrole role="WindowText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Text">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="ButtonText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>0</green>
+               <blue>0</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="PlaceholderText">
+             <brush brushstyle="NoBrush">
+              <color alpha="128">
+               <red>0</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </active>
+           <inactive>
+            <colorrole role="WindowText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Text">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="ButtonText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>0</green>
+               <blue>0</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="PlaceholderText">
+             <brush brushstyle="NoBrush">
+              <color alpha="128">
+               <red>0</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </inactive>
+           <disabled>
+            <colorrole role="WindowText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Text">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="ButtonText">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>0</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="Base">
+             <brush brushstyle="SolidPattern">
+              <color alpha="255">
+               <red>212</red>
+               <green>208</green>
+               <blue>200</blue>
+              </color>
+             </brush>
+            </colorrole>
+            <colorrole role="PlaceholderText">
+             <brush brushstyle="NoBrush">
+              <color alpha="128">
+               <red>0</red>
+               <green>255</green>
+               <blue>255</blue>
+              </color>
+             </brush>
+            </colorrole>
+           </disabled>
+          </palette>
+         </property>
+         <property name="font">
+          <font>
+           <family>Courier</family>
+           <pointsize>12</pointsize>
+           <italic>false</italic>
+           <bold>false</bold>
+           <kerning>false</kerning>
+          </font>
+         </property>
+         <property name="cursor" stdset="0">
+          <cursorShape>IBeamCursor</cursorShape>
+         </property>
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="inputMethodHints">
+          <set>Qt::ImhNone</set>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAsNeeded</enum>
+         </property>
+         <property name="undoRedoEnabled">
+          <bool>false</bool>
+         </property>
+         <property name="lineWrapMode">
+          <enum>QPlainTextEdit::WidgetWidth</enum>
+         </property>
+         <property name="plainText">
+          <string/>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QHBoxLayout" name="horizontalLayout_3">
+       <item>
+        <spacer name="horizontalSpacer">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>Clear Terminal</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
     </layout>
    </item>
@@ -2097,11 +2157,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>100</x>
-     <y>263</y>
+     <y>282</y>
     </hint>
     <hint type="destinationlabel">
      <x>151</x>
-     <y>268</y>
+     <y>287</y>
     </hint>
    </hints>
   </connection>
@@ -2113,11 +2173,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>105</x>
-     <y>366</y>
+     <y>394</y>
     </hint>
     <hint type="destinationlabel">
      <x>155</x>
-     <y>363</y>
+     <y>391</y>
     </hint>
    </hints>
   </connection>
@@ -2161,7 +2221,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>357</x>
-     <y>307</y>
+     <y>328</y>
     </hint>
     <hint type="destinationlabel">
      <x>377</x>
@@ -2177,11 +2237,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>350</x>
-     <y>403</y>
+     <y>433</y>
     </hint>
     <hint type="destinationlabel">
      <x>356</x>
-     <y>404</y>
+     <y>434</y>
     </hint>
    </hints>
   </connection>
@@ -2193,11 +2253,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>252</x>
-     <y>398</y>
+     <y>430</y>
     </hint>
     <hint type="destinationlabel">
      <x>262</x>
-     <y>413</y>
+     <y>445</y>
     </hint>
    </hints>
   </connection>
@@ -2209,11 +2269,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>268</x>
-     <y>306</y>
+     <y>329</y>
     </hint>
     <hint type="destinationlabel">
      <x>244</x>
-     <y>312</y>
+     <y>335</y>
     </hint>
    </hints>
   </connection>
@@ -2225,7 +2285,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>258</x>
-     <y>206</y>
+     <y>221</y>
     </hint>
     <hint type="destinationlabel">
      <x>241</x>
@@ -2273,7 +2333,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>78</x>
-     <y>207</y>
+     <y>222</y>
     </hint>
     <hint type="destinationlabel">
      <x>61</x>
@@ -2289,7 +2349,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>95</x>
-     <y>308</y>
+     <y>331</y>
     </hint>
     <hint type="destinationlabel">
      <x>79</x>
@@ -2305,11 +2365,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>73</x>
-     <y>408</y>
+     <y>440</y>
     </hint>
     <hint type="destinationlabel">
      <x>55</x>
-     <y>411</y>
+     <y>443</y>
     </hint>
    </hints>
   </connection>
@@ -2321,11 +2381,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>289</x>
-     <y>165</y>
+     <y>173</y>
     </hint>
     <hint type="destinationlabel">
      <x>314</x>
-     <y>163</y>
+     <y>171</y>
     </hint>
    </hints>
   </connection>
@@ -2337,11 +2397,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>270</x>
-     <y>262</y>
+     <y>279</y>
     </hint>
     <hint type="destinationlabel">
      <x>306</x>
-     <y>256</y>
+     <y>273</y>
     </hint>
    </hints>
   </connection>
@@ -2353,11 +2413,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>288</x>
-     <y>354</y>
+     <y>379</y>
     </hint>
     <hint type="destinationlabel">
      <x>326</x>
-     <y>354</y>
+     <y>379</y>
     </hint>
    </hints>
   </connection>
@@ -2385,11 +2445,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>364</x>
-     <y>86</y>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
      <x>375</x>
-     <y>462</y>
+     <y>528</y>
     </hint>
    </hints>
   </connection>
@@ -2400,12 +2460,12 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>413</x>
-     <y>112</y>
+     <x>407</x>
+     <y>109</y>
     </hint>
     <hint type="destinationlabel">
-     <x>381</x>
-     <y>427</y>
+     <x>382</x>
+     <y>487</y>
     </hint>
    </hints>
   </connection>
@@ -2416,12 +2476,12 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>413</x>
-     <y>112</y>
+     <x>407</x>
+     <y>109</y>
     </hint>
     <hint type="destinationlabel">
-     <x>363</x>
-     <y>392</y>
+     <x>364</x>
+     <y>446</y>
     </hint>
    </hints>
   </connection>
@@ -2433,11 +2493,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>350</x>
-     <y>81</y>
+     <y>90</y>
     </hint>
     <hint type="destinationlabel">
-     <x>376</x>
-     <y>357</y>
+     <x>377</x>
+     <y>405</y>
     </hint>
    </hints>
   </connection>
@@ -2448,12 +2508,12 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>413</x>
-     <y>112</y>
+     <x>407</x>
+     <y>109</y>
     </hint>
     <hint type="destinationlabel">
      <x>367</x>
-     <y>322</y>
+     <y>364</y>
     </hint>
    </hints>
   </connection>
@@ -2464,12 +2524,12 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>413</x>
+     <x>407</x>
      <y>109</y>
     </hint>
     <hint type="destinationlabel">
      <x>371</x>
-     <y>269</y>
+     <y>323</y>
     </hint>
    </hints>
   </connection>
@@ -2480,12 +2540,12 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>413</x>
-     <y>112</y>
+     <x>407</x>
+     <y>109</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
-     <y>237</y>
+     <y>282</y>
     </hint>
    </hints>
   </connection>
@@ -2496,12 +2556,12 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>413</x>
-     <y>112</y>
+     <x>407</x>
+     <y>109</y>
     </hint>
     <hint type="destinationlabel">
      <x>363</x>
-     <y>205</y>
+     <y>241</y>
     </hint>
    </hints>
   </connection>
@@ -2512,12 +2572,12 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>413</x>
-     <y>112</y>
+     <x>407</x>
+     <y>109</y>
     </hint>
     <hint type="destinationlabel">
      <x>411</x>
-     <y>173</y>
+     <y>200</y>
     </hint>
    </hints>
   </connection>
@@ -2529,7 +2589,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>379</x>
-     <y>85</y>
+     <y>94</y>
     </hint>
     <hint type="destinationlabel">
      <x>366</x>
@@ -2545,10 +2605,10 @@
    <hints>
     <hint type="sourcelabel">
      <x>193</x>
-     <y>82</y>
+     <y>91</y>
     </hint>
     <hint type="destinationlabel">
-     <x>222</x>
+     <x>221</x>
      <y>141</y>
     </hint>
    </hints>
@@ -2561,11 +2621,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>210</x>
-     <y>83</y>
+     <y>92</y>
     </hint>
     <hint type="destinationlabel">
-     <x>267</x>
-     <y>173</y>
+     <x>265</x>
+     <y>200</y>
     </hint>
    </hints>
   </connection>
@@ -2577,11 +2637,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>217</x>
-     <y>81</y>
+     <y>90</y>
     </hint>
     <hint type="destinationlabel">
-     <x>219</x>
-     <y>205</y>
+     <x>218</x>
+     <y>241</y>
     </hint>
    </hints>
   </connection>
@@ -2593,11 +2653,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>210</x>
-     <y>81</y>
+     <y>90</y>
     </hint>
     <hint type="destinationlabel">
-     <x>255</x>
-     <y>237</y>
+     <x>254</x>
+     <y>282</y>
     </hint>
    </hints>
   </connection>
@@ -2609,11 +2669,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>215</x>
-     <y>81</y>
+     <y>90</y>
     </hint>
     <hint type="destinationlabel">
-     <x>227</x>
-     <y>269</y>
+     <x>225</x>
+     <y>323</y>
     </hint>
    </hints>
   </connection>
@@ -2625,11 +2685,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>235</x>
-     <y>84</y>
+     <y>93</y>
     </hint>
     <hint type="destinationlabel">
-     <x>223</x>
-     <y>322</y>
+     <x>221</x>
+     <y>364</y>
     </hint>
    </hints>
   </connection>
@@ -2641,11 +2701,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>250</x>
-     <y>82</y>
+     <y>91</y>
     </hint>
     <hint type="destinationlabel">
-     <x>232</x>
-     <y>357</y>
+     <x>231</x>
+     <y>405</y>
     </hint>
    </hints>
   </connection>
@@ -2656,12 +2716,12 @@
    <slot>setChecked(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>266</x>
-     <y>88</y>
+     <x>261</x>
+     <y>109</y>
     </hint>
     <hint type="destinationlabel">
-     <x>219</x>
-     <y>392</y>
+     <x>218</x>
+     <y>446</y>
     </hint>
    </hints>
   </connection>
@@ -2673,11 +2733,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>236</x>
-     <y>82</y>
+     <y>91</y>
     </hint>
     <hint type="destinationlabel">
-     <x>237</x>
-     <y>427</y>
+     <x>236</x>
+     <y>487</y>
     </hint>
    </hints>
   </connection>
@@ -2689,27 +2749,27 @@
    <hints>
     <hint type="sourcelabel">
      <x>249</x>
-     <y>82</y>
+     <y>91</y>
     </hint>
     <hint type="destinationlabel">
-     <x>231</x>
-     <y>462</y>
+     <x>229</x>
+     <y>528</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>textStr</sender>
+   <sender>textStr1</sender>
    <signal>returnPressed()</signal>
-   <receiver>SendText</receiver>
+   <receiver>SendText1</receiver>
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>192</x>
-     <y>424</y>
+     <x>339</x>
+     <y>400</y>
     </hint>
     <hint type="destinationlabel">
-     <x>133</x>
-     <y>427</y>
+     <x>138</x>
+     <y>407</y>
     </hint>
    </hints>
   </connection>
@@ -2720,12 +2780,76 @@
    <slot>click()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>198</x>
-     <y>387</y>
+     <x>345</x>
+     <y>365</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>384</y>
+     <x>138</x>
+     <y>372</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Console</receiver>
+   <slot>clear()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1062</x>
+     <y>673</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>520</x>
+     <y>590</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>textStr2</sender>
+   <signal>returnPressed()</signal>
+   <receiver>SendText2</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>202</x>
+     <y>423</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>135</x>
+     <y>431</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>textStr3</sender>
+   <signal>returnPressed()</signal>
+   <receiver>SendText3</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>168</x>
+     <y>456</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>132</x>
+     <y>458</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>textStr4</sender>
+   <signal>returnPressed()</signal>
+   <receiver>SendText4</receiver>
+   <slot>click()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>183</x>
+     <y>491</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>119</x>
+     <y>492</y>
     </hint>
    </hints>
   </connection>

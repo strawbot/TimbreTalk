@@ -1,4 +1,6 @@
 # update GUI from designer
+import time
+
 from compileui import updateUi
 updateUi('terminal')
 '''
@@ -36,6 +38,7 @@ except AttributeError:
 appname = "TimbreTalk "
 version = "V2"
 
+
 class terminal(QtWidgets.QMainWindow):
     textSignal = QtCore.pyqtSignal(object)
     showPortSignal = QtCore.pyqtSignal()
@@ -46,6 +49,18 @@ class terminal(QtWidgets.QMainWindow):
         super(terminal, self).__init__()
         self.Window = QtWidgets.QFrame()
         self.ui = Ui_Frame()
+
+        # intercept pastes and drops
+        class MyTextBrowser(QtWidgets.QPlainTextEdit):
+            def __init__(self, parent=None):
+                super(MyTextBrowser, self).__init__(parent)
+
+            def insertFromMimeData(self2, source):
+                self.sendText(source.text())
+
+        self.ui.Console = MyTextBrowser(self.Window)
+        # comment out above assignment in terminal.py when it is regenerated
+
         self.ui.setupUi(self.Window)
         self.banner()
         self.Window.show()
@@ -72,7 +87,10 @@ class terminal(QtWidgets.QMainWindow):
         self.ui.BaudRate.currentIndexChanged.connect(self.selectRate)
         self.ui.ConsoleColor.activated.connect(self.setColor)
         self.ui.SendHex.clicked.connect(self.sendHex)
-        self.ui.SendText.clicked.connect(self.sendText)
+        self.ui.SendText1.clicked.connect(self.sendText1)
+        self.ui.SendText2.clicked.connect(self.sendText2)
+        self.ui.SendText3.clicked.connect(self.sendText3)
+        self.ui.SendText4.clicked.connect(self.sendText4)
         self.ui.SendFile.clicked.connect(self.sendFile)
 
         # self.ui.Console.setEnabled(True)
@@ -136,7 +154,10 @@ class terminal(QtWidgets.QMainWindow):
     def save_settings(self):
         self.settings.setValue('Window Geometry', self.Window.geometry())
         self.settings.setValue(self.ui.hexStr.objectName(), self.ui.hexStr.text())
-        self.settings.setValue(self.ui.textStr.objectName(), self.ui.textStr.text())
+        self.settings.setValue(self.ui.textStr1.objectName(), self.ui.textStr1.text())
+        self.settings.setValue(self.ui.textStr2.objectName(), self.ui.textStr2.text())
+        self.settings.setValue(self.ui.textStr3.objectName(), self.ui.textStr3.text())
+        self.settings.setValue(self.ui.textStr4.objectName(), self.ui.textStr4.text())
         self.settings.setValue(self.ui.ConsoleColor.objectName(),str(self.ui.ConsoleColor.currentText()))
         self.settings.setValue(self.ui.ConsoleProtocol.objectName(),str(self.ui.ConsoleProtocol.currentText()))
         self.settings.setValue(self.ui.BaudRate.objectName(),str(self.ui.BaudRate.currentText()))
@@ -149,7 +170,10 @@ class terminal(QtWidgets.QMainWindow):
         try:
             portMonitor.load(self.settings)
             self.ui.hexStr.setText(self.settings.value(self.ui.hexStr.objectName()))
-            self.ui.textStr.setText(self.settings.value(self.ui.textStr.objectName()))
+            self.ui.textStr1.setText(self.settings.value(self.ui.textStr1.objectName()))
+            self.ui.textStr2.setText(self.settings.value(self.ui.textStr2.objectName()))
+            self.ui.textStr3.setText(self.settings.value(self.ui.textStr3.objectName()))
+            self.ui.textStr4.setText(self.settings.value(self.ui.textStr4.objectName()))
             self.Window.setGeometry(self.settings.value('Window Geometry'))
             self.ui.ConsoleColor.setCurrentText(self.settings.value(self.ui.ConsoleColor.objectName()))
             self.ui.ConsoleProtocol.setCurrentText(self.settings.value(self.ui.ConsoleProtocol.objectName()))
@@ -225,7 +249,7 @@ class terminal(QtWidgets.QMainWindow):
                 return True # means stop event propagation
         return QtWidgets.QMainWindow.eventFilter(self, object, event)
 
-    def keyin(self, key):  # input is a qstring
+    def keyin(self, key, echo=True):  # input is a qstring
         for character in str(key):
 
             # detect and change delete key to backspace
@@ -233,18 +257,22 @@ class terminal(QtWidgets.QMainWindow):
                 character = chr(0x8)
 
             if character == '\x0d' or character == '\x0a':
-                self.showText('\r')
-                self.linebuffer.append('\x0d')
+                if echo: self.showText('\r')
+                self.linebuffer.append('\x00')
                 command = ''.join(self.linebuffer[:])
                 del self.linebuffer[:]
                 self.top.output.emit(command)
+                time.sleep(.1)
+                # wait for reply or timeout
+                # but it would be good to show replies
+                # just eat the prompts except for the last one
             elif character == chr(8):
                 if self.linebuffer:
                     self.linebuffer.pop()
-                    self.showText(character)
+                    if echo: self.showText(character)
             else:
                 self.linebuffer.append(character)
-                self.showText(character)
+                if echo: self.showText(character)
 
     # parity n' stuff
     def portParametersMenu(self):
@@ -363,14 +391,25 @@ class terminal(QtWidgets.QMainWindow):
             error('bad hex string')
             traceback.print_exc(file=sys.stderr)
 
-    def sendText(self):
+    def sendText(self,text):
         try:
-            text = self.ui.textStr.text()
             if len(text):
                 self.keyin(text+'\n')
         except Exception:
             error('bad text string')
             traceback.print_exc(file=sys.stderr)
+
+    def sendText1(self):
+        self.sendText(self.ui.textStr1.text())
+
+    def sendText2(self):
+        self.sendText(self.ui.textStr2.text())
+
+    def sendText3(self):
+        self.sendText(self.ui.textStr3.text())
+
+    def sendText4(self):
+        self.sendText(self.ui.textStr4.text())
 
     def sendFile(self):
         print("Not defined yet")
