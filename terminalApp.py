@@ -57,7 +57,11 @@ class terminal(QtWidgets.QMainWindow):
 
             def insertFromMimeData(self2, source):
                 self.sendText(source.text())
-
+        try:
+            if self.ui.Console:
+                print("comment out: 'self.ui.Console =' in terminal.py")
+        except Exception:
+            pass
         self.ui.Console = MyTextBrowser(self.Window)
         # comment out above assignment in terminal.py when it is regenerated
 
@@ -67,6 +71,13 @@ class terminal(QtWidgets.QMainWindow):
         setTextOutput(self.messageOut)
 
         self.linebuffer = []
+        self.linedelay = .1
+
+        self.ui.Find.clicked.connect(self.findText)
+
+        def SetLineDelay():
+            self.linedelay = int(self.ui.LineDelay.text())/1000
+        self.ui.LineDelay.returnPressed.connect(SetLineDelay)
 
         self.top = interface.Interface('terminal')
         self.protocol = SfpLayer()
@@ -223,7 +234,12 @@ class terminal(QtWidgets.QMainWindow):
         else:
             self.showText(text)
 
+    def isCursorVisible(self):
+        vbar = self.ui.Console.verticalScrollBar()
+        return vbar.value() == vbar.maximum()
+
     def showText(self, text, color=None):
+        visible = self.isCursorVisible()
         print(type(text),text)
         if color == None:
             color = self.color
@@ -236,9 +252,10 @@ class terminal(QtWidgets.QMainWindow):
                 text = text.decode(errors='ignore') # todo: shift to asciihex
             self.useColor(color)
             self.ui.Console.insertPlainText(text)
-        # self.ui.Console.moveCursor(QtGui.QTextCursor.End)  # get cursor to end of text
-        sb = self.ui.Console.verticalScrollBar()
-        sb.setValue(sb.maximum())
+
+        if visible:
+            sb = self.ui.Console.verticalScrollBar()
+            sb.setValue(sb.maximum())
         self.textMutex.unlock()
 
     def eventFilter(self, object, event):
@@ -262,7 +279,7 @@ class terminal(QtWidgets.QMainWindow):
                 command = ''.join(self.linebuffer[:])
                 del self.linebuffer[:]
                 self.top.output.emit(command)
-                time.sleep(.1)
+                time.sleep(self.linedelay)
                 # wait for reply or timeout
                 # but it would be good to show replies
                 # just eat the prompts except for the last one
@@ -273,6 +290,18 @@ class terminal(QtWidgets.QMainWindow):
             else:
                 self.linebuffer.append(character)
                 if echo: self.showText(character)
+
+    def findText(self): # find text in terminal window
+        try:
+            self.ui.Console.setFocus()
+            text = self.ui.FindText.text()
+            if self.ui.FindBackwards.checkState():
+                self.ui.Console.find(text, QtGui.QTextDocument().FindBackward)
+            else:
+                self.ui.Console.find(text)
+        except Exception as e:
+            print(e, file=sys.stderr)
+            traceback.print_exc(file=sys.stderr)
 
     # parity n' stuff
     def portParametersMenu(self):
@@ -412,8 +441,7 @@ class terminal(QtWidgets.QMainWindow):
         self.sendText(self.ui.textStr4.text())
 
     def sendFile(self):
-        print("Not defined yet")
-
+        self.sendText(open(self.ui.fileStr.text(),'r').readlines())
 
 # base application
 if __name__ == "__main__":
