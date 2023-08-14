@@ -10,7 +10,7 @@ import numpy as np
 from protocols.interface import interface, serialHub
 from protocols.sfpLayer import SfpLayer
 from protocols.airlink import decode_mant_header
-from protocols.decode_dcp import decode_dcp
+from protocols.dcp_api import decode_dcp
 from protocols import pids
 from protocols.interface.message import *
 from protocols.alert2_decode import checkAlert2

@@ -19,4 +19,4 @@ def updateUi(qt): # input file root name to be updated
         file.close()
 
 if __name__ == '__main__':
-    updateUi('mainWindow')
+    updateUi('terminal')

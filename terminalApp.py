@@ -1,4 +1,5 @@
 # update GUI from designer
+import os
 import time
 
 from compileui import updateUi
@@ -20,6 +21,7 @@ from terminal import Ui_Frame
 from protocols.interface import interface, ipHub, serialHub, jlinkHub
 from protocols.sfpLayer import SfpLayer
 from protocols import pids
+from protocols import send_os
 from threading import Thread
 from protocols.interface.message import note, warning, error, setTextOutput, eprint
 
@@ -44,6 +46,7 @@ class terminal(QtWidgets.QMainWindow):
     showPortSignal = QtCore.pyqtSignal()
     serialPortUpdate = QtCore.pyqtSignal(object)
     settings = QtCore.QSettings("TWE", "Tiny Timbre Talk")
+    setProgress = QtCore.pyqtSignal(object)
 
     def __init__(self):
         super(terminal, self).__init__()
@@ -103,6 +106,10 @@ class terminal(QtWidgets.QMainWindow):
         self.ui.SendText3.clicked.connect(self.sendText3)
         self.ui.SendText4.clicked.connect(self.sendText4)
         self.ui.SendFile.clicked.connect(self.sendFile)
+        def paste_file(file):
+            if file[0]:
+                self.ui.fileStr.setText(file[0])
+        self.ui.FileSelect.clicked.connect(lambda: paste_file(QtWidgets.QFileDialog().getOpenFileName(directory=self.downloaddir)))
 
         # self.ui.Console.setEnabled(True)
         self.ui.Console.installEventFilter(self)
@@ -161,6 +168,59 @@ class terminal(QtWidgets.QMainWindow):
         if self.settings.value(self.ui.Auto_Load.objectName()):
             self.load_settings()
 
+        # Transfer tab
+        def download_app():
+            # self.keyin('Tomato')
+            # return
+            send_os.FW_FILE = self.ui.Download_File.text()
+            # print(os.getcwd(), send_os.FW_FILE)
+            # send_os.send_os(self.console)
+            # return
+            self.messageOut('\nStarting download...','note')
+            self.console.close()
+            self.ui.progressBar.setValue(0)
+            # time.sleep(2)
+            # self.ui.progressBar.setValue(50)
+            # time.sleep(2)
+
+            # add protection and turn progress bar red if fails; use try/except
+            # add signal in for send_os to update progress bar in different thread?
+
+            def send_thread():
+                self.ts = time.time()
+                def notifier(i, max):
+                    if time.time() - self.ts > 1:
+                        self.ts = time.time()
+                        self.setProgress.emit(100 * i // max)
+                # port = self.console
+                # port.read = lambda : port.get_data()
+                # port.read = lambda n : port.get_data(n)
+                # port.read_until = lambda : port.get_data()
+                # port.write = lambda data : port.send_data(data)
+                # port.notifier = notifier
+                # port.close = lambda : self.messageOut("Download finished",'notice')
+                if send_os.send_os(self.console.name, notifier):
+                    self.messageOut('\nDownload successfull.', 'note')
+                    self.ui.progressBar.setValue(100)
+                else:
+                    self.messageOut('\nDownload failed.', 'error')
+                    self.ui.progressBar.setValue(0)
+                self.console.open()
+                self.connectPort()
+            self.setProgress.connect(lambda n: self.ui.progressBar.setValue(n))
+            t = Thread(name='send OS', target=send_thread)
+            t.setDaemon(True)
+            t.start()  # run serial port in thread
+
+        def select_file(file):
+            if file[0]:
+                self.ui.Download_File.setText(file[0])
+
+        self.ui.progressBar.setValue(0)
+        self.ui.Start_Download.clicked.connect(download_app)
+        self.downloaddir = './'
+        self.ui.Select_Download.clicked.connect(lambda: select_file(QtWidgets.QFileDialog().getOpenFileName()))
+
     # gui
     def save_settings(self):
         self.settings.setValue('Window Geometry', self.Window.geometry())
@@ -175,6 +235,8 @@ class terminal(QtWidgets.QMainWindow):
         self.settings.setValue(self.ui.PortSelect.objectName(),str(self.ui.PortSelect.currentText()))
         self.settings.setValue(self.ui.Tabs.objectName(),self.ui.Tabs.currentIndex())
         self.settings.setValue(self.ui.Auto_Load.objectName(),self.ui.Auto_Load.isChecked())
+        self.settings.setValue(self.ui.Download_File.objectName(), self.ui.Download_File.text())
+        self.settings.setValue(self.ui.fileStr.objectName(), self.ui.fileStr.text())
         portMonitor.save(self.settings)
 
     def load_settings(self):
@@ -192,6 +254,8 @@ class terminal(QtWidgets.QMainWindow):
             self.ui.PortSelect.setCurrentText(self.settings.value(self.ui.PortSelect.objectName()))
             self.ui.Tabs.setCurrentIndex(self.settings.value(self.ui.Tabs.objectName()))
             self.ui.Auto_Load.setChecked(self.settings.value(self.ui.Auto_Load.objectName()))
+            self.ui.Download_File.setText(self.settings.value(self.ui.Download_File.objectName()))
+            self.ui.fileStr.setText(self.settings.value(self.ui.fileStr.objectName()))
             self.selectProtocol()
             self.selectRate()
             self.setColor()
@@ -441,7 +505,8 @@ class terminal(QtWidgets.QMainWindow):
         self.sendText(self.ui.textStr4.text())
 
     def sendFile(self):
-        self.sendText(open(self.ui.fileStr.text(),'r').readlines())
+        for line in open(self.ui.fileStr.text(),'r').readlines():
+            self.sendText(line)
 
 # base application
 if __name__ == "__main__":
