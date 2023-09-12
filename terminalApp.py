@@ -235,7 +235,7 @@ class terminal(QtWidgets.QMainWindow):
         self.settings.setValue(self.ui.BaudRate.objectName(),str(self.ui.BaudRate.currentText()))
         self.settings.setValue(self.ui.PortSelect.objectName(),str(self.ui.PortSelect.currentText()))
         self.settings.setValue(self.ui.Tabs.objectName(),self.ui.Tabs.currentIndex())
-        self.settings.setValue(self.ui.Auto_Load.objectName(),self.ui.Auto_Load.isChecked())
+        self.settings.setValue(self.ui.Auto_Load.objectName(), self.ui.Auto_Load.isChecked())
         self.settings.setValue(self.ui.Download_File.objectName(), self.ui.Download_File.text())
         self.settings.setValue(self.ui.fileStr.objectName(), self.ui.fileStr.text())
         portMonitor.save(self.settings)
@@ -262,7 +262,8 @@ class terminal(QtWidgets.QMainWindow):
             self.setColor()
             self.selectPort()
         except TypeError:
-            self.save_settings() # some settingn hasn't been set
+            print("Error: some settings haven't been set!")
+            self.save_settings() #
 
     def selectProtocol(self):
         prot = self.ui.ConsoleProtocol.currentText()
