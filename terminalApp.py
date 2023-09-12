@@ -223,6 +223,7 @@ class terminal(QtWidgets.QMainWindow):
 
     # gui
     def save_settings(self):
+        self.settings.clear()
         self.settings.setValue('Window Geometry', self.Window.geometry())
         self.settings.setValue(self.ui.hexStr.objectName(), self.ui.hexStr.text())
         self.settings.setValue(self.ui.textStr1.objectName(), self.ui.textStr1.text())
@@ -253,7 +254,7 @@ class terminal(QtWidgets.QMainWindow):
             self.ui.BaudRate.setCurrentText(self.settings.value(self.ui.BaudRate.objectName()))
             self.ui.PortSelect.setCurrentText(self.settings.value(self.ui.PortSelect.objectName()))
             self.ui.Tabs.setCurrentIndex(self.settings.value(self.ui.Tabs.objectName()))
-            self.ui.Auto_Load.setChecked(self.settings.value(self.ui.Auto_Load.objectName()))
+            self.ui.Auto_Load.setChecked(self.settings.value(self.ui.Auto_Load.objectName(), type=bool))
             self.ui.Download_File.setText(self.settings.value(self.ui.Download_File.objectName()))
             self.ui.fileStr.setText(self.settings.value(self.ui.fileStr.objectName()))
             self.selectProtocol()
