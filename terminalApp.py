@@ -513,7 +513,29 @@ if __name__ == "__main__":
     import sys, traceback
 
     app = QtWidgets.QApplication(sys.argv)
+
+    # show a splash immediately since the main window takes a while to build
+    splash_pix = QtGui.QPixmap(420, 220)
+    splash_pix.fill(QtGui.QColor("#2b2b2b"))
+    painter = QtGui.QPainter(splash_pix)
+    painter.setPen(QtGui.QColor("white"))
+    titleFont = QtGui.QFont()
+    titleFont.setPointSize(20)
+    titleFont.setBold(True)
+    painter.setFont(titleFont)
+    painter.drawText(splash_pix.rect().adjusted(0, -30, 0, -30), QtCore.Qt.AlignCenter, appname + version)
+    msgFont = QtGui.QFont()
+    msgFont.setPointSize(11)
+    painter.setFont(msgFont)
+    painter.drawText(splash_pix.rect().adjusted(0, 30, 0, 30), QtCore.Qt.AlignCenter, "Starting up, please wait...")
+    painter.end()
+    splash = QtWidgets.QSplashScreen(splash_pix)
+    splash.show()
+    app.processEvents()
+
     terminal = terminal()
+    splash.finish(terminal.Window)
+
     try:
         sys.exit(app.exec_())
     except Exception as e:
