@@ -46,7 +46,7 @@ class Ui_Frame(object):
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.groupBox_8.sizePolicy().hasHeightForWidth())
+       # sizePolicy.setHeightForWidth(self.groupBox_8.sizePolicy().hasHeightForWidth())
         self.groupBox_8.setSizePolicy(sizePolicy)
         self.groupBox_8.setMinimumSize(QtCore.QSize(0, 0))
         self.groupBox_8.setObjectName("groupBox_8")

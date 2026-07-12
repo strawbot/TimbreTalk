@@ -1,4 +1,4 @@
-from qt import QtWidgets
+from PyQt5 import QtWidgets
 
 class PortCombo(QtWidgets.QComboBox):
     def __init__(self, parent):

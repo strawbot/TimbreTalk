@@ -1,2 +1,6 @@
-To run this app from a command line on a PC or Mac, run Python 3 and Qt5.12:
- terminalApp.py
+To compile on
+Windows:
+ pyinstaller -w -F -i timbretalk.ico -n TimbreTalkV4 --noupx -p . .\terminalApp.py
+
+Macos:
+ pyinstaller -w -F -i timbretalk.icns -n TimbreTalkV4 --noupx -p . terminalApp.py

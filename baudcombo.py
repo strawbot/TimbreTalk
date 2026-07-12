@@ -1,4 +1,4 @@
-from qt import QtWidgets
+from PyQt5 import QtWidgets
 
 class BaudCombo(QtWidgets.QComboBox):
     def __init__(self, parent):

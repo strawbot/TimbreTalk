@@ -2,7 +2,7 @@
 
 
 block_cipher = None
-version='V3.1'
+version='V3.4'
 
 
 a = Analysis(['terminalApp.py'],
@@ -34,7 +34,7 @@ exe = EXE(pyz,
           disable_windowed_traceback=False,
           target_arch=None,
           codesign_identity=None,
-          entitlements_file=None , icon='timbretalk.icns')
+          entitlements_file=None , icon='timbretalk.ico')
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
@@ -45,7 +45,7 @@ coll = COLLECT(exe,
                name='TimbreTalk'+version)
 app = BUNDLE(coll,
              name='TimbreTalkV3.app',
-             icon='timbretalk.icns',
+             icon='timbretalk.ico',
              bundle_identifier='TimbreTalk'+version,
              version=version,
              info_plist={

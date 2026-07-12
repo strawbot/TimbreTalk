@@ -1,6 +1,6 @@
 # monitor ports
 
-from qt import QtCore
+from PyQt5 import QtCore
 import bisect
 import time
 import traceback

@@ -1,9 +1,8 @@
 # update GUI from designer
 import os
 import time
+from protocols.interface.interface import Interface, Port
 
-from compileui import updateUi
-updateUi('terminal')
 '''
 900 transmitaudiomodulationvoltage s! 0 enabletdma c! 
 5 beacon
@@ -16,9 +15,9 @@ runapp
 '''
 # save from Phrases: 0 enabletdma c! 900 transmitaudiomodulationvoltage s!
 # save from Send Hex: 41 4C 32 32 62 07 0A 03 18 01 01 78 00
-from qt import QtGui, QtWidgets, QtCore
+from PyQt5 import QtGui, QtWidgets, QtCore
 from terminal import Ui_Frame
-from protocols.interface import interface, ipHub, serialHub, jlinkHub
+from protocols.interface import serialHub
 from protocols.sfpLayer import SfpLayer
 from protocols import pids
 from protocols import send_os
@@ -38,7 +37,7 @@ except AttributeError:
     _fromUtf8 = lambda s: s
 
 appname = "TimbreTalk "
-version = "V3"
+version = "V4"
 
 
 class terminal(QtWidgets.QMainWindow):
@@ -82,7 +81,7 @@ class terminal(QtWidgets.QMainWindow):
             self.linedelay = int(self.ui.LineDelay.text())/1000
         self.ui.LineDelay.returnPressed.connect(SetLineDelay)
 
-        self.top = interface.Interface('terminal')
+        self.top = Interface('terminal')
         self.protocol = SfpLayer()
 
         self.top.input.connect(self.textInput)
@@ -95,6 +94,7 @@ class terminal(QtWidgets.QMainWindow):
         self.portlistMutex = QtCore.QMutex()
         self.textMutex = QtCore.QMutex()
 
+        self.selectProtocol()
         self.ui.PortSelect.activated.connect(self.selectPort)
         self.ui.ConsoleProtocol.activated.connect(self.selectProtocol)
         self.ui.BaudRate.activated.connect(self.selectRate)
@@ -114,13 +114,10 @@ class terminal(QtWidgets.QMainWindow):
         # self.ui.Console.setEnabled(True)
         self.ui.Console.installEventFilter(self)
         self.noConsole()
-        self.jlinkHub = jlinkHub.JlinkHub()
-        self.jlinkHub.whofrom = pids.ETM_HOST
         self.serialHub = serialHub.SerialHub()
         self.serialHub.whofrom = pids.MAIN_HOST
 
         self.serialHub.update.connect(self.showPortUpdate)
-        self.jlinkHub.update.connect(self.showPortUpdate)
 
         self.rate = lambda : int(self.ui.BaudRate.currentText())
 
@@ -420,7 +417,7 @@ class terminal(QtWidgets.QMainWindow):
     # ports
     def noConsole(self):
         self.protocol.inner.unplug()
-        self.console = interface.Port(name='notalk')
+        self.console = Port(name='notalk')
 
     def ioError(self, message):
         error(message)
@@ -482,7 +479,8 @@ class terminal(QtWidgets.QMainWindow):
             text = self.ui.hexStr.text()
             if len(text):
                 self.top.output.emit(bytes.fromhex(text))
-        except Exception:
+        except Exception as e:
+            print(e)
             error('bad hex string')
             traceback.print_exc(file=sys.stderr)
 
