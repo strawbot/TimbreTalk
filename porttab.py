@@ -47,6 +47,12 @@ class PortTab(QtWidgets.QWidget):
     # Emitted whenever this tab opens/closes a port so the parent can refresh.
     portChanged = QtCore.pyqtSignal()
 
+    # Internal: reconnect-open result bounced back to the GUI thread.
+    _reconnectResultSignal = QtCore.pyqtSignal(bool)
+
+    RECONNECT_TIMEOUT  = 10.0   # seconds to wait for port to reappear
+    RECONNECT_INTERVAL = 500    # ms between re-checks
+
     def __init__(self, serial_hub, parent=None):
         super().__init__(parent)
         self.serialHub = serial_hub
@@ -59,6 +65,13 @@ class PortTab(QtWidgets.QWidget):
         # the GUI-thread timer drains and renders them in batches.
         # collections.deque append/popleft are atomic in CPython (GIL).
         self._textBuffer = collections.deque()
+
+        # Reconnect state — all managed on the GUI thread via _reconnectTimer.
+        self._lastRate          = 0       # baud rate saved at port open
+        self._reconnecting      = False   # True while waiting for port to return
+        self._reconnectName     = ''      # port name we're trying to recover
+        self._reconnectRate     = 0
+        self._reconnectDeadline = 0.0
 
         self._build_ui()
         self._setup_protocol()
@@ -74,6 +87,13 @@ class PortTab(QtWidgets.QWidget):
         self._flushTimer = QtCore.QTimer(self)
         self._flushTimer.timeout.connect(self._flushBuffer)
         self._flushTimer.start(30)
+
+        # Reconnect timer: fires every RECONNECT_INTERVAL ms while waiting
+        # for a lost port to reappear.  Single-shot is NOT used so we can
+        # keep polling without restarting manually each cycle.
+        self._reconnectTimer = QtCore.QTimer(self)
+        self._reconnectTimer.timeout.connect(self._tryReconnect)
+        self._reconnectResultSignal.connect(self._onReconnectResult)
 
     # ------------------------------------------------------------------
     # UI construction
@@ -221,6 +241,12 @@ class PortTab(QtWidgets.QWidget):
         self.console.close()
 
     def selectPort(self):
+        # User explicitly chose a port — cancel any pending reconnect first.
+        if self._reconnecting:
+            self._reconnectTimer.stop()
+            self._reconnecting = False
+            self.PortSelect.setEnabled(True)
+
         if self.console.is_open():
             self.console.close()
 
@@ -228,9 +254,11 @@ class PortTab(QtWidgets.QWidget):
             name = str(self.PortSelect.currentText())
             self.PortSelect.setDisabled(True)
             self.console = self.serialHub.get_port(name)
+            rate = self.rate()          # capture on GUI thread before spawning
+            self._lastRate = rate
 
             def portOpen():
-                self.console.open(rate=self.rate())
+                self.console.open(rate=rate)
                 if self.console.is_open():
                     self.console.ioError.connect(self._ioError)
                     self.console.ioException.connect(self._ioError)
@@ -298,9 +326,94 @@ class PortTab(QtWidgets.QWidget):
             if self.console.name != self.PortSelect.currentText():
                 idx = self.PortSelect.findText(self.console.name)
                 if idx == -1:
-                    idx = 0
-                    self.noConsole()
+                    if not self._reconnecting:
+                        # Port disappeared while we had it selected — try to
+                        # reconnect for up to RECONNECT_TIMEOUT seconds.
+                        self._startReconnect(self.console.name)
+                    # If already reconnecting, leave the combo alone and let
+                    # _tryReconnect handle it.
+                else:
+                    self.PortSelect.setCurrentIndex(idx)
+
+    # ------------------------------------------------------------------
+    # Reconnect logic (all slots run on the GUI thread)
+    # ------------------------------------------------------------------
+
+    def _startReconnect(self, port_name):
+        """Start the reconnect countdown after a port disappears."""
+        self._reconnecting      = True
+        self._reconnectName     = port_name
+        self._reconnectRate     = self._lastRate
+        self._reconnectDeadline = time.time() + self.RECONNECT_TIMEOUT
+        self._textBuffer.append((
+            '\n[%s lost — reconnecting for up to %g s…]\n'
+            % (port_name, self.RECONNECT_TIMEOUT),
+            QtGui.QColor('yellow')))
+        self.PortSelect.setEnabled(False)
+        self._reconnectTimer.start(self.RECONNECT_INTERVAL)
+        self.portChanged.emit()
+
+    def _tryReconnect(self):
+        """Timer slot: check every RECONNECT_INTERVAL ms for the port to return."""
+        if time.time() >= self._reconnectDeadline:
+            self._reconnectTimer.stop()
+            self._reconnecting = False
+            self._textBuffer.append((
+                '\n[Reconnect timed out — %s is closed]\n' % self._reconnectName,
+                QtGui.QColor('tomato')))
+            self.noConsole()
+            self.PortSelect.setCurrentIndex(0)
+            self.PortSelect.setEnabled(True)
+            self.portChanged.emit()
+            return
+
+        port = self.serialHub.get_port(self._reconnectName)
+        if port is None:
+            return      # Not back yet; keep the timer running
+
+        # Port object exists in the hub — try to open it in a thread
+        # (SerialPort.open() sleeps 100 ms, so we don't block the GUI).
+        self._reconnectTimer.stop()
+        self.console = port
+        rate = self._reconnectRate
+        def do_open():
+            try:
+                port.open(rate=rate)
+            except Exception:
+                pass
+            self._reconnectResultSignal.emit(port.is_open())
+        Thread(target=do_open, daemon=True).start()
+
+    def _onReconnectResult(self, success):
+        """GUI thread: called after a reconnect open attempt finishes."""
+        if success:
+            self._reconnecting = False
+            self.console.ioError.connect(self._ioError)
+            self.console.ioException.connect(self._ioError)
+            self.connectPort()
+            self._lastRate = self._reconnectRate
+            # Restore the combo selection to the reconnected port.
+            idx = self.PortSelect.findText(self._reconnectName)
+            if idx >= 0:
                 self.PortSelect.setCurrentIndex(idx)
+            self.PortSelect.setEnabled(True)
+            self._textBuffer.append((
+                '\n[Reconnected to %s]\n' % self._reconnectName,
+                QtGui.QColor('springgreen')))
+            self.portChanged.emit()
+        else:
+            # open() failed — device may still be booting; keep trying if time allows.
+            if time.time() < self._reconnectDeadline:
+                self._reconnectTimer.start(self.RECONNECT_INTERVAL)
+            else:
+                self._reconnecting = False
+                self._textBuffer.append((
+                    '\n[Reconnect timed out — %s is closed]\n' % self._reconnectName,
+                    QtGui.QColor('tomato')))
+                self.noConsole()
+                self.PortSelect.setCurrentIndex(0)
+                self.PortSelect.setEnabled(True)
+                self.portChanged.emit()
 
     # ------------------------------------------------------------------
     # Text I/O  (thread-safe via Qt signal)
