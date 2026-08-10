@@ -1,4 +1,5 @@
 # porttab.py — per-port terminal tab widget
+import collections
 import sys
 import time
 import traceback
@@ -43,9 +44,6 @@ DEFAULT_PROTOCOL = "Serial"
 class PortTab(QtWidgets.QWidget):
     """A self-contained terminal tab: port controls + console text area."""
 
-    # Thread-safe signal: (text, QColor|None).  None → use self.color.
-    _textSignal = QtCore.pyqtSignal(object, object)
-
     # Emitted whenever this tab opens/closes a port so the parent can refresh.
     portChanged = QtCore.pyqtSignal()
 
@@ -57,6 +55,11 @@ class PortTab(QtWidgets.QWidget):
         self.textMutex = QtCore.QMutex()
         self.color = QtGui.QColor(COLOR_MAP[DEFAULT_COLOR])
 
+        # Lock-free text buffer: serial threads append (text, color) tuples;
+        # the GUI-thread timer drains and renders them in batches.
+        # collections.deque append/popleft are atomic in CPython (GIL).
+        self._textBuffer = collections.deque()
+
         self._build_ui()
         self._setup_protocol()
         self._setup_params_menu()
@@ -66,6 +69,12 @@ class PortTab(QtWidgets.QWidget):
         # immediately without requiring a Save+Load cycle.
         self.selectProtocol()
 
+        # 30 ms timer drains _textBuffer on the GUI thread.
+        # Keeps serial threads and the GUI fully independent.
+        self._flushTimer = QtCore.QTimer(self)
+        self._flushTimer.timeout.connect(self._flushBuffer)
+        self._flushTimer.start(30)
+
     # ------------------------------------------------------------------
     # UI construction
     # ------------------------------------------------------------------
@@ -73,48 +82,60 @@ class PortTab(QtWidgets.QWidget):
     def _build_ui(self):
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(2, 2, 2, 2)
-        layout.setSpacing(3)
+        layout.setSpacing(2)
 
-        # --- Port section ---
-        portGroup = QtWidgets.QGroupBox("Port")
-        gl = QtWidgets.QVBoxLayout(portGroup)
-        gl.setSpacing(3)
+        # --- Compact single-row port bar ---
+        self._portRow = QtWidgets.QWidget(self)
+        row = QtWidgets.QHBoxLayout(self._portRow)
+        row.setContentsMargins(2, 1, 2, 1)
+        row.setSpacing(4)
 
-        row1 = QtWidgets.QHBoxLayout()
-        self.PortSelect = QtWidgets.QComboBox(portGroup)
+        # Collapse / expand toggle
+        self._collapseBtn = QtWidgets.QToolButton(self._portRow)
+        self._collapseBtn.setArrowType(QtCore.Qt.DownArrow)
+        self._collapseBtn.setFixedSize(14, 14)
+        self._collapseBtn.setAutoRaise(True)
+        self._collapseBtn.setToolTip("Show/hide port settings")
+        self._collapseBtn.clicked.connect(self._togglePortSettings)
+        row.addWidget(self._collapseBtn)
+
+        self.PortSelect = QtWidgets.QComboBox(self._portRow)
         self.PortSelect.addItem("(Select a Port)")
         self.PortSelect.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
         self.PortSelect.setInsertPolicy(QtWidgets.QComboBox.InsertAlphabetically)
-        row1.addWidget(self.PortSelect)
+        row.addWidget(self.PortSelect, 1)   # stretch to fill spare space
 
-        self.ConsoleColor = ColorCombo(portGroup)
+        self.ConsoleColor = ColorCombo(self._portRow)
         for c in ["white", "cyan", "blue", "green", "yellow", "orange", "magenta", "red"]:
             self.ConsoleColor.addItem(c)
         self.ConsoleColor.setCurrentText(DEFAULT_COLOR)
-        row1.addWidget(self.ConsoleColor)
-        row1.addStretch()
-        gl.addLayout(row1)
+        row.addWidget(self.ConsoleColor)
 
-        row2 = QtWidgets.QHBoxLayout()
-        self.ConsoleProtocol = QtWidgets.QComboBox(portGroup)
+        self.ConsoleProtocol = QtWidgets.QComboBox(self._portRow)
         self.ConsoleProtocol.addItems(PROTOCOLS)
-        row2.addWidget(self.ConsoleProtocol)
+        row.addWidget(self.ConsoleProtocol)
 
-        self.BaudRate = BaudCombo(portGroup)
+        self.BaudRate = BaudCombo(self._portRow)
         for b in BAUD_RATES:
             self.BaudRate.addItem(b)
         self.BaudRate.setCurrentText(DEFAULT_BAUD)
-        row2.addWidget(self.BaudRate)
+        row.addWidget(self.BaudRate)
 
-        self.toolButton = QtWidgets.QToolButton(portGroup)
+        self.toolButton = QtWidgets.QToolButton(self._portRow)
         self.toolButton.setText("N 8 1")
         self.toolButton.setPopupMode(QtWidgets.QToolButton.MenuButtonPopup)
         self.toolButton.setToolButtonStyle(QtCore.Qt.ToolButtonTextOnly)
-        row2.addWidget(self.toolButton)
-        row2.addStretch()
-        gl.addLayout(row2)
+        row.addWidget(self.toolButton)
+        row.addStretch()          # pins collapse button to the left when controls hidden
 
-        layout.addWidget(portGroup)
+        # Collect the "collapsible" widgets (everything except the toggle btn)
+        self._portControls = [
+            self.PortSelect, self.ConsoleColor,
+            self.ConsoleProtocol, self.BaudRate, self.toolButton,
+        ]
+        self._portSettingsVisible = True
+
+        layout.addWidget(self._portRow)
 
         # --- Console text area ---
         tab_self = self  # capture for inner class
@@ -137,7 +158,7 @@ class PortTab(QtWidgets.QWidget):
             palette.setBrush(state, QtGui.QPalette.Text, cyan)
             palette.setBrush(state, QtGui.QPalette.WindowText, cyan)
         self.Console.setPalette(palette)
-        self.Console.setMinimumSize(600, 400)
+        self.Console.setMinimumSize(200, 100)
         self.Console.setUndoRedoEnabled(False)
         self.Console.setLineWrapMode(QtWidgets.QPlainTextEdit.WidgetWidth)
         self.Console.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
@@ -149,7 +170,6 @@ class PortTab(QtWidgets.QWidget):
         self.protocol = SfpLayer()
         self.top.input.connect(self._textInputFromThread)
         self.top.plugin(self.protocol)
-        self._textSignal.connect(self._showText)
 
     def _setup_params_menu(self):
         menu = QtWidgets.QMenu(self)
@@ -178,6 +198,15 @@ class PortTab(QtWidgets.QWidget):
         self.BaudRate.activated.connect(self.selectRate)
         self.BaudRate.currentIndexChanged.connect(self.selectRate)
         self.ConsoleColor.activated.connect(self.setColor)
+
+    def _togglePortSettings(self):
+        """Show/hide the port control widgets (arrow button stays visible)."""
+        self._portSettingsVisible = not self._portSettingsVisible
+        for w in self._portControls:
+            w.setVisible(self._portSettingsVisible)
+        self._collapseBtn.setArrowType(
+            QtCore.Qt.DownArrow if self._portSettingsVisible
+            else QtCore.Qt.RightArrow)
 
     # ------------------------------------------------------------------
     # Port management
@@ -278,8 +307,8 @@ class PortTab(QtWidgets.QWidget):
     # ------------------------------------------------------------------
 
     def _textInputFromThread(self, text):
-        """Called from serial-reader thread — bounce to GUI via signal."""
-        self._textSignal.emit(text, None)
+        """Called from serial-reader thread — push into lock-free buffer."""
+        self._textBuffer.append((text, None))
 
     def _showText(self, text, color):
         """GUI-thread slot: append text to the Console widget."""
@@ -302,6 +331,22 @@ class PortTab(QtWidgets.QWidget):
             sb.setValue(sb.maximum())
         self.textMutex.unlock()
 
+    def _flushBuffer(self):
+        """GUI-thread timer slot: drain _textBuffer and render all pending text.
+
+        Serial threads never touch the GUI — they only append to the deque.
+        This slot runs at most every 30 ms, batching any number of chunks into
+        a single rendering pass for smooth high-throughput output.
+        """
+        if not self._textBuffer:
+            return
+        try:
+            while True:
+                text, color = self._textBuffer.popleft()
+                self._showText(text, color)
+        except IndexError:
+            pass
+
     def _isCursorVisible(self):
         vbar = self.Console.verticalScrollBar()
         return vbar.value() == vbar.maximum()
@@ -309,7 +354,7 @@ class PortTab(QtWidgets.QWidget):
     def messageOut(self, text, style=''):
         """Thread-safe output with optional named style."""
         color = QtGui.QColor(COLOR_MAP[style]) if style else None
-        self._textSignal.emit(text, color)
+        self._textBuffer.append((text, color))
 
     def keyin(self, key, echo=True):
         """Process typed/pasted characters: buffer, echo, and send on newline."""

@@ -22,6 +22,7 @@ from colorcombo import ColorCombo
 from formatcombo import FormatCombo
 from monitorframe import MonitorFrame
 from porttab import PortTab
+from panesplit import PaneSplitter
 
 try:
     _fromUtf8 = QtCore.QString.fromUtf8
@@ -56,21 +57,13 @@ class terminal(QtWidgets.QMainWindow):
 
         # -----------------------------------------------------------------
         # Port-tab container (replaces the single Console on the right side)
+        # PaneSplitter supports drag-to-split and multiple panes.
         # -----------------------------------------------------------------
-        self.portTabs = QtWidgets.QTabWidget()
-        self.portTabs.setTabsClosable(True)
-        self.portTabs.setMovable(True)
-        self.portTabs.tabCloseRequested.connect(self._closePortTab)
+        self.portTabs = PaneSplitter()
+        self.portTabs.tabCloseRequest.connect(self._closePortTab)
         self.portTabs.currentChanged.connect(self._onPortTabChanged)
-        self.portTabs.tabBar().tabBarDoubleClicked.connect(self._renamePortTab)
-
-        # "+" corner button to add a new port tab
-        # QToolButton renders correctly as a corner widget on macOS
-        addBtn = QtWidgets.QToolButton()
-        addBtn.setText("+")
-        addBtn.setToolTip("New port tab")
-        addBtn.clicked.connect(lambda: self.addPortTab())
-        self.portTabs.setCornerWidget(addBtn, QtCore.Qt.TopRightCorner)
+        self.portTabs.addTabRequested.connect(
+            lambda pane: self.addPortTab(target_pane=pane))
 
         # Swap the stub Console out of its layout and insert portTabs
         self.ui.verticalLayout.replaceWidget(self.ui.Console, self.portTabs)
@@ -98,8 +91,9 @@ class terminal(QtWidgets.QMainWindow):
         # -----------------------------------------------------------------
         def SetLineDelay():
             delay = int(self.ui.LineDelay.text()) / 1000
-            for i in range(self.portTabs.count()):
-                self.portTabs.widget(i).linedelay = delay
+            for tab, _lbl in self.portTabs.allTabs():
+                if isinstance(tab, PortTab):
+                    tab.linedelay = delay
         self.ui.LineDelay.returnPressed.connect(SetLineDelay)
 
         # -----------------------------------------------------------------
@@ -221,11 +215,9 @@ class terminal(QtWidgets.QMainWindow):
         w = self.portTabs.currentWidget()
         return w if isinstance(w, PortTab) else None
 
-    def addPortTab(self, label=None):
-        """Create and append a new PortTab; return it."""
+    def addPortTab(self, label=None, target_pane=None):
+        """Create a new PortTab and add it to target_pane (or the active pane)."""
         tab = PortTab(self.serialHub, self)
-        # Install on both the widget and its viewport: key events in a
-        # QPlainTextEdit go to the viewport child, not the widget itself.
         tab.Console.installEventFilter(self)
         tab.Console.viewport().installEventFilter(self)
         tab.portChanged.connect(self._showPortUpdate)
@@ -233,38 +225,29 @@ class terminal(QtWidgets.QMainWindow):
         if not isinstance(label, str) or not label:
             label = "Port %d" % (self.portTabs.count() + 1)
 
-        idx = self.portTabs.addTab(tab, label)
-        self.portTabs.setCurrentIndex(idx)
+        self.portTabs.addTab(tab, label, pane=target_pane)
 
-        # Populate port list for the new tab immediately
         ports = [p.name for p in self.serialHub.all_ports()]
         tab.updatePortList(ports)
-
         return tab
 
-    def _closePortTab(self, index):
-        """Close a port tab (keep at least one)."""
+    def _closePortTab(self, pane, local_idx):
+        """Close a specific tab; keep at least one tab total."""
         if self.portTabs.count() <= 1:
             return
-        tab = self.portTabs.widget(index)
+        tab = pane.widget(local_idx)
         if isinstance(tab, PortTab) and tab.console.is_open():
             tab.console.close()
-        self.portTabs.removeTab(index)
+        pane.removeTab(local_idx)
+        if pane.count() == 0 and self.portTabs.paneCount() > 1:
+            self.portTabs.removePane(pane)
         if isinstance(tab, PortTab):
             tab.deleteLater()
 
-    def _renamePortTab(self, index):
-        """Double-click tab bar → inline rename dialog."""
-        old = self.portTabs.tabText(index)
-        name, ok = QtWidgets.QInputDialog.getText(
-            self.Window, "Rename Tab", "Tab name:", text=old)
-        if ok and name:
-            self.portTabs.setTabText(index, name)
-
-    def _onPortTabChanged(self, index):
+    def _onPortTabChanged(self, _index):
         """Route global messages to the newly visible tab."""
-        tab = self.portTabs.widget(index)
-        if isinstance(tab, PortTab):
+        tab = self.activeTab()
+        if tab:
             setTextOutput(tab.messageOut)
 
     # =====================================================================
@@ -287,8 +270,7 @@ class terminal(QtWidgets.QMainWindow):
         self.portlistMutex.lock()
         try:
             ports = [p.name for p in self.serialHub.all_ports()]
-            for i in range(self.portTabs.count()):
-                tab = self.portTabs.widget(i)
+            for tab, _lbl in self.portTabs.allTabs():
                 if isinstance(tab, PortTab):
                     tab.updatePortList(ports)
             self.serialPortUpdate.emit(ports)
@@ -382,6 +364,20 @@ class terminal(QtWidgets.QMainWindow):
         self.Window.setWindowTitle(appname + version)
 
     # =====================================================================
+    # Shutdown
+    # =====================================================================
+
+    def closeEvent(self, event):
+        """Close all open ports in parallel before the window goes away."""
+        open_tabs = [t for t, _ in self.portTabs.allTabs()
+                     if isinstance(t, PortTab) and t.console.is_open()]
+        if open_tabs:
+            closers = [Thread(target=t.console.close, daemon=True) for t in open_tabs]
+            for c in closers: c.start()
+            for c in closers: c.join()
+        event.accept()
+
+    # =====================================================================
     # Settings  — save / load
     # =====================================================================
 
@@ -402,14 +398,15 @@ class terminal(QtWidgets.QMainWindow):
         self.settings.setValue(self.ui.Auto_Load.objectName(), self.ui.Auto_Load.isChecked())
         self.settings.setValue(self.ui.Download_File.objectName(), self.ui.Download_File.text())
 
-        # Port tabs
-        count = self.portTabs.count()
-        self.settings.setValue('portTabs/count', count)
-        self.settings.setValue('portTabs/current', self.portTabs.currentIndex())
-        for i in range(count):
-            tab = self.portTabs.widget(i)
+        # Port tabs — flat list with pane membership + full splitter tree
+        all_tabs = self.portTabs.allTabsWithPane()
+        self.settings.setValue('portTabs/count',     len(all_tabs))
+        self.settings.setValue('portTabs/paneCount', self.portTabs.paneCount())
+        self.settings.setValue('portTabs/layout',    self.portTabs.saveLayout())
+        for i, (tab, label, pane_idx) in enumerate(all_tabs):
             prefix = 'portTabs/%d/' % i
-            self.settings.setValue(prefix + 'label', self.portTabs.tabText(i))
+            self.settings.setValue(prefix + 'label',     label)
+            self.settings.setValue(prefix + 'paneIndex', pane_idx)
             if isinstance(tab, PortTab):
                 tab.saveToSettings(self.settings, prefix)
 
@@ -434,29 +431,34 @@ class terminal(QtWidgets.QMainWindow):
             self.ui.Download_File.setText(
                 self.settings.value(self.ui.Download_File.objectName()))
 
-            # Restore port tabs
             count = self.settings.value('portTabs/count', type=int) or 1
-            current = self.settings.value('portTabs/current', type=int) or 0
 
-            # Remove all current tabs
-            while self.portTabs.count():
-                w = self.portTabs.widget(0)
-                self.portTabs.removeTab(0)
-                if isinstance(w, PortTab) and w.console.is_open():
-                    w.console.close()
-                if isinstance(w, PortTab):
-                    w.deleteLater()
+            # Close all open ports in parallel so N ports take ~200 ms, not N×200 ms
+            all_existing = list(self.portTabs.allTabs())
+            open_tabs = [t for t, _ in all_existing
+                         if isinstance(t, PortTab) and t.console.is_open()]
+            if open_tabs:
+                closers = [Thread(target=t.console.close, daemon=True) for t in open_tabs]
+                for c in closers: c.start()
+                for c in closers: c.join()
+            for tab, _ in all_existing:
+                if isinstance(tab, PortTab):
+                    tab.deleteLater()
 
-            # Recreate saved tabs
+            # Rebuild the pane layout from scratch
+            self.portTabs.resetLayout()
+
+            # 1. Create tabs and place each in the correct pane
             for i in range(count):
-                prefix = 'portTabs/%d/' % i
-                label  = self.settings.value(prefix + 'label', 'Port %d' % (i + 1))
-                tab    = self.addPortTab(label=label)
+                prefix   = 'portTabs/%d/' % i
+                label    = self.settings.value(prefix + 'label',     'Port %d' % (i + 1))
+                pane_idx = int(self.settings.value(prefix + 'paneIndex', 0) or 0)
+                pane     = self.portTabs.paneAt(pane_idx)
+                tab      = self.addPortTab(label=label, target_pane=pane)
                 tab.loadFromSettings(self.settings, prefix)
 
-            # Restore active tab
-            if 0 <= current < self.portTabs.count():
-                self.portTabs.setCurrentIndex(current)
+            # 2. Restore the splitter tree (pane positions / nesting / orientation)
+            self.portTabs.applyLayout(self.settings.value('portTabs/layout', ''))
 
         except TypeError:
             print("Error: some settings haven't been set!")
