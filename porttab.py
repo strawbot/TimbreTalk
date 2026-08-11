@@ -9,6 +9,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from protocols.interface.interface import Interface, Port
 from protocols.interface import serialHub as serialHubModule
+from protocols.interface.telnetPort import TelnetPort
 from protocols.sfpLayer import SfpLayer
 from protocols.interface.message import note, warning, error, eprint
 
@@ -35,7 +36,7 @@ BAUD_RATES = [
     "1200", "9600", "19200", "28800", "38400", "57600",
     "115200", "230400", "460800", "500000", "921600", "1000000",
 ]
-PROTOCOLS = ["Serial", "SFP", "Alert2 IND"]
+PROTOCOLS = ["Serial", "SFP", "Alert2 IND", "Telnet"]
 DEFAULT_BAUD = "57600"
 DEFAULT_COLOR = "cyan"
 DEFAULT_PROTOCOL = "Serial"
@@ -49,6 +50,10 @@ class PortTab(QtWidgets.QWidget):
 
     # Internal: reconnect-open result bounced back to the GUI thread.
     _reconnectResultSignal = QtCore.pyqtSignal(bool)
+
+    # Internal: Telnet connect result and unexpected-drop notification.
+    _telnetConnectResultSignal = QtCore.pyqtSignal(bool)
+    _telnetDroppedSignal       = QtCore.pyqtSignal()
 
     RECONNECT_TIMEOUT  = 10.0   # seconds to wait for port to reappear
     RECONNECT_INTERVAL = 500    # ms between re-checks
@@ -94,6 +99,8 @@ class PortTab(QtWidgets.QWidget):
         self._reconnectTimer = QtCore.QTimer(self)
         self._reconnectTimer.timeout.connect(self._tryReconnect)
         self._reconnectResultSignal.connect(self._onReconnectResult)
+        self._telnetConnectResultSignal.connect(self._onTelnetConnectResult)
+        self._telnetDroppedSignal.connect(self._onTelnetDropped)
 
     # ------------------------------------------------------------------
     # UI construction
@@ -125,6 +132,30 @@ class PortTab(QtWidgets.QWidget):
         self.PortSelect.setInsertPolicy(QtWidgets.QComboBox.InsertAlphabetically)
         row.addWidget(self.PortSelect, 1)   # stretch to fill spare space
 
+        # --- Telnet bar (shown instead of PortSelect+BaudRate in Telnet mode) ---
+        self._telnetBar = QtWidgets.QWidget(self._portRow)
+        trow = QtWidgets.QHBoxLayout(self._telnetBar)
+        trow.setContentsMargins(0, 0, 0, 0)
+        trow.setSpacing(2)
+
+        self._telnetHost = QtWidgets.QLineEdit(self._telnetBar)
+        self._telnetHost.setPlaceholderText("hostname or IP")
+        trow.addWidget(self._telnetHost, 1)
+
+        trow.addWidget(QtWidgets.QLabel(":", self._telnetBar))
+
+        self._telnetTcpPort = QtWidgets.QLineEdit(self._telnetBar)
+        self._telnetTcpPort.setPlaceholderText("23")
+        self._telnetTcpPort.setFixedWidth(42)
+        trow.addWidget(self._telnetTcpPort)
+
+        self._connectBtn = QtWidgets.QToolButton(self._telnetBar)
+        self._connectBtn.setText("Connect")
+        trow.addWidget(self._connectBtn)
+
+        self._telnetBar.hide()
+        row.addWidget(self._telnetBar, 1)   # same stretch slot as PortSelect
+
         self.ConsoleColor = ColorCombo(self._portRow)
         for c in ["white", "cyan", "blue", "green", "yellow", "orange", "magenta", "red"]:
             self.ConsoleColor.addItem(c)
@@ -148,11 +179,6 @@ class PortTab(QtWidgets.QWidget):
         row.addWidget(self.toolButton)
         row.addStretch()          # pins collapse button to the left when controls hidden
 
-        # Collect the "collapsible" widgets (everything except the toggle btn)
-        self._portControls = [
-            self.PortSelect, self.ConsoleColor,
-            self.ConsoleProtocol, self.BaudRate, self.toolButton,
-        ]
         self._portSettingsVisible = True
 
         layout.addWidget(self._portRow)
@@ -218,12 +244,31 @@ class PortTab(QtWidgets.QWidget):
         self.BaudRate.activated.connect(self.selectRate)
         self.BaudRate.currentIndexChanged.connect(self.selectRate)
         self.ConsoleColor.activated.connect(self.setColor)
+        self._connectBtn.clicked.connect(self._toggleTelnet)
+        self._telnetHost.returnPressed.connect(self._connectTelnet)
+        self._telnetTcpPort.returnPressed.connect(self._connectTelnet)
+
+    def _isTelnetMode(self):
+        return self.ConsoleProtocol.currentText() == 'Telnet'
+
+    def _updateControlsVisibility(self):
+        """Apply correct widget visibility for current mode + collapse state."""
+        shown  = self._portSettingsVisible
+        telnet = self._isTelnetMode()
+        # Serial-only controls
+        self.PortSelect.setVisible(shown and not telnet)
+        self.BaudRate.setVisible(shown and not telnet)
+        self.toolButton.setVisible(shown and not telnet)
+        # Telnet bar
+        self._telnetBar.setVisible(shown and telnet)
+        # Mode-independent controls
+        self.ConsoleColor.setVisible(shown)
+        self.ConsoleProtocol.setVisible(shown)
 
     def _togglePortSettings(self):
         """Show/hide the port control widgets (arrow button stays visible)."""
         self._portSettingsVisible = not self._portSettingsVisible
-        for w in self._portControls:
-            w.setVisible(self._portSettingsVisible)
+        self._updateControlsVisibility()
         self._collapseBtn.setArrowType(
             QtCore.Qt.DownArrow if self._portSettingsVisible
             else QtCore.Qt.RightArrow)
@@ -238,9 +283,15 @@ class PortTab(QtWidgets.QWidget):
 
     def _ioError(self, message):
         error(message)
+        was_telnet = isinstance(self.console, TelnetPort)
         self.console.close()
+        if was_telnet:
+            self._telnetDroppedSignal.emit()
 
     def selectPort(self):
+        if self._isTelnetMode():
+            return  # PortSelect is hidden in Telnet mode; ignore stray signals
+
         # User explicitly chose a port — cancel any pending reconnect first.
         if self._reconnecting:
             self._reconnectTimer.stop()
@@ -252,22 +303,40 @@ class PortTab(QtWidgets.QWidget):
 
         if self.PortSelect.currentIndex():
             name = str(self.PortSelect.currentText())
+            port = self.serialHub.get_port(name)
+            if port is None:
+                # Device not connected yet — reset quietly
+                self._textBuffer.append((
+                    '\n[%s not found — connect the device and reselect]\n' % name,
+                    QtGui.QColor('orange')))
+                self.PortSelect.setCurrentIndex(0)
+                self.noConsole()
+                self.portChanged.emit()
+                return
+
             self.PortSelect.setDisabled(True)
-            self.console = self.serialHub.get_port(name)
+            self.console = port
             rate = self.rate()          # capture on GUI thread before spawning
             self._lastRate = rate
 
             def portOpen():
-                self.console.open(rate=rate)
-                if self.console.is_open():
-                    self.console.ioError.connect(self._ioError)
-                    self.console.ioException.connect(self._ioError)
-                    self.connectPort()
-                else:
+                try:
+                    self.console.open(rate=rate)
+                    if self.console.is_open():
+                        self.console.ioError.connect(self._ioError)
+                        self.console.ioException.connect(self._ioError)
+                        self.connectPort()
+                    else:
+                        self.PortSelect.setCurrentIndex(0)
+                        self.noConsole()
+                except Exception as e:
+                    error('port open failed: %s' % e)
                     self.PortSelect.setCurrentIndex(0)
                     self.noConsole()
-                self.PortSelect.setDisabled(False)
-                self.portChanged.emit()
+                finally:
+                    # Always re-enable — even if open() raises or close() was called
+                    self.PortSelect.setDisabled(False)
+                    self.portChanged.emit()
 
             Thread(target=portOpen, daemon=True).start()
         else:
@@ -286,14 +355,24 @@ class PortTab(QtWidgets.QWidget):
 
     def selectProtocol(self):
         prot = self.ConsoleProtocol.currentText()
+        # Switching away from Telnet: close any open connection first
+        if isinstance(self.console, TelnetPort) and prot != 'Telnet':
+            self._disconnectTelnet()
         if prot == 'Serial':
             self.protocol.passthru()
         elif prot == 'SFP':
             self.protocol.connected()
         elif prot == 'Alert2 IND':
             warning('Under Construction')
+        elif prot == 'Telnet':
+            self.protocol.passthru()
+            # Close any open serial port
+            if self.console.is_open() and not isinstance(self.console, TelnetPort):
+                self.console.close()
+                self.noConsole()
         else:
             error(prot + ' is not accounted for')
+        self._updateControlsVisibility()
 
     def setColor(self):
         self.color = QtGui.QColor(COLOR_MAP[self.ConsoleColor.currentText()])
@@ -322,14 +401,18 @@ class PortTab(QtWidgets.QWidget):
     def updatePortList(self, ports):
         """Refresh PortSelect combo; called when USB ports appear/disappear."""
         updatePortCombo(self.PortSelect, ports)
-        if self.console.name:
-            if self.console.name != self.PortSelect.currentText():
-                idx = self.PortSelect.findText(self.console.name)
+        if self._isTelnetMode():
+            return  # Telnet connections are not in the serial port list
+        name = self.console.name
+        # 'notalk' is the dummy name set by noConsole() — never reconnect to it.
+        if name and name != 'notalk':
+            if name != self.PortSelect.currentText():
+                idx = self.PortSelect.findText(name)
                 if idx == -1:
                     if not self._reconnecting:
                         # Port disappeared while we had it selected — try to
                         # reconnect for up to RECONNECT_TIMEOUT seconds.
-                        self._startReconnect(self.console.name)
+                        self._startReconnect(name)
                     # If already reconnecting, leave the combo alone and let
                     # _tryReconnect handle it.
                 else:
@@ -414,6 +497,90 @@ class PortTab(QtWidgets.QWidget):
                 self.PortSelect.setCurrentIndex(0)
                 self.PortSelect.setEnabled(True)
                 self.portChanged.emit()
+
+    # ------------------------------------------------------------------
+    # Telnet connect / disconnect
+    # ------------------------------------------------------------------
+
+    def _toggleTelnet(self):
+        """Connect button clicked: toggle the Telnet connection."""
+        if isinstance(self.console, TelnetPort) and self.console.is_open():
+            self._disconnectTelnet()
+        else:
+            self._connectTelnet()
+
+    def _connectTelnet(self):
+        """Parse host:port and open a TelnetPort (in a thread)."""
+        host = self._telnetHost.text().strip()
+        port_str = self._telnetTcpPort.text().strip() or '23'
+        if not host:
+            error('Telnet: enter a hostname or IP address')
+            return
+        try:
+            tcp_port = int(port_str)
+        except ValueError:
+            error('Telnet: port must be a number')
+            return
+
+        self._connectBtn.setEnabled(False)
+        self._connectBtn.setText('Connecting…')
+
+        port = TelnetPort(host, tcp_port)
+        self.console = port
+
+        def do_open():
+            err = None
+            try:
+                port.open()
+            except Exception as e:
+                import traceback as _tb
+                err = str(e)
+                # Also dump the full traceback to stderr for the developer,
+                # and append the condensed last-line detail to the console.
+                _tb.print_exc()
+            if err:
+                self._textBuffer.append((
+                    '\n[Telnet: %s]\n' % err,
+                    QtGui.QColor('tomato')))
+            self._telnetConnectResultSignal.emit(port.is_open())
+
+        Thread(target=do_open, daemon=True).start()
+
+    def _disconnectTelnet(self):
+        """Close the Telnet connection and reset the connect button."""
+        if isinstance(self.console, TelnetPort) and self.console.is_open():
+            self.console.close()
+        self.noConsole()
+        self._connectBtn.setText('Connect')
+        self._connectBtn.setEnabled(True)
+        self.portChanged.emit()
+
+    def _onTelnetConnectResult(self, success):
+        """GUI thread: called after TelnetPort.open() finishes."""
+        if success:
+            self.console.ioError.connect(self._ioError)
+            self.console.ioException.connect(self._ioError)
+            self.connectPort()
+            self._connectBtn.setText('Disconnect')
+            self._connectBtn.setEnabled(True)
+            self._textBuffer.append((
+                '\n[Connected to %s]\n' % self.console.name,
+                QtGui.QColor('springgreen')))
+            self.portChanged.emit()
+        else:
+            self.noConsole()
+            self._connectBtn.setText('Connect')
+            self._connectBtn.setEnabled(True)
+            self.portChanged.emit()
+
+    def _onTelnetDropped(self):
+        """GUI thread: Telnet reader thread detected the connection was lost."""
+        self.noConsole()
+        self._connectBtn.setText('Connect')
+        self._connectBtn.setEnabled(True)
+        self._textBuffer.append((
+            '\n[Telnet connection lost]\n', QtGui.QColor('tomato')))
+        self.portChanged.emit()
 
     # ------------------------------------------------------------------
     # Text I/O  (thread-safe via Qt signal)
@@ -512,6 +679,8 @@ class PortTab(QtWidgets.QWidget):
         settings.setValue(prefix + 'BaudRate',        self.BaudRate.currentText())
         settings.setValue(prefix + 'ConsoleColor',    self.ConsoleColor.currentText())
         settings.setValue(prefix + 'ConsoleProtocol', self.ConsoleProtocol.currentText())
+        settings.setValue(prefix + 'TelnetHost',      self._telnetHost.text())
+        settings.setValue(prefix + 'TelnetTcpPort',   self._telnetTcpPort.text())
 
     def loadFromSettings(self, settings, prefix):
         self.BaudRate.setCurrentText(
@@ -520,11 +689,15 @@ class PortTab(QtWidgets.QWidget):
             settings.value(prefix + 'ConsoleColor', DEFAULT_COLOR))
         self.ConsoleProtocol.setCurrentText(
             settings.value(prefix + 'ConsoleProtocol', DEFAULT_PROTOCOL))
+        self._telnetHost.setText(settings.value(prefix + 'TelnetHost', ''))
+        self._telnetTcpPort.setText(settings.value(prefix + 'TelnetTcpPort', ''))
         self.setColor()
         self.selectProtocol()
-        self.selectRate()
-        # Restore port selection last (triggers port open in thread)
-        saved_port = settings.value(prefix + 'PortSelect', '')
-        if saved_port:
-            self.PortSelect.setCurrentText(saved_port)
-            self.selectPort()
+        if not self._isTelnetMode():
+            self.selectRate()
+            # Restore serial port selection last (triggers port open in thread)
+            saved_port = settings.value(prefix + 'PortSelect', '')
+            if saved_port:
+                self.PortSelect.setCurrentText(saved_port)
+                self.selectPort()
+        # For Telnet, host:port is restored but the user connects manually

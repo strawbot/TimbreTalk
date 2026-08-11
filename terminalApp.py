@@ -34,10 +34,11 @@ version = "V4"
 
 
 class terminal(QtWidgets.QMainWindow):
-    showPortSignal  = QtCore.pyqtSignal()
+    showPortSignal   = QtCore.pyqtSignal()
     serialPortUpdate = QtCore.pyqtSignal(object)
-    settings = QtCore.QSettings("TWE", "Tiny Timbre Talk")
-    setProgress = QtCore.pyqtSignal(object)
+    settings         = QtCore.QSettings("TWE", "Tiny Timbre Talk")
+    setProgress      = QtCore.pyqtSignal(object)
+    _pingResult      = QtCore.pyqtSignal(bool, str)   # (success, rtt_or_error)
 
     def __init__(self):
         super(terminal, self).__init__()
@@ -56,9 +57,18 @@ class terminal(QtWidgets.QMainWindow):
         self.ui.groupBox_8.hide()
 
         # -----------------------------------------------------------------
+        # IP ping widget — inserted into Console_tab above the spacer
+        # -----------------------------------------------------------------
+        self._buildPingWidget()
+
+        # -----------------------------------------------------------------
         # Port-tab container (replaces the single Console on the right side)
         # PaneSplitter supports drag-to-split and multiple panes.
         # -----------------------------------------------------------------
+        self._lastActiveTab = None   # most recently focused PortTab
+        QtWidgets.QApplication.instance().focusChanged.connect(
+            self._onFocusChanged)
+
         self.portTabs = PaneSplitter()
         self.portTabs.tabCloseRequest.connect(self._closePortTab)
         self.portTabs.currentChanged.connect(self._onPortTabChanged)
@@ -110,12 +120,16 @@ class terminal(QtWidgets.QMainWindow):
         self.ui.SendText2.clicked.connect(self.sendText2)
         self.ui.SendText3.clicked.connect(self.sendText3)
         self.ui.SendText4.clicked.connect(self.sendText4)
+        self.ui.SendText5.clicked.connect(self.sendText5)
+        self.ui.SendText6.clicked.connect(self.sendText6)
         self.ui.SendFile.clicked.connect(self.sendFile)
 
         self.ui.textStr1.returnPressed.connect(self.ui.SendText1.click)
         self.ui.textStr2.returnPressed.connect(self.ui.SendText2.click)
         self.ui.textStr3.returnPressed.connect(self.ui.SendText3.click)
         self.ui.textStr4.returnPressed.connect(self.ui.SendText4.click)
+        self.ui.textStr5.returnPressed.connect(self.ui.SendText5.click)
+        self.ui.textStr6.returnPressed.connect(self.ui.SendText6.click)
         self.ui.hexStr.returnPressed.connect(self.ui.SendHex.click)
 
         def paste_file(file):
@@ -210,8 +224,32 @@ class terminal(QtWidgets.QMainWindow):
     # Port-tab management
     # =====================================================================
 
+    def _onFocusChanged(self, _old, new):
+        """Track whichever PortTab most recently held keyboard focus."""
+        w = new
+        while w:
+            if isinstance(w, PortTab):
+                self._lastActiveTab = w
+                return
+            w = w.parent() if hasattr(w, 'parent') else None
+
     def activeTab(self):
-        """Return the currently visible PortTab, or None."""
+        """Return the PortTab with current or most recently held focus.
+
+        When focus is inside a PortTab (e.g. the Console text area) return it
+        directly.  When focus is elsewhere — e.g. in a Send Text field — return
+        the last PortTab that had focus so sends go to the right window.
+        """
+        # Is focus currently inside a PortTab?
+        w = QtWidgets.QApplication.focusWidget()
+        while w:
+            if isinstance(w, PortTab):
+                return w
+            w = w.parent() if hasattr(w, 'parent') else None
+        # Focus is in the tools panel or elsewhere — use last focused terminal.
+        if self._lastActiveTab is not None:
+            return self._lastActiveTab
+        # Final fallback: current tab in the primary pane.
         w = self.portTabs.currentWidget()
         return w if isinstance(w, PortTab) else None
 
@@ -262,6 +300,85 @@ class terminal(QtWidgets.QMainWindow):
     # =====================================================================
     # Port-list management
     # =====================================================================
+
+    # =====================================================================
+    # IP ping
+    # =====================================================================
+
+    def _buildPingWidget(self):
+        """Add an IP-ping row to the Console tab, above the expanding spacer."""
+        import subprocess as _sp
+        self._subprocess = _sp           # keep reference for _doPing
+
+        box = QtWidgets.QGroupBox('Network', self.ui.Console_tab)
+        row = QtWidgets.QHBoxLayout(box)
+        row.setContentsMargins(6, 4, 6, 4)
+        row.setSpacing(4)
+
+        row.addWidget(QtWidgets.QLabel('Ping:', box))
+
+        self._pingAddr = QtWidgets.QLineEdit(box)
+        self._pingAddr.setPlaceholderText('IP address or hostname')
+        self._pingAddr.returnPressed.connect(self._doPing)
+        row.addWidget(self._pingAddr, 1)
+
+        pingBtn = QtWidgets.QPushButton('Ping', box)
+        pingBtn.clicked.connect(self._doPing)
+        self._pingBtn = pingBtn
+        row.addWidget(pingBtn)
+
+        # Coloured dot: grey=idle, amber=running, green=ok, red=fail
+        self._pingDot = QtWidgets.QLabel('●', box)
+        self._pingDot.setFixedWidth(16)
+        self._pingDot.setAlignment(QtCore.Qt.AlignCenter)
+        self._pingDot.setStyleSheet('color: #505050; font-size: 14px;')
+        self._pingDot.setToolTip('Ping status')
+        row.addWidget(self._pingDot)
+
+        # Insert before the expanding spacer (index 2 = after groupBox_8 + groupBox_7)
+        self.ui.verticalLayout_3.insertWidget(2, box)
+
+        self._pingResult.connect(self._onPingResult)
+
+    def _doPing(self):
+        addr = self._pingAddr.text().strip()
+        if not addr:
+            return
+        self._pingBtn.setEnabled(False)
+        self._pingDot.setStyleSheet('color: #d08000; font-size: 14px;')  # amber
+        self._pingDot.setToolTip('Pinging %s …' % addr)
+
+        sp = self._subprocess
+        def do_ping():
+            try:
+                # macOS: -c 1 count, -t 2 timeout in seconds
+                r = sp.run(
+                    ['ping', '-c', '1', '-t', '2', addr],
+                    capture_output=True, timeout=5)
+                if r.returncode == 0:
+                    # Extract round-trip time from output, e.g. "time=1.23 ms"
+                    out = r.stdout.decode(errors='ignore')
+                    rtt = ''
+                    for token in out.split():
+                        if token.startswith('time='):
+                            rtt = token[5:]   # e.g. "1.23"
+                            break
+                    self._pingResult.emit(True, rtt + ' ms' if rtt else 'ok')
+                else:
+                    self._pingResult.emit(False, 'no reply')
+            except Exception as e:
+                self._pingResult.emit(False, str(e))
+
+        Thread(target=do_ping, daemon=True).start()
+
+    def _onPingResult(self, success, detail):
+        self._pingBtn.setEnabled(True)
+        if success:
+            self._pingDot.setStyleSheet('color: #00bb44; font-size: 14px;')  # green
+            self._pingDot.setToolTip('Reachable — %s' % detail)
+        else:
+            self._pingDot.setStyleSheet('color: #dd2222; font-size: 14px;')  # red
+            self._pingDot.setToolTip('Unreachable — %s' % detail)
 
     def _showPortUpdate(self):
         self.showPortSignal.emit()
@@ -344,10 +461,12 @@ class terminal(QtWidgets.QMainWindow):
             error('bad text string')
             traceback.print_exc(file=sys.stderr)
 
-    def sendText1(self): self._sendText(self.ui.textStr1.text())
-    def sendText2(self): self._sendText(self.ui.textStr2.text())
-    def sendText3(self): self._sendText(self.ui.textStr3.text())
-    def sendText4(self): self._sendText(self.ui.textStr4.text())
+    def sendText1(self): self.ui.textStr1.record(); self._sendText(self.ui.textStr1.text())
+    def sendText2(self): self.ui.textStr2.record(); self._sendText(self.ui.textStr2.text())
+    def sendText3(self): self.ui.textStr3.record(); self._sendText(self.ui.textStr3.text())
+    def sendText4(self): self.ui.textStr4.record(); self._sendText(self.ui.textStr4.text())
+    def sendText5(self): self.ui.textStr5.record(); self._sendText(self.ui.textStr5.text())
+    def sendText6(self): self.ui.textStr6.record(); self._sendText(self.ui.textStr6.text())
 
     def sendFile(self):
         tab = self.activeTab()
@@ -374,7 +493,7 @@ class terminal(QtWidgets.QMainWindow):
         if open_tabs:
             closers = [Thread(target=t.console.close, daemon=True) for t in open_tabs]
             for c in closers: c.start()
-            for c in closers: c.join()
+            for c in closers: c.join(timeout=3.0)   # never hang on exit
         event.accept()
 
     # =====================================================================
@@ -410,6 +529,9 @@ class terminal(QtWidgets.QMainWindow):
             if isinstance(tab, PortTab):
                 tab.saveToSettings(self.settings, prefix)
 
+        # Ping address
+        self.settings.setValue('pingAddr', self._pingAddr.text())
+
         # Monitor tab
         portMonitor.save(self.settings)
 
@@ -431,6 +553,8 @@ class terminal(QtWidgets.QMainWindow):
             self.ui.Download_File.setText(
                 self.settings.value(self.ui.Download_File.objectName()))
 
+            self._pingAddr.setText(self.settings.value('pingAddr', ''))
+
             count = self.settings.value('portTabs/count', type=int) or 1
 
             # Close all open ports in parallel so N ports take ~200 ms, not N×200 ms
@@ -440,7 +564,7 @@ class terminal(QtWidgets.QMainWindow):
             if open_tabs:
                 closers = [Thread(target=t.console.close, daemon=True) for t in open_tabs]
                 for c in closers: c.start()
-                for c in closers: c.join()
+                for c in closers: c.join(timeout=3.0)   # cap wait per port
             for tab, _ in all_existing:
                 if isinstance(tab, PortTab):
                     tab.deleteLater()
