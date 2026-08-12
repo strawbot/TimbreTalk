@@ -15,6 +15,7 @@ from protocols.interface.message import note, warning, error, eprint
 
 from baudcombo import BaudCombo
 from colorcombo import ColorCombo
+from historylineedit import HistoryLineEdit
 from monitor import updatePortCombo
 
 
@@ -70,6 +71,11 @@ class PortTab(QtWidgets.QWidget):
         # the GUI-thread timer drains and renders them in batches.
         # collections.deque append/popleft are atomic in CPython (GIL).
         self._textBuffer = collections.deque()
+
+        # Echo suppression for Telnet: after we send a command the device CLI
+        # echoes it back.  Store the expected echo here; _consumeEcho() strips
+        # it from the front of the first incoming data chunk(s).
+        self._echoFilter = ''
 
         # Reconnect state — all managed on the GUI thread via _reconnectTimer.
         self._lastRate          = 0       # baud rate saved at port open
@@ -183,7 +189,7 @@ class PortTab(QtWidgets.QWidget):
 
         layout.addWidget(self._portRow)
 
-        # --- Console text area ---
+        # --- Console text area + command line ---
         tab_self = self  # capture for inner class
 
         class _Console(QtWidgets.QPlainTextEdit):
@@ -209,7 +215,26 @@ class PortTab(QtWidgets.QWidget):
         self.Console.setLineWrapMode(QtWidgets.QPlainTextEdit.WidgetWidth)
         self.Console.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAsNeeded)
         self.Console.setUndoRedoEnabled(False)
-        layout.addWidget(self.Console)
+
+        # Command line — sits flush below the output area; styled to match.
+        # Receives whole lines and sends them on Enter.  Serial output in the
+        # QPlainTextEdit above is never disturbed by what the user types here.
+        self._cmdLine = HistoryLineEdit(self)
+        self._cmdLine.setFont(font)
+        self._cmdLine.setPlaceholderText('command…')
+        self._cmdLine.returnPressed.connect(self._sendCmdLine)
+
+        # Container: Console on top, command line pinned to bottom, no gaps
+        _termBox = QtWidgets.QWidget(self)
+        _tlay = QtWidgets.QVBoxLayout(_termBox)
+        _tlay.setContentsMargins(0, 0, 0, 0)
+        _tlay.setSpacing(0)
+        _tlay.addWidget(self.Console)
+        _tlay.addWidget(self._cmdLine)
+        layout.addWidget(_termBox)
+
+        # Apply initial command-line style (colour updated by setColor)
+        self._updateCmdLineStyle()
 
     def _setup_protocol(self):
         self.top = Interface('terminal')
@@ -376,6 +401,36 @@ class PortTab(QtWidgets.QWidget):
 
     def setColor(self):
         self.color = QtGui.QColor(COLOR_MAP[self.ConsoleColor.currentText()])
+        self._updateCmdLineStyle()
+
+    def _updateCmdLineStyle(self):
+        """Keep the command line background/foreground in sync with the Console color."""
+        rgb = self.color.name()   # e.g. '#00ffff'
+        self._cmdLine.setStyleSheet(
+            'QLineEdit {'
+            '  background-color: black;'
+            '  color: %s;'
+            '  border: none;'
+            '  border-top: 1px solid #1c1c1c;'  # barely-visible hairline separator
+            '  padding: 1px 4px;'
+            '}' % rgb
+        )
+
+    def _sendCmdLine(self):
+        """Send the command line as a complete unit and record it in history."""
+        text = self._cmdLine.text()
+        if not text:
+            return
+        self._cmdLine.record()
+        if isinstance(self.console, TelnetPort):
+            self._echoFilter = text  # suppress the CLI echo coming back
+        else:
+            # For serial: echo locally since devices don't echo back
+            self._showText('> ' + text + '\n', QtGui.QColor('white'))
+        # Send to device — same null-terminated format that keyin() uses
+        # (TelnetPort.send_data replaces \x00 with \r\n automatically)
+        self.top.output.emit(text + '\x00')
+        self._cmdLine.clear()
 
     def setParam(self, parity, bytesize, stopbits):
         try:
@@ -587,8 +642,48 @@ class PortTab(QtWidgets.QWidget):
     # ------------------------------------------------------------------
 
     def _textInputFromThread(self, text):
-        """Called from serial-reader thread — push into lock-free buffer."""
+        """Called from serial/telnet reader thread — push into lock-free buffer."""
+        # Telnet reader emits bytes; SFP layer emits str.  Normalise to str so
+        # everything downstream (echo filter, _showText, insertPlainText) sees
+        # a consistent type.  latin-1 maps each byte 0-255 to the same Unicode
+        # code point with no exceptions, preserving all control characters.
+        if isinstance(text, (bytes, bytearray)):
+            text = text.decode('latin-1')
+        if self._echoFilter:
+            text = self._consumeEcho(text)
+            if not text:
+                return
         self._textBuffer.append((text, None))
+
+    def _consumeEcho(self, text):
+        """Strip the expected CLI echo from the front of received Telnet data.
+
+        Works statelessly across chunk boundaries: if the echo spans two
+        recv() calls, the remaining filter carries over to the next call.
+        CR and LF in the received stream are ignored during matching so that
+        devices which include them in the echo don't confuse the matcher.
+        On any mismatch the filter is cleared and all received data is shown.
+        """
+        echo = self._echoFilter
+        i = 0   # position in received text
+        j = 0   # position in echo still to match
+        while i < len(text) and j < len(echo):
+            c = text[i]
+            if c in '\r\n':
+                i += 1          # skip line endings in the received stream
+                continue
+            if c == echo[j]:
+                i += 1
+                j += 1
+            else:
+                self._echoFilter = ''   # mismatch — show everything
+                return text
+        self._echoFilter = echo[j:]     # '' when fully matched, partial otherwise
+        if not self._echoFilter:
+            # Also swallow the CR/LF that follows the echoed command
+            while i < len(text) and text[i] in '\r\n':
+                i += 1
+        return text[i:]
 
     def _showText(self, text, color):
         """GUI-thread slot: append text to the Console widget."""
@@ -644,6 +739,9 @@ class PortTab(QtWidgets.QWidget):
             if character in ('\x0d', '\x0a'):
                 if echo:
                     self._showText('\r', None)
+                text = ''.join(self.linebuffer)
+                if isinstance(self.console, TelnetPort):
+                    self._echoFilter = text  # suppress the CLI echo coming back
                 self.linebuffer.append('\x00')
                 command = ''.join(self.linebuffer)
                 self.linebuffer.clear()
