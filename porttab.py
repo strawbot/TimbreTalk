@@ -37,7 +37,8 @@ BAUD_RATES = [
     "1200", "9600", "19200", "28800", "38400", "57600",
     "115200", "230400", "460800", "500000", "921600", "1000000",
 ]
-PROTOCOLS = ["Serial", "SFP", "Alert2 IND", "Telnet"]
+PROTOCOLS = ["Serial", "SFP", "Alert2 IND", "Telnet", "Monitor"]
+MONITOR_DECODE_OPTIONS = ["ASCII", "Hex", "AirLink PDU", "ALERT2 IND", "Dev Config"]
 DEFAULT_BAUD = "57600"
 DEFAULT_COLOR = "cyan"
 DEFAULT_PROTOCOL = "Serial"
@@ -76,6 +77,16 @@ class PortTab(QtWidgets.QWidget):
         # echoes it back.  Store the expected echo here; _consumeEcho() strips
         # it from the front of the first incoming data chunk(s).
         self._echoFilter = ''
+
+        # Monitor mode: cache mode flag (safe to read from background threads)
+        # and stateful decode buffers.
+        self._monitorMode = False
+        self._dcpHold     = bytearray()
+        try:
+            from protocols.alert2_decode import checkAlert2 as _checkAlert2
+            self._alert2checker = _checkAlert2()
+        except Exception:
+            self._alert2checker = None
 
         # Reconnect state — all managed on the GUI thread via _reconnectTimer.
         self._lastRate          = 0       # baud rate saved at port open
@@ -171,6 +182,12 @@ class PortTab(QtWidgets.QWidget):
         self.ConsoleProtocol = QtWidgets.QComboBox(self._portRow)
         self.ConsoleProtocol.addItems(PROTOCOLS)
         row.addWidget(self.ConsoleProtocol)
+
+        # Decode combo — only visible in Monitor mode
+        self._monitorDecodeCombo = QtWidgets.QComboBox(self._portRow)
+        self._monitorDecodeCombo.addItems(MONITOR_DECODE_OPTIONS)
+        self._monitorDecodeCombo.hide()
+        row.addWidget(self._monitorDecodeCombo)
 
         self.BaudRate = BaudCombo(self._portRow)
         for b in BAUD_RATES:
@@ -276,19 +293,27 @@ class PortTab(QtWidgets.QWidget):
     def _isTelnetMode(self):
         return self.ConsoleProtocol.currentText() == 'Telnet'
 
+    def _isMonitorMode(self):
+        return self.ConsoleProtocol.currentText() == 'Monitor'
+
     def _updateControlsVisibility(self):
         """Apply correct widget visibility for current mode + collapse state."""
-        shown  = self._portSettingsVisible
-        telnet = self._isTelnetMode()
-        # Serial-only controls
+        shown   = self._portSettingsVisible
+        telnet  = self._isTelnetMode()
+        monitor = self._monitorMode
+        # Serial-only controls (Monitor also uses PortSelect + BaudRate)
         self.PortSelect.setVisible(shown and not telnet)
         self.BaudRate.setVisible(shown and not telnet)
-        self.toolButton.setVisible(shown and not telnet)
+        self.toolButton.setVisible(shown and not telnet and not monitor)
         # Telnet bar
         self._telnetBar.setVisible(shown and telnet)
+        # Monitor decode combo
+        self._monitorDecodeCombo.setVisible(shown and monitor)
         # Mode-independent controls
         self.ConsoleColor.setVisible(shown)
         self.ConsoleProtocol.setVisible(shown)
+        # Command line — hidden in Monitor mode (receive-only)
+        self._cmdLine.setVisible(not monitor)
 
     def _togglePortSettings(self):
         """Show/hide the port control widgets (arrow button stays visible)."""
@@ -395,8 +420,14 @@ class PortTab(QtWidgets.QWidget):
             if self.console.is_open() and not isinstance(self.console, TelnetPort):
                 self.console.close()
                 self.noConsole()
+        elif prot == 'Monitor':
+            # Receive-only: passthru so raw bytes reach _textInputFromThread
+            self.protocol.passthru()
+            # Reset decode buffers when entering Monitor mode
+            self._dcpHold = bytearray()
         else:
             error(prot + ' is not accounted for')
+        self._monitorMode = (prot == 'Monitor')
         self._updateControlsVisibility()
 
     def setColor(self):
@@ -418,6 +449,8 @@ class PortTab(QtWidgets.QWidget):
 
     def _sendCmdLine(self):
         """Send the command line as a complete unit and record it in history."""
+        if self._monitorMode:
+            return  # Monitor is receive-only
         text = self._cmdLine.text()
         if not text:
             return
@@ -648,12 +681,65 @@ class PortTab(QtWidgets.QWidget):
         # a consistent type.  latin-1 maps each byte 0-255 to the same Unicode
         # code point with no exceptions, preserving all control characters.
         if isinstance(text, (bytes, bytearray)):
+            if self._monitorMode:
+                # In Monitor mode, apply the selected decode translation and
+                # buffer the result.  _monitorMode is a plain bool set on the
+                # GUI thread by selectProtocol() — safe to read here.
+                decoded = self._applyMonitorDecode(bytes(text))
+                if decoded:
+                    self._textBuffer.append((decoded, None))
+                return
             text = text.decode('latin-1')
         if self._echoFilter:
             text = self._consumeEcho(text)
             if not text:
                 return
         self._textBuffer.append((text, None))
+
+    def _applyMonitorDecode(self, data):
+        """Translate raw bytes using the selected Monitor decode option.
+
+        Called from the serial reader thread — only reads GUI state via the
+        combo's currentText() which is safe for simple reads.
+
+        Returns a str to display, or '' to suppress output entirely.
+        """
+        decode = self._monitorDecodeCombo.currentText()
+        try:
+            if decode == 'ASCII':
+                from protocols.utilities import asciify
+                return asciify(data) + '\n'
+            elif decode == 'Hex':
+                from protocols.utilities import hexify
+                return hexify(data) + '\n'
+            elif decode == 'AirLink PDU':
+                from protocols.airlink import decode_mant_header
+                raw = decode_mant_header(data)
+                return ('\n' + raw.strip()).replace('\n', '\n  ') + '\n'
+            elif decode == 'ALERT2 IND':
+                if self._alert2checker is not None:
+                    import time as _time
+                    end = int(_time.time() * 1000)
+                    report, _ = self._alert2checker(end, end, data)
+                    return report if report else ''
+            elif decode == 'Dev Config':
+                from protocols.dcp_api import decode_dcp
+                import time as _time
+                self._dcpHold += data
+                result = []
+                while True:
+                    before = len(self._dcpHold)
+                    report = decode_dcp(self._dcpHold)
+                    after  = len(self._dcpHold)
+                    if report:
+                        result.append(report)
+                    if after == 0 or before == after:
+                        break
+                return '\n'.join(result)
+        except Exception as e:
+            pass
+        # Fallback: show as latin-1 text
+        return data.decode('latin-1')
 
     def _consumeEcho(self, text):
         """Strip the expected CLI echo from the front of received Telnet data.
@@ -733,6 +819,8 @@ class PortTab(QtWidgets.QWidget):
 
     def keyin(self, key, echo=True):
         """Process typed/pasted characters: buffer, echo, and send on newline."""
+        if self._monitorMode:
+            return  # Monitor is receive-only
         for character in str(key):
             if character == chr(0x7F):
                 character = chr(0x8)
@@ -779,6 +867,7 @@ class PortTab(QtWidgets.QWidget):
         settings.setValue(prefix + 'ConsoleProtocol', self.ConsoleProtocol.currentText())
         settings.setValue(prefix + 'TelnetHost',      self._telnetHost.text())
         settings.setValue(prefix + 'TelnetTcpPort',   self._telnetTcpPort.text())
+        settings.setValue(prefix + 'MonitorDecode',   self._monitorDecodeCombo.currentText())
 
     def loadFromSettings(self, settings, prefix):
         self.BaudRate.setCurrentText(
@@ -789,6 +878,8 @@ class PortTab(QtWidgets.QWidget):
             settings.value(prefix + 'ConsoleProtocol', DEFAULT_PROTOCOL))
         self._telnetHost.setText(settings.value(prefix + 'TelnetHost', ''))
         self._telnetTcpPort.setText(settings.value(prefix + 'TelnetTcpPort', ''))
+        self._monitorDecodeCombo.setCurrentText(
+            settings.value(prefix + 'MonitorDecode', 'ASCII'))
         self.setColor()
         self.selectProtocol()
         if not self._isTelnetMode():

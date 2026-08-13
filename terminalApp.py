@@ -10,17 +10,10 @@ from protocols.interface.interface import Interface, Port
 from protocols.interface import serialHub
 from protocols.sfpLayer import SfpLayer
 from protocols import pids
-from protocols import send_os
 from threading import Thread
 from protocols.interface.message import note, warning, error, setTextOutput, eprint
 
 from terminal import Ui_Frame
-from monitor import portMonitor, updatePortCombo
-from portcombo import PortCombo
-from baudcombo import BaudCombo
-from colorcombo import ColorCombo
-from formatcombo import FormatCombo
-from monitorframe import MonitorFrame
 from porttab import PortTab
 from panesplit import PaneSplitter
 
@@ -37,7 +30,6 @@ class terminal(QtWidgets.QMainWindow):
     showPortSignal   = QtCore.pyqtSignal()
     serialPortUpdate = QtCore.pyqtSignal(object)
     settings         = QtCore.QSettings("TWE", "Tiny Timbre Talk")
-    setProgress      = QtCore.pyqtSignal(object)
     _pingResult      = QtCore.pyqtSignal(bool, str)   # (success, rtt_or_error)
 
     def __init__(self):
@@ -53,11 +45,8 @@ class terminal(QtWidgets.QMainWindow):
         self.banner()
         self.Window.show()
 
-        # Hide the old single-port controls — they now live inside each PortTab.
-        self.ui.groupBox_8.hide()
-
         # -----------------------------------------------------------------
-        # IP ping widget — inserted into Console_tab above the spacer
+        # IP ping widget — inserted between Tools and Settings panels
         # -----------------------------------------------------------------
         self._buildPingWidget()
 
@@ -135,25 +124,9 @@ class terminal(QtWidgets.QMainWindow):
         def paste_file(file):
             if file[0]:
                 self.ui.fileStr.setText(file[0])
+        self.downloaddir = './'
         self.ui.FileSelect.clicked.connect(
             lambda: paste_file(QtWidgets.QFileDialog().getOpenFileName(directory=self.downloaddir)))
-
-        # -----------------------------------------------------------------
-        # Monitor tab
-        # -----------------------------------------------------------------
-        for widget in self.ui.PortMonitors_tab.findChildren(MonitorFrame):
-            port     = widget.findChildren(PortCombo)[0]
-            baud     = widget.findChildren(BaudCombo)[0]
-            color    = widget.findChildren(ColorCombo)[0]
-            protocol = widget.findChildren(FormatCombo)[0]
-            mname    = widget.findChildren(QtWidgets.QLineEdit)[0]
-            pm = portMonitor(port, baud, mname, protocol, color)
-            pm.monitorOut.connect(self.messageOut)
-            pm.monitorOut.emit(mname.text(), 'white')
-
-        self.serialPortUpdate.connect(portMonitor.updatePortList)
-        self.ui.SavePortMonitor.clicked.connect(self.save_settings)
-        self.ui.LoadPortMonitor.clicked.connect(self.load_settings)
 
         self.showPorts()
 
@@ -170,49 +143,6 @@ class terminal(QtWidgets.QMainWindow):
                     font.setFamily(_fromUtf8("Andale Mono"))
                 font.setPointSize(font.pointSize() - 3)
                 tab.Console.setFont(font)
-
-        # -----------------------------------------------------------------
-        # Transfer / Download tab
-        # -----------------------------------------------------------------
-        self.downloaddir = './'
-
-        def download_app():
-            tab = self.activeTab()
-            if not tab:
-                return
-            send_os.FW_FILE = self.ui.Download_File.text()
-            self.messageOut('\nStarting download...', 'note')
-            tab.console.close()
-            self.ui.progressBar.setValue(0)
-
-            def send_thread():
-                ts = time.time()
-                def notifier(i, mx):
-                    nonlocal ts
-                    if time.time() - ts > 1:
-                        ts = time.time()
-                        self.setProgress.emit(100 * i // mx)
-                if send_os.send_os(tab.console.name, notifier):
-                    self.messageOut('\nDownload successful.', 'note')
-                    self.ui.progressBar.setValue(100)
-                else:
-                    self.messageOut('\nDownload failed.', 'error')
-                    self.ui.progressBar.setValue(0)
-                tab.console.open()
-                tab.connectPort()
-
-            self.setProgress.connect(lambda n: self.ui.progressBar.setValue(n))
-            t = Thread(name='send OS', target=send_thread, daemon=True)
-            t.start()
-
-        def select_file(file):
-            if file[0]:
-                self.ui.Download_File.setText(file[0])
-
-        self.ui.progressBar.setValue(0)
-        self.ui.Start_Download.clicked.connect(download_app)
-        self.ui.Select_Download.clicked.connect(
-            lambda: select_file(QtWidgets.QFileDialog().getOpenFileName()))
 
         # -----------------------------------------------------------------
         # Auto-load on startup
@@ -310,7 +240,7 @@ class terminal(QtWidgets.QMainWindow):
         import subprocess as _sp
         self._subprocess = _sp           # keep reference for _doPing
 
-        box = QtWidgets.QGroupBox('Network', self.ui.Console_tab)
+        box = QtWidgets.QGroupBox('Network', self.Window)
         row = QtWidgets.QHBoxLayout(box)
         row.setContentsMargins(6, 4, 6, 4)
         row.setSpacing(4)
@@ -335,8 +265,8 @@ class terminal(QtWidgets.QMainWindow):
         self._pingDot.setToolTip('Ping status')
         row.addWidget(self._pingDot)
 
-        # Insert before the expanding spacer (index 2 = after groupBox_8 + groupBox_7)
-        self.ui.verticalLayout_3.insertWidget(2, box)
+        # Insert after Tools (groupBox_7 is index 0 in verticalLayout_9)
+        self.ui.verticalLayout_9.insertWidget(1, box)
 
         self._pingResult.connect(self._onPingResult)
 
@@ -513,9 +443,7 @@ class terminal(QtWidgets.QMainWindow):
         self.settings.setValue(self.ui.fileStr.objectName(),  self.ui.fileStr.text())
 
         # Tabs (main left panel) and misc
-        self.settings.setValue(self.ui.Tabs.objectName(),     self.ui.Tabs.currentIndex())
         self.settings.setValue(self.ui.Auto_Load.objectName(), self.ui.Auto_Load.isChecked())
-        self.settings.setValue(self.ui.Download_File.objectName(), self.ui.Download_File.text())
 
         # Port tabs — flat list with pane membership + full splitter tree
         all_tabs = self.portTabs.allTabsWithPane()
@@ -532,13 +460,9 @@ class terminal(QtWidgets.QMainWindow):
         # Ping address
         self.settings.setValue('pingAddr', self._pingAddr.text())
 
-        # Monitor tab
-        portMonitor.save(self.settings)
 
     def load_settings(self):
         try:
-            portMonitor.load(self.settings)
-
             # Shared tool strings
             self.ui.hexStr.setText(   self.settings.value(self.ui.hexStr.objectName()))
             self.ui.textStr1.setText( self.settings.value(self.ui.textStr1.objectName()))
@@ -547,11 +471,8 @@ class terminal(QtWidgets.QMainWindow):
             self.ui.textStr4.setText( self.settings.value(self.ui.textStr4.objectName()))
             self.ui.fileStr.setText(  self.settings.value(self.ui.fileStr.objectName()))
             self.Window.setGeometry(  self.settings.value('Window Geometry'))
-            self.ui.Tabs.setCurrentIndex(self.settings.value(self.ui.Tabs.objectName()))
             self.ui.Auto_Load.setChecked(
                 self.settings.value(self.ui.Auto_Load.objectName(), type=bool))
-            self.ui.Download_File.setText(
-                self.settings.value(self.ui.Download_File.objectName()))
 
             self._pingAddr.setText(self.settings.value('pingAddr', ''))
 
