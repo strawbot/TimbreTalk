@@ -23,7 +23,7 @@ except AttributeError:
     _fromUtf8 = lambda s: s
 
 appname = "TimbreTalk "
-version = "V4"
+version = "V5"
 
 
 class terminal(QtWidgets.QMainWindow):
