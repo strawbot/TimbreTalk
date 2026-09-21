@@ -223,7 +223,11 @@ class PortTab(QtWidgets.QWidget):
                 tab_self.keyin(source.text() + '\n')
 
         self.Console = _Console(self)
-        font = QtGui.QFont("Courier", 12)
+        # "Courier" isn't a real registered family on macOS — Qt has to
+        # populate its whole font-alias table to resolve it, which is slow
+        # and prints a qt.qpa.fonts warning at startup. "Courier New" is an
+        # actual installed family, so it resolves directly.
+        font = QtGui.QFont("Courier New", 12)
         font.setKerning(False)
         self.Console.setFont(font)
 
@@ -343,8 +347,11 @@ class PortTab(QtWidgets.QWidget):
     def _ioError(self, message):
         """May run on the serial reader thread (read errors) or the GUI
         thread (write errors from keyin/_sendCmdLine) — touch nothing but
-        thread-safe operations here and hand off via a real Qt signal."""
-        error(message)
+        thread-safe operations here. Write straight to this tab's own
+        buffer rather than the global note/warning/error routing, which
+        sends to whichever tab currently has GUI focus — not necessarily
+        this one — and would misattribute the message to the wrong port."""
+        self._textBuffer.append(('\n' + message + '\n', QtGui.QColor('tomato')))
         was_telnet = isinstance(self.console, TelnetPort)
         name = self.console.name
         self.console.close()
@@ -405,11 +412,15 @@ class PortTab(QtWidgets.QWidget):
                         self.console.ioError.connect(self._ioError)
                         self.console.ioException.connect(self._ioError)
                         self.connectPort()
+                        self._textBuffer.append((
+                            '\n[Opened %s at %d]\n' % (name, rate),
+                            QtGui.QColor('springgreen')))
                     else:
                         self.PortSelect.setCurrentIndex(0)
                         self.noConsole()
                 except Exception as e:
-                    error('port open failed: %s' % e)
+                    self._textBuffer.append((
+                        '\n[port open failed: %s]\n' % e, QtGui.QColor('tomato')))
                     self.PortSelect.setCurrentIndex(0)
                     self.noConsole()
                 finally:

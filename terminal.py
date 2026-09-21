@@ -201,7 +201,7 @@ class Ui_Frame(object):
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.PlaceholderText, brush)
         self.Console.setPalette(palette)
         font = QtGui.QFont()
-        font.setFamily("Courier")
+        font.setFamily("Courier New")
         font.setPointSize(12)
         font.setBold(False)
         font.setItalic(False)

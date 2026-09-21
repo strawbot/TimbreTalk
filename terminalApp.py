@@ -43,6 +43,12 @@ class terminal(QtWidgets.QMainWindow):
         self.ui.Console = QtWidgets.QPlainTextEdit(self.Window)
 
         self.ui.setupUi(self.Window)
+        # terminal.py (generated) sets this stub's font to "Courier", which
+        # isn't a real registered family on macOS and makes Qt populate its
+        # whole font-alias table at startup (the qt.qpa.fonts warning).
+        # Override with an actually-installed family; the widget is hidden
+        # below anyway.
+        self.ui.Console.setFont(QtGui.QFont("Courier New", 12))
         self.banner()
         self.Window.show()
 
@@ -129,6 +135,9 @@ class terminal(QtWidgets.QMainWindow):
         self.downloaddir = './'
         self.ui.FileSelect.clicked.connect(
             lambda: paste_file(QtWidgets.QFileDialog().getOpenFileName(directory=self.downloaddir)))
+
+        self.ui.SavePortMonitor.clicked.connect(self.save_settings)
+        self.ui.LoadPortMonitor.clicked.connect(self.load_settings)
 
         self.showPorts()
 
