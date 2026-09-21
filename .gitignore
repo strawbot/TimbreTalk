@@ -7,3 +7,4 @@ tt.spec
 netifaces
 .idea
 *.autosave
+venv

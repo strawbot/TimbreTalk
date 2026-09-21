@@ -31,6 +31,7 @@ class terminal(QtWidgets.QMainWindow):
     serialPortUpdate = QtCore.pyqtSignal(object)
     settings         = QtCore.QSettings("TWE", "Tiny Timbre Talk")
     _pingResult      = QtCore.pyqtSignal(bool, str)   # (success, rtt_or_error)
+    _messageSignal   = QtCore.pyqtSignal(str, str)    # note/warning/error -> GUI thread
 
     def __init__(self):
         super(terminal, self).__init__()
@@ -76,6 +77,7 @@ class terminal(QtWidgets.QMainWindow):
         self.serialHub.whofrom = pids.MAIN_HOST
         self.serialHub.update.connect(self._showPortUpdate)
         self.showPortSignal.connect(self.showPorts)
+        self._messageSignal.connect(self._doMessageOut)
 
         # -----------------------------------------------------------------
         # First port tab
@@ -223,6 +225,14 @@ class terminal(QtWidgets.QMainWindow):
     # =====================================================================
 
     def messageOut(self, text, style=''):
+        """note()/warning()/error() land here from any thread (e.g. the
+        background serial reader/poller threads on disconnect) — emit a real
+        Qt signal so the actual widget lookup below always runs on the GUI
+        thread instead of touching Qt/AppKit off-thread (which can hang the
+        app with a spinning beachball on macOS)."""
+        self._messageSignal.emit(text, style)
+
+    def _doMessageOut(self, text, style=''):
         tab = self.activeTab()
         if tab:
             tab.messageOut(text, style)

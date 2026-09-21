@@ -57,6 +57,12 @@ class PortTab(QtWidgets.QWidget):
     _telnetConnectResultSignal = QtCore.pyqtSignal(bool)
     _telnetDroppedSignal       = QtCore.pyqtSignal()
 
+    # Internal: serial port dropped unexpectedly (read/write error) — carries
+    # the port name so the GUI thread can start the reconnect countdown even
+    # when the Hub's poll cycle never notices the device going missing (e.g.
+    # a fast replug that lands on the same device path).
+    _serialDroppedSignal = QtCore.pyqtSignal(str)
+
     RECONNECT_TIMEOUT  = 10.0   # seconds to wait for port to reappear
     RECONNECT_INTERVAL = 500    # ms between re-checks
 
@@ -78,9 +84,10 @@ class PortTab(QtWidgets.QWidget):
         # it from the front of the first incoming data chunk(s).
         self._echoFilter = ''
 
-        # Monitor mode: cache mode flag (safe to read from background threads)
-        # and stateful decode buffers.
-        self._monitorMode = False
+        # Monitor mode: cache mode flag and decode selection (safe to read
+        # from background threads) plus stateful decode buffers.
+        self._monitorMode   = False
+        self._monitorDecode = 'ASCII'
         self._dcpHold     = bytearray()
         try:
             from protocols.alert2_decode import checkAlert2 as _checkAlert2
@@ -118,6 +125,7 @@ class PortTab(QtWidgets.QWidget):
         self._reconnectResultSignal.connect(self._onReconnectResult)
         self._telnetConnectResultSignal.connect(self._onTelnetConnectResult)
         self._telnetDroppedSignal.connect(self._onTelnetDropped)
+        self._serialDroppedSignal.connect(self._onSerialDropped)
 
     # ------------------------------------------------------------------
     # UI construction
@@ -286,6 +294,7 @@ class PortTab(QtWidgets.QWidget):
         self.BaudRate.activated.connect(self.selectRate)
         self.BaudRate.currentIndexChanged.connect(self.selectRate)
         self.ConsoleColor.activated.connect(self.setColor)
+        self._monitorDecodeCombo.currentIndexChanged.connect(self._selectMonitorDecode)
         self._connectBtn.clicked.connect(self._toggleTelnet)
         self._telnetHost.returnPressed.connect(self._connectTelnet)
         self._telnetTcpPort.returnPressed.connect(self._connectTelnet)
@@ -332,11 +341,31 @@ class PortTab(QtWidgets.QWidget):
         self.console = Port(name='notalk')
 
     def _ioError(self, message):
+        """May run on the serial reader thread (read errors) or the GUI
+        thread (write errors from keyin/_sendCmdLine) — touch nothing but
+        thread-safe operations here and hand off via a real Qt signal."""
         error(message)
         was_telnet = isinstance(self.console, TelnetPort)
+        name = self.console.name
         self.console.close()
         if was_telnet:
             self._telnetDroppedSignal.emit()
+        else:
+            self._serialDroppedSignal.emit(name)
+
+    def _onSerialDropped(self, name):
+        """GUI thread: a serial port closed unexpectedly (read/write error).
+
+        Starts the same reconnect countdown as updatePortList() uses, since
+        the Hub's poll loop can miss a fast replug entirely (the device
+        re-enumerates under the same name before the next poll), leaving
+        the combo showing the port as still selected while self.console is
+        actually the dead, closed object.
+        """
+        if self._reconnecting or self._isTelnetMode():
+            return
+        if name and name != 'notalk':
+            self._startReconnect(name)
 
     def selectPort(self):
         if self._isTelnetMode():
@@ -429,6 +458,10 @@ class PortTab(QtWidgets.QWidget):
             error(prot + ' is not accounted for')
         self._monitorMode = (prot == 'Monitor')
         self._updateControlsVisibility()
+
+    def _selectMonitorDecode(self):
+        """GUI-thread slot: cache the decode combo's value for background reads."""
+        self._monitorDecode = self._monitorDecodeCombo.currentText()
 
     def setColor(self):
         self.color = QtGui.QColor(COLOR_MAP[self.ConsoleColor.currentText()])
@@ -699,12 +732,13 @@ class PortTab(QtWidgets.QWidget):
     def _applyMonitorDecode(self, data):
         """Translate raw bytes using the selected Monitor decode option.
 
-        Called from the serial reader thread — only reads GUI state via the
-        combo's currentText() which is safe for simple reads.
+        Called from the serial reader thread — reads _monitorDecode, a plain
+        str cached on the GUI thread by _selectMonitorDecode(), instead of
+        touching the QComboBox directly (illegal cross-thread widget access).
 
         Returns a str to display, or '' to suppress output entirely.
         """
-        decode = self._monitorDecodeCombo.currentText()
+        decode = self._monitorDecode
         try:
             if decode == 'ASCII':
                 from protocols.utilities import asciify
