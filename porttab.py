@@ -344,6 +344,11 @@ class PortTab(QtWidgets.QWidget):
         self.protocol.inner.unplug()
         self.console = Port(name='notalk')
 
+    def releasePort(self):
+        """Give up ownership of the shared SerialPort (tab closed/replaced)."""
+        if getattr(self.console, 'owner', None) is self:
+            self.console.owner = None
+
     def _ioError(self, message):
         """May run on the serial reader thread (read errors) or the GUI
         thread (write errors from keyin/_sendCmdLine) — touch nothing but
@@ -400,8 +405,23 @@ class PortTab(QtWidgets.QWidget):
                 self.portChanged.emit()
                 return
 
+            # The hub hands every tab the same SerialPort object for a name,
+            # and its signals hold one callback each, so a second tab on the
+            # same port would silently rewire the first (it looks connected
+            # but receives nothing). Refuse instead.
+            owner = getattr(port, 'owner', None)
+            if owner is not None and owner is not self and owner.console is port:
+                self._textBuffer.append((
+                    '\n[%s is already open in another tab]\n' % name,
+                    QtGui.QColor('orange')))
+                self.PortSelect.setCurrentIndex(0)
+                self.noConsole()
+                self.portChanged.emit()
+                return
+
             self.PortSelect.setDisabled(True)
             self.console = port
+            port.owner = self
             rate = self.rate()          # capture on GUI thread before spawning
             self._lastRate = rate
 
@@ -590,6 +610,7 @@ class PortTab(QtWidgets.QWidget):
         # (SerialPort.open() sleeps 100 ms, so we don't block the GUI).
         self._reconnectTimer.stop()
         self.console = port
+        port.owner = self
         rate = self._reconnectRate
         def do_open():
             try:

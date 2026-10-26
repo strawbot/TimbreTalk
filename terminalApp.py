@@ -78,7 +78,8 @@ class terminal(QtWidgets.QMainWindow):
         # -----------------------------------------------------------------
         # Serial hub (shared across all tabs)
         # -----------------------------------------------------------------
-        self.portlistMutex = QtCore.QMutex()
+        self._showingPorts   = False   # showPorts() re-entrancy guard
+        self._showPortsAgain = False
         self.serialHub = serialHub.SerialHub()
         self.serialHub.whofrom = pids.MAIN_HOST
         self.serialHub.update.connect(self._showPortUpdate)
@@ -217,6 +218,8 @@ class terminal(QtWidgets.QMainWindow):
         tab = pane.widget(local_idx)
         if isinstance(tab, PortTab) and tab.console.is_open():
             tab.console.close()
+        if isinstance(tab, PortTab):
+            tab.releasePort()
         pane.removeTab(local_idx)
         if pane.count() == 0 and self.portTabs.paneCount() > 1:
             self.portTabs.removePane(pane)
@@ -333,15 +336,29 @@ class terminal(QtWidgets.QMainWindow):
         self.showPortSignal.emit()
 
     def showPorts(self):
-        self.portlistMutex.lock()
+        """Refresh every tab's port list (GUI thread only).
+
+        updatePortList() can start a reconnect, whose portChanged signal
+        calls straight back into showPorts() on this same thread. A
+        non-recursive lock there deadlocks the whole GUI (beachball), so
+        nested calls just flag a re-run once the current pass finishes.
+        """
+        if self._showingPorts:
+            self._showPortsAgain = True
+            return
+        self._showingPorts = True
         try:
-            ports = [p.name for p in self.serialHub.all_ports()]
-            for tab, _lbl in self.portTabs.allTabs():
-                if isinstance(tab, PortTab):
-                    tab.updatePortList(ports)
-            self.serialPortUpdate.emit(ports)
+            while True:
+                self._showPortsAgain = False
+                ports = [p.name for p in self.serialHub.all_ports()]
+                for tab, _lbl in self.portTabs.allTabs():
+                    if isinstance(tab, PortTab):
+                        tab.updatePortList(ports)
+                self.serialPortUpdate.emit(ports)
+                if not self._showPortsAgain:
+                    break
         finally:
-            self.portlistMutex.unlock()
+            self._showingPorts = False
 
     # =====================================================================
     # Keyboard / event filter  (routes to active tab)
@@ -507,6 +524,7 @@ class terminal(QtWidgets.QMainWindow):
                 for c in closers: c.join(timeout=3.0)   # cap wait per port
             for tab, _ in all_existing:
                 if isinstance(tab, PortTab):
+                    tab.releasePort()
                     tab.deleteLater()
 
             # Rebuild the pane layout from scratch
